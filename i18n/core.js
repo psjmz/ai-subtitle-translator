@@ -21,12 +21,15 @@ const UI_LANGS = [['en','English'], ['zh-CN','简体中文'], ['zh-TW','繁體�
    不在这个表里的语言走分片，缺键回落英文 —— 见 t()。 */
 const UI27 = ['zh-CN','zh-TW','en','ja','es','pt','ko','de','fr','id','hi','th','vi','ru','it','ar','tr','nl','pl','sv','cs','uk','da','fi','el','he','ro'];
 
-/* v0.9.339：只有这 27 种语言有本地化页面（server.js 的 SEO_LANGS 与之路由一一对应）。
-   新增的 73 种界面语言目前只做到「界面可切换」，页面 URL 还没有对应版本 → 一律回 /，
-   否则点 logo 或切语言时地址栏写成 /ms/ 会直接 404。等 SEO 表补齐、SEO_LANGS 开到 100 后
-   把这里的判断换成 SEO 名单即可。 */
+/* v0.9.410：100 种语言的本地化页面都已经上线（server.js 的 SEO_LANGS 开到 100，
+   实测 /ms/ /fil/ /yue/ /ceb/ /bo/ /mi/ 全部 200），所以这里不再按 27 语判断。
+   按 27 语判断的后果：从 /ms/ 点左上 logo 会掉回中文首页，语言版之间也互相跳不回去。
+   ⚠️ 只认 UI_LANGS 里登记过的代码：用户手改 UI.lang 或外链带怪参数时仍然回 /，
+      不去拼一个必然 404 的地址。 */
+const UI_HAS_PAGE = {};
+for (let _i = 0; _i < UI_LANGS.length; _i++) UI_HAS_PAGE[UI_LANGS[_i][0]] = 1;
 function uiHref(lang) {
-  return (lang && lang !== 'zh-CN' && UI27.indexOf(lang) >= 0) ? '/' + lang + '/' : '/';
+  return (lang && lang !== 'zh-CN' && UI_HAS_PAGE[lang] === 1) ? '/' + lang + '/' : '/';
 }
 
 

@@ -158,7 +158,7 @@
     ml: { href: '/multilang.html', name: 'navMl',   desc: 'tcMlD', c: '#3730A3', bg: '#EEF0FE', ic: 'ml' },
     /* v0.9.323：使用指南 —— 内容页索引（/guides/），顶栏直出，不进 Mega 分组 */
     gd: { href: '/guides/',        name: 'navGuide' },
-    /* v0.9.409：第二十二个工具 —— KTV 字幕制作（霓虹洋红 #DB2777，全站无人使用；
+    /* v0.9.410：第二十二个工具 —— KTV 字幕制作（霓虹洋红 #DB2777，全站无人使用；
        简繁转换是靛紫 #5B21B6、歌词打轴是酒红 #9D174D，三色拉开距离）。
        注意：302~370 这段历史教训是「只挂首页一条链接 = 把工具藏起来」，
        所以 TOOLS / GROUPS / ICONS 三处必须一次加齐。 */

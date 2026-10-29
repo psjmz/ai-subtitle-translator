@@ -1,0 +1,7091 @@
+'use strict';
+const C = window.SrtCore;
+/* v0.9.277：本页文件名 —— 切界面语言要改写 URL 用（不能写成 '/'，那是落地页） */
+const SELF_PAGE = 'translate.html';
+
+/* ---------------- 常量与状态 ---------------- */
+/* 服务商预设（v0.9.30）：海外/国内头部 + 其他，全部 OpenAI 兼容端点；模型由用户自填 */
+const PROVIDERS = [
+  { id:'openai',     name:'OpenAI',            base:'https://api.openai.com/v1',                                       keyUrl:'https://platform.openai.com/api-keys' },
+  { id:'anthropic',  name:'Anthropic Claude',  base:'https://api.anthropic.com/v1',                                    keyUrl:'https://console.anthropic.com/settings/keys' },
+  { id:'gemini',     name:'Google Gemini',     base:'https://generativelanguage.googleapis.com/v1beta/openai',         keyUrl:'https://aistudio.google.com/apikey' },
+  { id:'xai',        name:'xAI Grok',          base:'https://api.x.ai/v1',                                             keyUrl:'https://console.x.ai' },
+  { id:'openrouter', name:'OpenRouter', zhName:'OpenRouter（聚合百模）', base:'https://openrouter.ai/api/v1',                                 keyUrl:'https://openrouter.ai/settings/keys', note:'noteOpenRouter' },
+  { id:'deepseek',   name:'DeepSeek', zhName:'DeepSeek（推荐）', note:'noteDeepSeek',   base:'https://api.deepseek.com',                                        keyUrl:'https://platform.deepseek.com/api_keys' },
+  { id:'qwen',       name:'Qwen (Alibaba)', zhName:'阿里通义千问',       base:'https://dashscope.aliyuncs.com/compatible-mode/v1',              keyUrl:'https://bailian.console.aliyun.com/?apiKey=1' },
+  { id:'glm',        name:'Zhipu GLM', zhName:'智谱 GLM',          base:'https://open.bigmodel.cn/api/paas/v4',                            keyUrl:'https://open.bigmodel.cn/usercenter/apikeys' },
+  /* v0.9.232：Z.AI 是智谱的海外站（同为 GLM 系）。⚠️ 它的网关不放行 CORS 预检
+     （OPTIONS 不返回 Access-Control-Allow-*），浏览器直连必抛 Failed to fetch
+     ——选它时必须勾选「由本站服务器转发」。 */
+  { id:'zai',        name:'Z.AI (GLM Overseas)', zhName:'Z.AI（智谱 GLM 海外版）', base:'https://api.z.ai/api/paas/v4',                         keyUrl:'' },
+  { id:'kimi',       name:'Moonshot Kimi', zhName:'月之暗面 Kimi',      base:'https://api.moonshot.cn/v1',                                      keyUrl:'https://platform.moonshot.cn/console/api-keys' },
+  { id:'doubao',     name:'Doubao (Volcengine Ark)', zhName:'字节豆包（火山方舟）', base:'https://ark.cn-beijing.volces.com/api/v3',                      keyUrl:'https://console.volcengine.com/ark', note:'noteDoubao' },
+  { id:'siliconflow',name:'SiliconFlow', zhName:'硅基流动 SiliconFlow', base:'https://api.siliconflow.cn/v1',                                keyUrl:'https://cloud.siliconflow.cn/account/ak' },
+  { id:'custom',     name:'',                    base:'', keyUrl:'' }   /* 自定义：不覆盖已填值 */
+];
+/* 站点内置免费模型（后台配置）：免 Key、OpenAI 兼容；匿名有速率限制 */
+/* 默认模型（站点后端 /api/translate 代理，管理员在 admin.html 配置） */
+const BUILTIN_API = '/api/translate';
+/* v0.9.232：自定义 API 的「服务端转发」端点。勾选「由本站服务器转发」后，
+   请求不再由浏览器直连第三方端点，而是发到本站、由 server.js 用与内置通道同一套
+   callModel 代发（解决端点不放行 CORS 预检 / 用户网络不通两类死局）。 */
+const RELAY_API = '/api/proxy';
+let BUILTIN_INFO = { configured: false, label: '', perIpDaily: 0, globalDaily: 0, usedToday: 0 };
+async function refreshBuiltinHint(){
+  const el=$('builtinHint'); if(!el) return;
+  let shown=false;
+  try{
+    const r=await fetch('/api/model-info');
+    if(r.ok){
+      BUILTIN_INFO=await r.json(); shown=true;
+    }
+  }catch(e){ /* 后端不可用（如本地直接打开文件） */ }
+  if(!shown){ BUILTIN_INFO={configured:false,label:'',perIpDaily:0,globalDaily:0,usedToday:0}; }
+  el.textContent = BUILTIN_INFO.configured
+    ? t('builtinOn', BUILTIN_INFO.label, BUILTIN_INFO.perIpDaily>0 ? BUILTIN_INFO.perIpDaily : '∞')
+    : t('builtinOff');
+}
+/* ---------------- 累计统计（v0.9.212 / v0.9.213 / v0.9.215）----------------
+   口径（服务端账本，见 server.js bumpStats）：
+   - 服务用户 = 去重 IP 数；字幕数 = 经服务端跑过的翻译任务数（同任务重发不重复加）
+   - Token = 累计 tkIn + tkOut（含缓存命中）
+   自带 Key 的翻译不经服务端，不计入。数据只读服务端账本，不在浏览器算统计。
+   v0.9.213：展示位置从工作台顶栏移到**首页数字带**（首页左 2 格是产品能力、细线分隔、
+   右 3 格是本组真实使用量）——社会证明属于营销页，工具界面不摆。
+   每 30 分钟拉一次；数字变了那格闪一下。拉取失败保持上一次的值（不闪、不清零）。 */
+const STATS_EVERY_MS = 30 * 60 * 1000;
+let statsTimer = null, statsLast = null, statsRaw = null, statsTickLast = null;
+/* 中文用万/亿，英文用 K/M/B —— 跟随界面语言，避免 1284 写成 "1,284" 还是 "1.2千" 的观感问题 */
+function fmtCount(n, lang){
+  n = Number(n) || 0;
+  const zh = /^zh|^ja$|^ko$/.test(lang || 'zh-CN');
+  if (n < 10000) return n.toLocaleString(lang || 'zh-CN');
+  if (zh){
+    if (n < 100000000) return (n/10000).toFixed(n < 100000 ? 1 : 0).replace(/\.0$/,'') + '万';
+    return (n/100000000).toFixed(1).replace(/\.0$/,'') + '亿';
+  }
+  if (n < 1000000)   return (n/1000).toFixed(n < 10000 ? 1 : 0).replace(/\.0$/,'') + 'K';
+  if (n < 1000000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
+  return (n/1000000000).toFixed(1).replace(/\.0$/,'') + 'B';
+}
+function paintStats(s){
+  /* 位置：首页数字带右三格（v0.9.213 从顶栏搬下来）。数字带是首页既有的社会证明区，
+     工具顶栏摆「累计 Token」对访客无意义、抢主按钮的注意力。 */
+  /* 顺手留一份原始值：切界面语言时要按新语言重排，重排不能重新请求接口。
+     放在 paintStats 里（而不是只在 refreshStats 里）→ 任何调用路径都会同步到这份缓存。 */
+  statsRaw = s;
+  /* 用界面语言（UI.lang），不是目标字幕语言（curLang）——后者是译文语言，与数字排版无关 */
+  const lang = (typeof UI !== 'undefined' && UI && UI.lang) ? UI.lang : 'zh-CN';
+  const vals = { ldUsers: fmtCount(s.users, lang), ldSubs: fmtCount(s.subs, lang), ldTok: fmtCount(s.tokens, lang) };
+  for (const id in vals){
+    const el = $(id); if(!el) continue;
+    const old = el.textContent;
+    el.textContent = vals[id];
+    /* 只有真变了才闪：初次填充（old 是占位符 —）不算「数字变了」 */
+    if (statsLast && old !== vals[id]){
+      el.classList.add('bump');
+      setTimeout(()=>{ try{ el.classList.remove('bump'); }catch(e){} }, 900);
+    }
+  }
+  statsLast = vals;
+  /* 顶栏滚动播报与首页数字带同源：同一次接口、同一份 statsRaw */
+  if (typeof buildTicker === 'function') buildTicker();
+}
+async function refreshStats(){
+  try{
+    const r = await fetch('/api/stats', { cache:'no-store' });
+    if (r && r.ok){ statsRaw = await r.json(); paintStats(statsRaw); }
+  }catch(e){ /* 拿不到就保持旧值，不清零 */ }
+}
+/* v0.9.214：工作台顶栏滚动播报。内容与首页数字带同源（同一个 statsRaw、同一次请求）。
+   做法：把「一段内容」生成两遍并排，动画从 0 走到 -50%，两段严丝合缝 → 循环无接缝。
+   时长按一段的实际像素宽算（每秒约 28px），字多字少都不会快到看不清。
+   两遍不是「刷新就重建」：只有数字真变了才重排，否则动画会从头跳。 */
+function tickerText(){
+  if (!statsRaw) return '';
+  const lang = (typeof UI !== 'undefined' && UI && UI.lang) ? UI.lang : 'zh-CN';
+  const u = fmtCount(statsRaw.users, lang), s = fmtCount(statsRaw.subs, lang), k = fmtCount(statsRaw.tokens, lang);
+  /* 词条是纯文本，只含 {0}。要强调数字又不能把 HTML 塞进词条（t() 返回纯字符串，标签会原样显示）。
+     做法：先算出「格式化后的确切字符串」，再用 split(该字符串) 定位并包 <b>。
+     不用正则去猜数字长什么样 —— 各语言千分位不同（de 是 2.464、ru 是窄空格 2 464、en 是 2,464），
+     正则一猜就出错（实测俄语被拆成两段、尾随空格被包进去）。 */
+  const item = (key, val) => '<span class="tk-item">' + t(key, val).split(val).join('<b>' + val + '</b>') + '</span>';
+  return item('tickServed', u) + '<i class="tk-sep">·</i>' +
+         item('tickSubs', s)   + '<i class="tk-sep">·</i>' +
+         item('tickToken', k);
+}
+function buildTicker(){
+  const box = $('ticker'), track = $('tkTrack');
+  if (!box || !track) return;
+  const one = tickerText();
+  if (!one){ box.hidden = true; return; }
+  box.hidden = false;
+  /* v0.9.215：静态一行（此前是滚动长卷）。随之简化——只写一遍、不算动画时长。
+     数字变化时给上色闪一下：静态下也保留，作为「数据是活的」提示（30 分钟刷新一次）。 */
+  track.innerHTML = one;
+  const marks = track.querySelectorAll('b');
+  for (let i = 0; i < marks.length; i++){
+    if (statsTickLast && statsTickLast[i] !== undefined && statsTickLast[i] !== marks[i].textContent){
+      marks[i].classList.add('upd');
+      (function(m){ setTimeout(()=>{ try{ m.classList.remove('upd'); }catch(e){} }, 900); })(marks[i]);
+    }
+  }
+  statsTickLast = Array.prototype.map.call(marks, m => m.textContent);
+}
+/* 切界面语言后重排：只换排版，不重新拉接口。
+   数字从 DOM 现有文本反解不靠谱（万/亿 与 K/M/B 互推有损），所以以 statsRaw 为准；
+   它在 refreshStats 成功后必然有值。若还没拉到（比如接口失败），保持原样即可。 */
+function repaintStats(){
+  if (!statsRaw) return;
+  paintStats(statsRaw);
+  buildTicker();     /* 播报里的文案也要按新语言重排 */
+}
+function startStats(){
+  if (statsTimer) return;
+  refreshStats();
+  statsTimer = setInterval(refreshStats, STATS_EVERY_MS);
+  /* v0.9.215：播报改成静态后不再需要 resize 重算动画时长（CSS 截尾自适应），
+     此前为滚动长卷加的 rAF 节流重算已随之删除。 */
+}
+/* ---------------- 语言 / 风格配置 ---------------- */
+const LANGS = [
+  { v:'en',    zh:'English', en:'English',          file:'英文',   prompt:'English' },
+  { v:'zh-CN', zh:'简体中文', en:'Chinese',          file:'中文',   prompt:'简体中文 (Simplified Chinese)' },
+  { v:'zh-TW', zh:'繁體中文', en:'Chinese (Trad.)',          file:'繁体中文',prompt:'繁體中文 (Traditional Chinese)' },
+  { v:'ja',    zh:'日本語', en:'Japanese',            file:'日文',   prompt:'Japanese' },
+  { v:'ko',    zh:'한국어', en:'Korean',            file:'韩文',   prompt:'Korean' },
+  { v:'fr',    zh:'Français', en:'French',         file:'法文',   prompt:'French' },
+  { v:'de',    zh:'Deutsch', en:'German',          file:'德文',   prompt:'German' },
+  { v:'es',    zh:'Español', en:'Spanish',          file:'西文',   prompt:'Spanish' },
+  { v:'pt',    zh:'Português', en:'Portuguese',        file:'葡文',   prompt:'Portuguese' },
+  { v:'it',    zh:'Italiano', en:'Italian',         file:'意文',   prompt:'Italian' },
+  { v:'ru',    zh:'Русский', en:'Russian',          file:'俄文',   prompt:'Russian' },
+  { v:'ar',    zh:'العربية', en:'Arabic',          file:'阿文',   prompt:'Arabic' },
+  { v:'th',    zh:'ไทย', en:'Thai',              file:'泰文',   prompt:'Thai' },
+  { v:'vi',    zh:'Tiếng Việt', en:'Vietnamese',       file:'越文',   prompt:'Vietnamese' },
+  { v:'id',    zh:'Bahasa Indonesia', en:'Indonesian', file:'印尼文', prompt:'Indonesian' },
+  { v:'hi',    zh:'हिन्दी', en:'Hindi',            file:'印地文', prompt:'Hindi' },
+  { v:'tr',    zh:'Türkçe', en:'Turkish',           file:'土文',   prompt:'Turkish' },
+  { v:'pl',    zh:'Polski', en:'Polish',           file:'波兰文', prompt:'Polish' },
+  { v:'nl',    zh:'Nederlands', en:'Dutch',       file:'荷兰文', prompt:'Dutch' },
+  { v:'ms',    zh:'Bahasa Melayu', en:'Malay',    file:'马来文', prompt:'Malay' },
+  { v:'fil',   zh:'Filipino', en:'Filipino',         file:'菲律宾文',prompt:'Filipino (Tagalog)' },
+  { v:'fa',    zh:'فارسی', en:'Persian',            file:'波斯文', prompt:'Persian (Farsi)' },
+
+  /* v0.9.110：26 种新语言（北欧 / 中东欧 / 希腊·西里尔 / 中东 / 南亚 / 东南亚 / 东非）。
+     每种都同步了四处：① 这里的显示名与文件名 ② MAXW_BY_LANG 折行阈值 ③ EX_SAMPLE 真实译文
+     ④ srt-core.js 的 INK_RATIO / REC_ASS_SIZE / INK_DESC（headless canvas 实测字形）*/
+  { v:'sv', zh:'Svenska', en:'Swedish', file:'瑞典文', prompt:'Swedish' },
+  { v:'da', zh:'Dansk', en:'Danish', file:'丹麦文', prompt:'Danish' },
+  { v:'fi', zh:'Suomi', en:'Finnish', file:'芬兰文', prompt:'Finnish' },
+  { v:'nb', zh:'Norsk bokmål', en:'Norwegian', file:'挪威文', prompt:'Norwegian Bokmål' },
+  { v:'cs', zh:'Čeština', en:'Czech', file:'捷克文', prompt:'Czech' },
+  { v:'sk', zh:'Slovenčina', en:'Slovak', file:'斯洛伐克文', prompt:'Slovak' },
+  { v:'hu', zh:'Magyar', en:'Hungarian', file:'匈牙利文', prompt:'Hungarian' },
+  { v:'ro', zh:'Română', en:'Romanian', file:'罗马尼亚文', prompt:'Romanian' },
+  { v:'ca', zh:'Català', en:'Catalan', file:'加泰罗尼亚文', prompt:'Catalan' },
+  { v:'hr', zh:'Hrvatski', en:'Croatian', file:'克罗地亚文', prompt:'Croatian' },
+  { v:'el', zh:'Ελληνικά', en:'Greek', file:'希腊文', prompt:'Greek' },
+  { v:'uk', zh:'Українська', en:'Ukrainian', file:'乌克兰文', prompt:'Ukrainian' },
+  { v:'sr', zh:'Српски', en:'Serbian', file:'塞尔维亚文', prompt:'Serbian' },
+  { v:'bg', zh:'Български', en:'Bulgarian', file:'保加利亚文', prompt:'Bulgarian' },
+  { v:'he', zh:'עברית', en:'Hebrew', file:'希伯来文', prompt:'Hebrew' },
+  { v:'ur', zh:'اردو', en:'Urdu', file:'乌尔都文', prompt:'Urdu' },
+  { v:'bn', zh:'বাংলা', en:'Bengali', file:'孟加拉文', prompt:'Bengali' },
+  { v:'ta', zh:'தமிழ்', en:'Tamil', file:'泰米尔文', prompt:'Tamil' },
+  { v:'te', zh:'తెలుగు', en:'Telugu', file:'泰卢固文', prompt:'Telugu' },
+  { v:'mr', zh:'मराठी', en:'Marathi', file:'马拉地文', prompt:'Marathi' },
+  { v:'ne', zh:'नेपाली', en:'Nepali', file:'尼泊尔文', prompt:'Nepali' },
+  { v:'si', zh:'සිංහල', en:'Sinhala', file:'僧伽罗文', prompt:'Sinhala' },
+  { v:'my', zh:'မြန်မာ', en:'Burmese', file:'缅甸文', prompt:'Burmese (Myanmar)' },
+  { v:'km', zh:'ខ្មែរ', en:'Khmer', file:'高棉文', prompt:'Khmer (Cambodian)' },
+  { v:'lo', zh:'ລາວ', en:'Lao', file:'老挝文', prompt:'Lao' },
+  { v:'sw', zh:'Kiswahili', en:'Swahili', file:'斯瓦希里文', prompt:'Swahili' },
+
+  /* v0.9.112：27 种新语言（南亚 / 中亚 / 欧洲 / 中东非洲）。
+     同步四处：① 这里的显示名与文件名 ② MAXW_BY_LANG 折行阈值
+     ③ EX_SAMPLE 真实译文 ④ srt-core.js 的 INK_RATIO / REC_ASS_SIZE / INK_DESC。
+     字形度量采 headless canvas 实测：校验组 th/hi/te/my/lo/he 完全复现既有值，
+     as 与 bn 同孟加拉文、ps/ku 与 ar 同阿拉伯字母，直接沿用既有值保持一致。*/
+  { v:'gu', zh:'ગુજરાતી', en:'Gujarati', file:'古吉拉特文', prompt:'Gujarati' },
+  { v:'kn', zh:'ಕನ್ನಡ', en:'Kannada', file:'卡纳达文', prompt:'Kannada' },
+  { v:'ml', zh:'മലയാളം', en:'Malayalam', file:'马拉雅拉姆文', prompt:'Malayalam' },
+  { v:'pa', zh:'ਪੰਜਾਬੀ', en:'Punjabi', file:'旁遮普文', prompt:'Punjabi (Gurmukhi)' },
+  { v:'or', zh:'ଓଡ଼ିଆ', en:'Odia', file:'奥里亚文', prompt:'Odia (Oriya)' },
+  { v:'as', zh:'অসমীয়া', en:'Assamese', file:'阿萨姆文', prompt:'Assamese' },
+  { v:'kk', zh:'Қазақша', en:'Kazakh', file:'哈萨克文', prompt:'Kazakh' },
+  { v:'uz', zh:'O‘zbekcha', en:'Uzbek', file:'乌兹别克文', prompt:'Uzbek' },
+  { v:'mn', zh:'Монгол', en:'Mongolian', file:'蒙古文', prompt:'Mongolian' },
+  { v:'az', zh:'Azərbaycan', en:'Azerbaijani', file:'阿塞拜疆文', prompt:'Azerbaijani' },
+  { v:'is', zh:'Íslenska', en:'Icelandic', file:'冰岛文', prompt:'Icelandic' },
+  { v:'et', zh:'Eesti', en:'Estonian', file:'爱沙尼亚文', prompt:'Estonian' },
+  { v:'lv', zh:'Latviešu', en:'Latvian', file:'拉脱维亚文', prompt:'Latvian' },
+  { v:'lt', zh:'Lietuvių', en:'Lithuanian', file:'立陶宛文', prompt:'Lithuanian' },
+  { v:'sl', zh:'Slovenščina', en:'Slovenian', file:'斯洛文尼亚文', prompt:'Slovenian' },
+  { v:'sq', zh:'Shqip', en:'Albanian', file:'阿尔巴尼亚文', prompt:'Albanian' },
+  { v:'mk', zh:'Македонски', en:'Macedonian', file:'马其顿文', prompt:'Macedonian' },
+  { v:'eu', zh:'Euskara', en:'Basque', file:'巴斯克文', prompt:'Basque' },
+  { v:'gl', zh:'Galego', en:'Galician', file:'加利西亚文', prompt:'Galician' },
+  { v:'am', zh:'አማርኛ', en:'Amharic', file:'阿姆哈拉文', prompt:'Amharic' },
+  { v:'ha', zh:'Hausa', en:'Hausa', file:'豪萨文', prompt:'Hausa' },
+  { v:'yo', zh:'Yorùbá', en:'Yoruba', file:'约鲁巴文', prompt:'Yoruba' },
+  { v:'zu', zh:'isiZulu', en:'Zulu', file:'祖鲁文', prompt:'Zulu' },
+  { v:'so', zh:'Soomaali', en:'Somali', file:'索马里文', prompt:'Somali' },
+  { v:'ps', zh:'پښتو', en:'Pashto', file:'普什图文', prompt:'Pashto' },
+  { v:'ku', zh:'کوردی', en:'Kurdish', file:'库尔德文', prompt:'Kurdish (Sorani)' },
+  { v:'af', zh:'Afrikaans', en:'Afrikaans', file:'南非荷兰文', prompt:'Afrikaans' },
+
+  /* v0.9.338：25 种新语言（75 → 100）。与前两批同样同步四处：
+     ① 这里的显示名与文件名 ② MAXW_BY_LANG 折行阈值 ③ EX_SAMPLE 真实译文
+     ④ srt-core.js 的 INK_RATIO / REC_ASS_SIZE / INK_DESC。
+     字形度量这次改用「多组真实文本合并取中位数」——单样本会随文本构成漂（实测同一语言换一段文本，
+     中位数能差 0.2），先用 15 种既有语言校验，全部复现（平均绝对偏差 0.002）后才取信新值：
+       · 全新书写系统实测：hy 0.738 / ka 0.724 / bo 0.525（藏文的元音符号是组合标记，
+         悬浮在 baseline 上方、单独测 descent 为负，按既有「只滤标点」口径计入中位数）
+       · 同字母族沿用既有值：ti 同 am（吉兹字母，本次实测 0.843 与 am 实测 0.837 互证）、
+         yue 同 zh-TW（汉字）、ug/sd 同 ar（阿拉伯字母）、yi 同 he（希伯来字母）
+       · 其余拉丁/西里尔一律走 _default 0.545，连带变音符的 tk/cy/ga/mt/ig 也不单列（同 v0.9.109 口径）*/
+  { v:'yue', zh:'粵語', en:'Cantonese', file:'粤文', prompt:'Cantonese (Yue)' },
+  { v:'be', zh:'Беларуская', en:'Belarusian', file:'白俄罗斯文', prompt:'Belarusian' },
+  { v:'tg', zh:'Тоҷикӣ', en:'Tajik', file:'塔吉克文', prompt:'Tajik' },
+  { v:'ky', zh:'Кыргызча', en:'Kyrgyz', file:'吉尔吉斯文', prompt:'Kyrgyz' },
+  { v:'tk', zh:'Türkmençe', en:'Turkmen', file:'土库曼文', prompt:'Turkmen' },
+  { v:'bs', zh:'Bosanski', en:'Bosnian', file:'波斯尼亚文', prompt:'Bosnian' },
+  { v:'mt', zh:'Malti', en:'Maltese', file:'马耳他文', prompt:'Maltese' },
+  { v:'cy', zh:'Cymraeg', en:'Welsh', file:'威尔士文', prompt:'Welsh' },
+  { v:'ga', zh:'Gaeilge', en:'Irish', file:'爱尔兰文', prompt:'Irish' },
+  { v:'hy', zh:'Հայերեն', en:'Armenian', file:'亚美尼亚文', prompt:'Armenian' },
+  { v:'ka', zh:'ქართული', en:'Georgian', file:'格鲁吉亚文', prompt:'Georgian' },
+  { v:'ti', zh:'ትግርኛ', en:'Tigrinya', file:'提格利尼亚文', prompt:'Tigrinya' },
+  { v:'bo', zh:'བོད་སྐད', en:'Tibetan', file:'藏文', prompt:'Tibetan' },
+  { v:'ug', zh:'ئۇيغۇرچە', en:'Uyghur', file:'维吾尔文', prompt:'Uyghur' },
+  { v:'sd', zh:'سنڌي', en:'Sindhi', file:'信德文', prompt:'Sindhi' },
+  { v:'yi', zh:'ייִדיש', en:'Yiddish', file:'意第绪文', prompt:'Yiddish' },
+  { v:'jv', zh:'Basa Jawa', en:'Javanese', file:'爪哇文', prompt:'Javanese' },
+  { v:'su', zh:'Basa Sunda', en:'Sundanese', file:'巽他文', prompt:'Sundanese' },
+  { v:'ceb', zh:'Cebuano', en:'Cebuano', file:'宿务文', prompt:'Cebuano' },
+  { v:'mg', zh:'Malagasy', en:'Malagasy', file:'马达加斯加文', prompt:'Malagasy' },
+  { v:'ig', zh:'Igbo', en:'Igbo', file:'伊博文', prompt:'Igbo' },
+  { v:'xh', zh:'isiXhosa', en:'Xhosa', file:'科萨文', prompt:'Xhosa' },
+  { v:'sn', zh:'chiShona', en:'Shona', file:'绍纳文', prompt:'Shona' },
+  { v:'ny', zh:'Chichewa', en:'Chichewa', file:'齐切瓦文', prompt:'Chichewa (Nyanja)' },
+  { v:'mi', zh:'Māori', en:'Maori', file:'毛利文', prompt:'Māori (Te Reo)' },
+
+];
+const LBY = (v) => LANGS.find(l => l.v === v) || { zh:v, file:v, prompt:v };
+/* v0.9.117：目标语言名去重——prompt 已含该语言自称时不再补一次
+   （English/English、Filipino (Tagalog)/Filipino、Hausa/Hausa、Afrikaans/Afrikaans、
+     简体中文 (Simplified Chinese)/简体中文），避免出现 "English (English)" */
+function dstLangLabel(n, zh){
+  const p = (n && n.prompt) || '', nat = (n && n.zh) || '';
+  if(!p || !nat || p.toLowerCase().indexOf(nat.toLowerCase()) >= 0) return p || nat;
+  return zh ? (p + '\uFF08' + nat + '\uFF09') : (p + ' (' + nat + ')');
+}
+const STYLE_DESC = {
+  elegant: '均衡（默认）：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯；不逐词直译，也不过度发挥。影视、纪录片、访谈等通用。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  plain:   '口语自然：译文像人在说话——日常口语、短句和常用词、保留说话人的语气与节奏，书面腔和翻译腔是毛病。适合影视对白、动漫、访谈。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  formal:  '书面专业：正式、精炼、术语准确，像专业配音或新闻解说；避免网络用语与过度口语化，保持陈述的客观感。适合纪录片、财经、讲座、会议。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  dubbed:  '译制腔：像影院配音剧本——短句有节奏感，梗与习语大胆本地化，按目标语言的戏感重写，不追求字面忠实。适合娱乐向影视与动漫。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）'
+};
+
+/* ---------------- 界面多语言（跟随浏览器 + 手动切换） ---------------- */
+  /* v0.9.277：界面字典（UI_LANGS / I18N / UI / t / detectUiLang）已抽到 site-i18n.js，
+     由页面在本文件之前引入 —— 两页共用一份，避免改一处忘一处。
+     ⚠️ 本文件里不要再重复声明这几个名字（重复顶层 const 是 SyntaxError，整段脚本会失效）。 */
+/* v0.9.33：解析问题/后端错误按界面语言显示 */
+function issTxt(i){
+  if(!i) return '';
+  if(!i.code) return i.msg;
+  const k='iss'+String(i.code)[0].toUpperCase()+String(i.code).slice(1); /* code:'badTs' → 键 issBadTs */
+  if((I18N[UI.lang] && Object.prototype.hasOwnProperty.call(I18N[UI.lang],k)) || Object.prototype.hasOwnProperty.call(I18N['zh-CN'],k)) return t(k, ...(i.args||[]));
+  return i.msg;
+}
+function srvErrTxt(msg){ /* 后端 /api/translate 错误：按 code 映射本地化（v0.9.33），未知则原样 */
+  const c=msg.match(/"code"\s*:\s*"([^"]+)"/);
+  const m=msg.match(/"message"\s*:\s*"([^"]+)"/);
+  const keyMap={not_configured:'errNotCfg',ip_limit:'errIpLimit',global_limit:'errGlobalLimit',bad_json:'errBadJson',missing_messages:'errNoMsgs',upstream_error:'errUpstream'};
+  const k=c && keyMap[c[1]];
+  if(k==='errIpLimit'){
+    const p=msg.match(/"params"\s*:\s*\[\s*(\d+)\s*\]/);
+    return t('errIpLimit', p ? p[1] : '');
+  }
+  if(k==='errUpstream'){
+    const raw=m ? m[1] : msg;
+    return t('errUpstream', raw.replace(/^Default model call failed: /,''));
+  }
+  if(k) return t(k);
+  return m ? m[1] : msg;
+}
+/* v0.9.135：risekol.com 引流条。v0.9.162 起同时管两处：首页横条 #rkBanner + 工作台卡片 #rkBannerWs。
+   只做两件事：判定该不该显示、给 hero 挂个 class 让底部装饰让位。
+   文案本身交给 i18n 字典（rkTx / rkGo / wsRkSub，27 种界面语言各一套），
+   由 applyI18n 里的 data-i18n / data-i18n-html 统一填充，切语言自动跟着变。
+   显示条件：官方域名，或本地预览加 ?rkbanner=1 —— 开源版与自部署实例都不显示。 */
+function rkBanner(){
+  /* 调试开关走 sessionStorage 而不是只看 query：切换界面语言会重写 URL 路径，
+     query 会被抹掉（实测 /index.html?rkbanner=1 → /ja/），只认 query 的话一换语言就失效。
+     先用参数落一次标记，之后不再依赖 URL。 */
+  let force=false;
+  try{
+    if(/[?&]rkbanner=1/.test(String((location&&location.search)||''))) sessionStorage.setItem('rkForce','1');
+    force = sessionStorage.getItem('rkForce')==='1';
+  }catch(e){}
+  const host=String((location&&location.hostname)||'');
+  const on = /(^|\.)ai-srtsub\.com$/i.test(host) || force;
+  /* 两处各自判空再设——原先首页那条不存在就 return，加上工作台这条后会连带把它也吞掉 */
+  const el=$('rkBanner');   if (el) el.style.display = on ? 'flex' : 'none';
+  const ws=$('rkBannerWs'); if (ws) ws.style.display = on ? 'flex' : 'none';
+  /* v0.9.278：原来这里还给 .hero 切 has-rk、让底部 💜 装饰让位 —— hero 上的三个 emoji
+     装饰已整块撤掉（落地页那侧），这条分支成了空转，一并删掉。 */
+}
+
+function applyI18n(){
+  document.documentElement.lang = UI.lang;
+  document.documentElement.dir = (RTL_UI.indexOf(UI.lang) >= 0) ? 'rtl' : 'ltr'; // v0.9.113：阿拉伯语、希伯来语界面从右向左
+  /* v0.9.407：字典改成按语言分片后，多了一种失败可能 —— 分片没到（404 / 断网 / 爬虫不取子资源）。
+     那时 t() 会原样返回键名，直接写进 DOM 就是「btnParse」这种鬼东西，对 SEO 和可读性都是灾难。
+     所以每次赋值前比一下：翻译结果 === 键名 → 跳过，保留 HTML 里服务端渲染好的默认文案。
+     宁可整页显示默认语言，也不要把键名写进页面。 */
+  var _dt = t('docTitle'); if (_dt !== 'docTitle') document.title = _dt;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ var _s=t(el.dataset.i18n); if(_s!==el.dataset.i18n) el.textContent=_s; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ var _s=t(el.dataset.i18nHtml); if(_s!==el.dataset.i18nHtml) el.innerHTML=_s; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ var _s=t(el.dataset.i18nPh); if(_s!==el.dataset.i18nPh) el.placeholder=_s; });
+  /* v0.9.199：这两个框没有可见 label（标题是「导入」整节，不是字段标签），读屏进来只知道是个编辑框。
+     复用它自己那句 placeholder 当 aria-label——零新增词条，且跟着界面语言走。
+     有可见 label 的字段一律不在这加：label 的 for 已能关联，再挂 aria-label 会覆盖掉 label 文案、造成重复播报。 */
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{ var _s=t(el.dataset.i18nAria); if(_s!==el.dataset.i18nAria) el.setAttribute('aria-label', _s); });
+  if (typeof buildStyleOptions === 'function') buildStyleOptions(); // 导出样式选项的组标签跟随界面语言
+  if (typeof buildProviderOptions === 'function') buildProviderOptions(); // 服务商分组的组标签跟随界面语言
+  const ao = document.querySelector('#srcLang option[value=auto]');
+  if (ao) ao.textContent = t('autoDetect');
+  /* v0.9.383：换界面语言时这句提示要跟着换（它不在 data-i18n 体系里，得手动刷） */
+  if (typeof sameLangHintSync==='function') sameLangHintSync();
+  if (typeof renderRows==='function') renderRows();
+  if (typeof styleUI==='function') styleUI();
+  if (typeof termsUI==='function') termsUI();
+  if (typeof rkBanner==='function') rkBanner(); // v0.9.135：引流条文案跟随界面语言
+  if (typeof modeUI==='function') modeUI();
+  if (typeof updateWidthHints==='function') updateWidthHints(); // v0.9.99：行宽换算提示跟随界面语言
+  if (typeof syncAssSizeHint==='function') syncAssSizeHint(); // v0.9.110：ASS 字号推荐值提示跟随界面语言
+  /* v0.9.110：离底距离提示同样要跟随界面语言——旧版靠「字号 apply 顺带调用 syncAssMVBox」实现，
+     重构后两者解耦，必须显式重绘，否则切界面语言后提示行仍是旧语言。 */
+  if (typeof syncAssMVBox==='function') syncAssMVBox();
+  if (typeof syncFxCard==='function') syncFxCard(); // v0.9.278：去特效页那张卡的标题与说明行也跟界面语言走
+  if (typeof syncLogoHome==='function') syncLogoHome(); // v0.9.280：左上 logo 的回首页地址跟着界面语言走
+}
+
+/* v0.9.280：左上 logo 整块可点，回「当前界面语言的首页」（/ja/translate.html → /ja/，不掉语言）。
+   ⚠️ 工作台页内切语言不会重建 DOM，所以挂在 applyI18n 末尾每次重算，别只在首屏设一次。 */
+function syncLogoHome(){
+  const el = document.getElementById('logoHome');
+  if (!el) return;
+  el.href = (UI.lang==='zh-CN' ? '/' : '/'+UI.lang+'/');
+}
+syncLogoHome();
+
+const S = {
+  srcItems: [],        // 解析出的原始字幕 {no,start,end,text}
+  rows: [],            // 工作行 {id, start, end, en, zh, flag:''|'drop'|'merged'|'merge'|'missing'|'long'}
+  fileBase: '',
+  srcFp: '',           // v0.9.144：当前片的文本指纹（落盘），用来判断是不是换了一部新片
+  translating: false,
+  stop: false,
+  snapOff: false,  // v0.9.77：localStorage 写满/被禁用时置 true，之后不再尝试存断点
+  dropN: 0, mergeN: 0, wrapN: 0, dropLocal: 0, dropAiFiller: 0, dropAiDrop: 0,
+};
+
+/* ---------------- 工具函数 ---------------- */
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* v0.9.400：可原地更新的日志行。整批重发最多 3 次，原来是「每失败一次打一行」——
+   一次任务光重发就能刷出十几行，用户分不清哪条是结论。现在同一批共用一行：
+   「请求已发出」→「第 k 次失败」→「完成（重试 k 次后成功）」，始终只有一条。
+   按 key 分组：主通道 b<批号>-0、音乐组 -1、逐组补救 -4，互不覆盖。
+   ⚠️ 别的日志会插到它后面，所以每次更新都把它拉回面板底部（appendChild 自带移动）。 */
+const _stickyMap = new Map();
+function logSticky(key, msg, cls){
+  if(cls==='err'){ const d=document.querySelector('details.logbox'); if(d && !d.open) d.open=true; }
+  let el=_stickyMap.get(key);
+  if(!el || !el.parentNode){ el=document.createElement('div'); $('log').appendChild(el); }
+  else if(el!==$('log').lastElementChild){ $('log').appendChild(el); }
+  _stickyMap.set(key, el);
+  el.className = cls || '';
+  el.textContent = msg;
+  $('log').scrollTop = 1e9;
+}
+function logStickyEnd(key){ _stickyMap.delete(key); }
+function log(msg, cls){
+  // v0.9.88：err 级日志自动展开折叠的日志面板——启动前校验（无文件/语言相同/自定义空值）
+  // 的报错此前写进默认折叠的 details 里，用户表现为"点了没反应"
+  if(cls==='err'){ const d=document.querySelector('details.logbox'); if(d && !d.open) d.open=true; }
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = msg;
+  $('log').appendChild(d);
+  $('log').scrollTop = 1e9;
+}
+function clearLog(){ $('log').innerHTML = ''; _stickyMap.clear(); }
+
+// v0.9.56：错误弹窗（模型无响应 / 致命错误）——不再只沉底日志，用户必须能看见。
+// opts.settings !== false 时显示「自己设置翻译引擎设置」主按钮（平滑滚动到 mode 下拉并聚焦）
+function showErrModal(title, body, opts){
+  opts = opts || {};
+  const old = document.getElementById('errModal');
+  if (old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'errModal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+  const h = document.createElement('div');
+  h.style.cssText = 'font-weight:700;font-size:16px;color:var(--del);margin-bottom:10px;';
+  h.textContent = title;
+  const b = document.createElement('div');
+  b.style.cssText = 'color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+  b.textContent = body;
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+  const mk = (txt, primary, fn) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn';
+    if (primary) btn.style.cssText = 'background:var(--acc);color:#fff;border-color:var(--acc);';
+    btn.textContent = txt;
+    btn.onclick = () => { ov.remove(); if (fn) fn(); };
+    btns.appendChild(btn);
+  };
+  mk(t('errModalLater'), false, null);
+  if (opts.settings !== false) mk(t('errModalGo'), true, () => {
+    const m = $('mode');
+    if (m) {
+      m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { try { m.focus({ preventScroll: true }); } catch (e) {} }, 380);
+    }
+  });
+  box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+  ov.appendChild(box);
+  ov.addEventListener('click', (ev) => { if (ev.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+if (!window.__errModalEsc){
+  window.__errModalEsc = true;
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') { const m = document.getElementById('errModal'); if (m) m.remove(); }
+  });
+}
+function fmtTC(s,e){ return C.fmtTime(s)+' --> '+C.fmtTime(e); }
+/* v0.9.270：时间码格可点开编辑（canEdit 为 false 时不挂 title，免得点了没反应） */
+function tcHtml(it){ return '<span class="cue tc"'+(canEdit()?' title="'+esc(t('edHintEdit'))+'"':'')+'>'+esc(C.fmtTime(it.start))+'<br>'+esc(C.fmtTime(it.end))+'</span>'; }
+/* v0.9.28 进度仪表卡：sticky 可见 + 大号百分比 + ETA（EMA 平滑）+ 标签页标题进度 + 完成态 */
+const BASE_TITLE = document.title;
+const PG = { t0:0, tAll:0, durs:[], ok:false };
+function fmtDur(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
+  return h>0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
+}
+/* ---------------- 任务条下方广告位 ----------------
+   2026-10-28：广告位已改为常驻（不再等任务条出现），容器常显，脚本随页面解析就写出 iframe，
+   所以这里不再需要 showAd()/懒 push。 */
+/* v0.9.297：任务条下方那句宽心话的开关。只有一个调用点原则会漂 ——
+   所以集中到这里，三处（pgStart 开、pgFinish 关、setProg(…,false) 关）都走它。
+   文案本身不在这里：走 data-i18n="pgBusyTip"，applyI18n 负责 27 语。 */
+function pgBusy(on){
+  const el=$('pgBusy');
+  if(el) el.hidden=!on;
+}
+function setProg(p, show){
+  const w=$('progWrap'); if(!w) return;
+  if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); pgBusy(false); document.title=BASE_TITLE; return; }
+  w.classList.add('show');
+  $('pgPct').textContent=p+'%';
+  $('prog').firstChild.style.width=p+'%';
+  document.title = (p>0 && p<100) ? (p+'% · '+BASE_TITLE) : BASE_TITLE;
+}
+function pgStart(){
+  PG.t0=0; PG.tAll=Date.now(); PG.durs=[]; PG.ok=false;
+  S.tkSum={in:0,out:0,cache:0};   // v0.9.183：本次任务的 token 消耗，完成态展示用
+  const w=$('progWrap');
+  if(w){ w.classList.remove('done'); $('prog').classList.add('run'); }
+  const st=$('pgState'); if(st) st.textContent=t('pgRun');
+  $('pgEta').textContent='';
+  pgBusy(true);   // v0.9.297：跑起来就挂上「AI 算力紧张…」，收工（pgFinish）时摘掉
+  try{ setPrText(''); }catch(e){}   // v0.9.184：清掉上一轮完成态留下的消耗行，否则新一轮开头还挂着旧数字
+  /* v0.9.263：任务条开局即显（0% + 流动动画），不等第一批返回。
+     此前要等第一批落地（中途还有分组/歌词预处理），短任务也要十几秒，长任务更久——
+     这段时间用户只见按钮变灰，不知道有没有开始；广告位也跟着晚出场。
+     顺带保证广告位置固定：任务条先出现、广告挂它下面，之后不再位移（避免布局跳动）。 */
+  try{ setProg(0, true); }catch(e){}
+}
+function pgBatch(bi, totalB, skip){
+  const now=Date.now();
+  // v0.9.77：skip=断点续传跳过已完成的批——不记耗时，否则 ETA 会被这些 0 秒批拉成乐观值
+  if(PG.t0 && !skip) PG.durs.push((now-PG.t0)/1000);
+  if(!skip) PG.t0=now;
+  // v0.9.59：批翻译阶段 95% 封顶——100% 收归 pgFinish 独有（批翻完还有回填/压缩重译/折行渲染）
+  setProg(Math.round(bi/totalB*95), true);
+  const etaEl=$('pgEta');
+  // v0.9.77：第 1 批落地即出预估（原来要等满 3 批，短任务几乎看不到 ETA）；
+  // 改用 EMA（新样本权重 0.3）——单批抖动不再带着剩余时间大幅跳变
+  if(PG.durs.length>=1 && bi<totalB){
+    let avg=PG.durs[0];
+    for(let i=1;i<PG.durs.length;i++) avg=avg*0.7+PG.durs[i]*0.3;
+    etaEl.textContent=t('pgEta', fmtDur((totalB-bi)*avg));
+  }
+}
+/* v0.9.183：服务端排队期间的表现——进度条百分比冻结、流动动画暂停、右侧倒计时，
+   时间到自动继续。刻意不弹窗：额度是所有用户共用的，排队是常态，
+   弹窗会让连刷多集的用户被反复打断。 */
+function pgPace(sec){
+  return new Promise(function(resolve){
+    const bar=$('prog'), stEl=$('pgState'), eta=$('pgEta');
+    if(bar) bar.classList.remove('run');          /* 视觉上就是「停了一下」 */
+    if(stEl) stEl.textContent=t('pgWait');
+    let left=Math.max(1, Math.round(sec));
+    const show=function(){ if(eta) eta.textContent=t('pgWaitSec', left); };
+    show();
+    const restore=function(val){
+      clearInterval(timer);
+      if(eta) eta.textContent='';
+      if(stEl) stEl.textContent=t('pgRun');
+      if(bar) bar.classList.add('run');
+      resolve(val);
+    };
+    const timer=setInterval(function(){
+      /* v0.9.185：排队中点「停止」要立刻响应。此前最长要干等 60 秒才理用户。 */
+      if(typeof S!=='undefined' && S && S.stop){ restore('stop'); return; }
+      left--;
+      if(left<=0){ restore('done'); return; }
+      show();
+    }, 1000);
+  });
+}
+function pgFinish(){
+  PG.ok=true;
+  pgBusy(false);   // v0.9.297：出结果了，那句「因AI算力紧张…」立刻退场（含下面排队超时那条路）
+  const w=$('progWrap');
+  if(!w || !w.classList.contains('show')) return;
+  $('pgState').textContent=t('pgDone', fmtDur((Date.now()-PG.tAll)/1000));
+  $('pgEta').textContent='';
+  /* v0.9.183：完成态顺带给出本次消耗。数字走千分位，各语言通用 */
+  const tkTot=(S.tkSum && ((S.tkSum.in||0)+(S.tkSum.out||0)))||0;
+  if(tkTot){
+    $('prText').textContent=t('pgTok', tkTot.toLocaleString('en-US'));
+    /* v0.9.184：日志区也留一行——进度条迟早会被下一轮翻译顶掉，日志里这条一直在 */
+    try{ log($('prText').textContent,'okc'); }catch(e){}
+  }
+  /* v0.9.186：排队超时停下的这一轮没跑完，进度条别写「完成」——会和弹窗自相矛盾。
+     已消耗的 token 仍然给（上面那行 prText 已写好，日志里也留了一份）。 */
+  if(S.paceOut){
+    $('pgState').textContent=t('busyTitle');
+    $('prog').classList.remove('run');
+    $('pgEta').textContent='';
+    document.title=BASE_TITLE;
+    return;
+  }
+  $('prog').classList.remove('run');
+  w.classList.add('done');
+  $('pgPct').textContent='100%';
+  $('prog').firstChild.style.width='100%';
+  document.title=BASE_TITLE;
+  /* v0.9.184：完成态不再自动收起。此前 6 秒后自动隐藏——实测跑完 1.5 秒出完成态、7.5 秒就没了，
+     用户回过头想看「这一趟花了多少 token」时进度条早没了，等于白给。
+     现在一直留着，直到下一次开翻（pgStart）或导入新片（setSrc）才清。 */
+}
+function setPrText(t){ $('prText').textContent=t||''; }
+
+/* ---------------- v0.9.77 断点续传 ----------------
+   数千条字幕要跑十几到几十分钟，标签页一关/一刷新/网络一断就前功尽弃。
+   做法：每批落地即把「已完成的译文 + 水词集合 + 跨批上下文」写进 localStorage；
+   下次打开同一份文件按同样参数开翻时，询问是否从断点继续（已完成的批不再重发）。
+   指纹 = 文件名 + 条数 + 语言对 + 切批参数 + 源文内容哈希，任一变化即作废，绝不串片。
+   只存译文与进度，不存任何 Key / 原文。 */
+/* v0.9.404 兜底：snap-store.js 是本版新增的外链文件。万一部署漏了它（或 CDN 抽风没取到），
+   下面这几行顶层声明会直接 ReferenceError —— 整页脚本跟着全崩，用户看到的是一个死页面。
+   这与 v0.9.394 的 BUILTIN_API 血案是同一类：一个缺失的定义放倒整页。
+   这里备一份同名的空壳：功能降级为「没有断点」，但页面照常能用。
+   ⚠️ 正常加载时这段不会执行（snap-store.js 在前，SnapStore 已定义）。 */
+if (typeof SnapStore === 'undefined') {
+  var SnapStore = { K_BASE:'srt_resume_v1', K_LEGACY:'srt_resume_v1',
+    SNAP_TTL:30*24*3600*1000, FIN_SNAP_TTL:14*24*3600*1000, BUDGET:3*1024*1024,
+    keyFor:function(fk,lang){ return 'srt_resume_v1:'+fk+':'+lang; },
+    read:function(){ return null; }, write:function(){ return false; },
+    finish:function(){ return false; }, remove:function(){}, list:function(){ return []; },
+    /* v0.9.406：导出也备空壳 —— toSrt 返回 null 会被 downloadSnapSrt 当成「导不出」处理，
+       不会抛错（虽然 list() 为空时根本不会出现下载按钮，这里只是不让任何路径炸）。 */
+    peek:function(){ return null; }, toSrt:function(){ return null; }, fmtMs:function(){ return ''; },
+    gc:function(){ return 0; }, bytes:function(){ return 0; }, evict:function(){},
+    snapHasText:function(){ return false; }, usable:function(){ return false; },
+    valid:function(){ return false; }, expired:function(){ return false; } };
+}
+const SNAP_KEY_LEGACY='srt_resume_v1';   // v0.9.403 及以前的老单键，仅用于迁移
+let   SNAP_KEY=SnapStore.K_BASE;         // 当前槽键，开翻时按「内容哈希 + 目标语言」重算
+let   SNAP_META={src:'',dst:'',lines:0}; // 进索引的展示信息（文件名/条数/语言对）
+/* v0.9.406：时间轴快照 —— 有了它才能从「本机记录」里直接把译文下载成成品 srt。
+   tl = 扁平数组 [起1,止1,起2,止2,…]（第 n 条在 tl[(n-1)*2]，单位毫秒）；
+   gs = [ 每个句组各含几条 ]（按 gno 顺序）。
+   ⚠️ 只有时间与分句，不含任何原文 —— 要双语仍然得重选字幕文件。
+   ⚠️ 用扁平数组而不是 {编号:[起,止]}：键名在 1200 条时要白占 7 个字符，
+      实测扁平能把时间轴这块的体积从 132KB 压到 113KB（单份总占用 +77% → +51%）。 */
+let   SNAP_GEO={tl:null,gs:null};
+function snapTimeline(items){
+  const arr=[];
+  (items||[]).forEach(function(it){
+    const i=(Number(it.no)||0)-1;
+    if(i<0) return;
+    arr[i*2]=Number(it.start)||0; arr[i*2+1]=Number(it.end)||0;
+  });
+  return arr;
+}
+const SNAP_TTL = SnapStore.SNAP_TTL;
+const FIN_SNAP_TTL = SnapStore.FIN_SNAP_TTL;
+/* v0.9.167：整片跑完的快照不再删除（可让二次运行的同一文件免于重译）。
+   v0.9.404：两个时限统一由 snap-store.js 给出（未完成 30 天 / 已完成 14 天），
+   此处不再各写一份 —— 以前只在「一个槽、随时被下一部片挤掉」的前提下才需要压得那么短。 */
+function srcFingerprint(items){
+  let h=5381;
+  for(let i=0;i<items.length;i++){
+    const s=String(items[i].text||'');
+    for(let j=0;j<s.length;j++) h=((h<<5)+h+s.charCodeAt(j))|0;
+  }
+  return (h>>>0).toString(36);
+}
+function snapFp(cfg, budget, cap){
+  // 影响译文形态的参数全部入指纹（语言对 / 风格 / 行宽 / 专名策略 / 术语）；
+  // 不含 base/key/model——换 Key 或换引擎续跑是合理需求，不该作废已完成批次
+  return [S.fileBase, S.srcItems.length, cfg.src, cfg.dst, budget, cap,
+          cfg.styleMode, cfg.styleCustom, cfg.maxW, cfg.keepTerms?1:0, cfg.glossKey,
+          cfg.lyricMode||'keep', cfg.musicMarks||'',   // v0.9.78：歌词设置改变译文形态，必须作废快照
+          cfg.dropFillers!==false?1:0,
+          srcFingerprint(S.srcItems)].join('|');
+}
+/* v0.9.404：校验与迁移全部下沉到 snap-store.js（与多语页同一份），本页只管传键。
+   顺带补上此前缺失的「空译文校验」——多语页 v0.9.397 因 394 事故加了这道闸，翻译页一直没加，
+   于是空快照会被 askReuse 当成「上次的结果」摆给用户，一点取回就是空白字幕。 */
+function loadSnap(fp){
+  try{ return SnapStore.read(SNAP_KEY, fp, SNAP_KEY_LEGACY); }catch(e){ return null; }
+}
+function serRes(res){
+  const o={};
+  res.forEach(function(v,k){
+    o[k]={ type:(v&&v.type)||'', text:String((v&&v.text)||''),
+           cueTexts:(v&&v.cueTexts&&v.cueTexts.size)?Array.from(v.cueTexts.entries()):null };
+  });
+  return o;
+}
+function saveSnap(fp, res, fillerSet, ctx, bi, totalB, durs, file){
+  if(S.snapOff) return;
+  /* v0.9.404：写槽 + 更新索引 + 容量治理都在 snap-store.js 里。
+     返回 false 表示确实存不下（清过一轮 LRU 仍然失败），此时才降级为「本次不再存」。 */
+  const ok=SnapStore.write(SNAP_KEY, fp,
+    { fp:fp, file:file||'', bi:bi, totalB:totalB,
+      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5),
+      tl:SNAP_GEO.tl, gs:SNAP_GEO.gs },
+    SNAP_META);
+  if(!ok && !S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
+}
+function rmSnap(){ try{ SnapStore.remove(SNAP_KEY); }catch(e){} }
+/* v0.9.167：任务整片跑完时「不再删除」快照，只把它标成已完成（fin=1）并刷新时间戳——
+   下次同一文件 + 同一套参数再点翻译，可以弹窗让用户直接取回这份结果，一个模型请求都不发。
+   此前这里直接 rmSnap()，结果是：用户翻完没导出、回头刷新页面或重传一次再跑，
+   就得从头付第二遍钱（9/25 全站 189 组重复任务里有 100 组从未下载，多数是这个形态）。
+   ⚠️ 只改「跑成功」这一处：用户主动停止 / 模型熔断（S.stop）时快照不标 fin，
+   仍然保留为「未完成」状态，走原来的断点续传，行为不变。 */
+function markSnapDone(){
+  if(S.snapOff) return;
+  try{ SnapStore.finish(SNAP_KEY); }
+  catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
+}
+/* v0.9.167：把快照里的译文还原进本次运行的容器（两条路径共用，避免还原逻辑漂移）。
+   值与当初 saveSnap 存进去的完全一致——cueTexts 这个 Map 已序列化成数组，这里原样还原。 */
+function applySnapInto(snap, res, fillerSet){
+  Object.keys(snap.done).forEach(function(k){
+    const v=snap.done[k];
+    res.set(Number(k), { type:v.type||'', text:v.text||'', cueTexts:v.cueTexts?new Map(v.cueTexts):null });
+  });
+  (snap.fillers||[]).forEach(function(no){ fillerSet.add(Number(no)); });
+}
+/* 断点询问弹窗：返回 Promise<'resume'|'new'>（样式沿用错误弹窗，标题改用主色以示非错误） */
+function askResume(bi, totalB){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.id='resumeModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('resumeTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=t('resumeBody',bi,totalB);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('resumeNew'),false,'new');
+    mk(t('resumeGo'),true,'resume');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('new'); } });
+    document.body.appendChild(ov);
+  });
+}
+/* v0.9.167：整片跑完且快照还在 → 询问要不要直接取回上次那份结果。
+   样式与 askResume 完全一致，只有文案与返回值不同。三个返回值各有各的必要性：
+    'reuse'  把上次译文灌回去；因 startBi=bi=totalB，批次循环零次执行，全程零模型请求
+    'new'    删快照从头翻译（就是现在的行为）
+    'cancel' 什么都不做，回到翻译前状态。⚠️ 这个出口不能省——点遮罩关闭若等于「重译」，
+             只是想关掉窗口的用户会被迫付一次钱；此处点遮罩 = cancel，语义安全。 */
+function askReuse(file, lines, langName, ts){
+  return new Promise(function(resolve){
+    const d=new Date(ts||Date.now()), now=new Date();
+    const hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const when=(d.toDateString()===now.toDateString())?hh:((d.getMonth()+1)+'/'+d.getDate()+' '+hh);
+    const ov=document.createElement('div');
+    ov.id='reuseModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('reuseTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=t('reuseBody', file, lines, langName, when);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('reuseCancel'),false,'cancel');
+    mk(t('resumeNew'),false,'new');
+    mk(t('reuseGo'),true,'reuse');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    const note=document.createElement('div');
+    note.style.cssText='color:var(--sub);font-size:12px;line-height:1.6;margin-top:14px;';
+    note.textContent=t('reuseNote');
+    box.appendChild(note);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('cancel'); } });
+    document.body.appendChild(ov);
+  });
+}
+
+/* v0.9.406：翻到一半的记录先问一句再导 —— 拿到的是「已译完的那部分」，
+   不说明白就下载，用户会以为整片都译好了（缺的行不是丢行，是还没翻）。
+   文案全部复用已有词条（snapPart 说明进度、snapDl 作按钮），不再补 27 语。 */
+function askPartialExport(it){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.id='partialExportModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:430px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('snapDl');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;';
+    b.textContent=t('snapPart', it.bi, it.totalB);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('reuseCancel'),false,false);
+    mk(t('snapDl'),true,true);
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve(false); } });
+    document.body.appendChild(ov);
+  });
+}
+/* v0.9.406：导出文件名跟正常导出保持一致（<原名>_<语言名>字幕.srt）。
+   否则用户从面板下一次、再从正常流程下一次，会拿到两个看起来毫不相干的名字。
+   快照里只有译文，所以固定按「单语」命名（双语要原文，走不了这条路）。 */
+function snapOutName(item){
+  const base=String(item.file||'subtitles').replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
+  try{
+    const zhUI=UI.lang==='zh-CN'||UI.lang==='zh-TW';
+    const L=LBY(item.dst);
+    return base+'_'+(zhUI?L.file:L.en)+(zhUI?'字幕':'_'+t('fnSub'))+'.srt';
+  }catch(e){ return base+'.'+(item.dst||'out')+'.srt'; }
+}
+/* v0.9.406：把一条记录导出成目标语言成品 srt 并下载。
+   ⚠️ 只出译文 —— 本机没存原文，双语必须重选字幕文件走正常导出，那是另一条路。
+   ⚠️ 翻到一半的记录也能导，拿到的是已译完的那部分（行数会少），不静默补空行。 */
+async function downloadSnapSrt(item){
+  if(!item.fin && !(await askPartialExport(item))) return;
+  const o=SnapStore.peek(item.k);
+  const txt=(o&&SnapStore.toSrt(o))||'';
+  if(!txt){ try{ log(t('snapNoTl'),'err'); }catch(_){} return; }
+  const url=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  const a=document.createElement('a');
+  a.href=url; a.download=snapOutName(item);
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },1500);
+}
+
+/* ---------------- v0.9.404：本机记录面板 ----------------
+   以前断点只有一个槽、用户也看不见，于是「翻 A 到一半去翻 B，A 就没了」这件事
+   既无法避免、也无法察觉。分槽之后每部片（每种目标语言）各占一格，
+   这里就是查看与清理的入口——能看见才谈得上管理。
+   ⚠️ 只提供「看 + 删」，不提供「点一下就恢复」：本机只存译文不存原文，
+      拿回进度必须重新选同一份字幕文件（选完会自动弹「继续 / 取回」）。 */
+function openSnapPanel(){
+  const ov=document.createElement('div');
+  ov.id='snapPanel';   // v0.9.404：给面板一个 id，便于自动化点开后定位与关闭
+  ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+  const h=document.createElement('div');
+  h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:4px;';
+  h.textContent=t('snapTitle');
+  const listBox=document.createElement('div');
+  listBox.style.cssText='overflow:auto;flex:1;margin-bottom:12px;';
+  function fmtTs(ts){
+    const d=new Date(ts||Date.now()), now=new Date();
+    const hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    return (d.toDateString()===now.toDateString())?hh:((d.getMonth()+1)+'/'+d.getDate()+' '+hh);
+  }
+  function render(){
+    const items=SnapStore.list();
+    listBox.textContent='';
+    if(!items.length){
+      const e=document.createElement('div');
+      e.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;white-space:pre-wrap;padding:6px 0;';
+      e.textContent=t('snapEmpty');
+      listBox.appendChild(e);
+      return;
+    }
+    items.forEach(function(it){
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);';
+      const main=document.createElement('div');
+      main.style.cssText='flex:1;min-width:0;';
+      const nm=document.createElement('div');
+      nm.style.cssText='font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      nm.textContent=it.file||'(untitled)';
+      const sub=document.createElement('div');
+      sub.style.cssText='color:var(--sub);font-size:12px;margin-top:3px;';
+      sub.textContent=[it.lines?t('snapLines',it.lines):'', (it.src&&it.dst)?(it.src+'\u2192'+it.dst):'',
+                       it.fin?t('snapDone'):t('snapPart',it.bi,it.totalB), fmtTs(it.ts),
+                       Math.max(1,Math.round(it.sz/1024))+' KB'].filter(Boolean).join(' \u00b7 ');
+      main.appendChild(nm); main.appendChild(sub);
+      /* v0.9.406：下载按钮。没有时间轴的老快照（v0.9.404 及以前存的）置灰并说明原因——
+         总比点了没反应强，用户至少知道「重新翻一次就有了」。 */
+      const dl=document.createElement('button');
+      dl.type='button'; dl.className='btn xs ghost'; dl.textContent='\u2b07';
+      if(it.hasTl){ dl.title=t('snapDl'); dl.onclick=function(){ downloadSnapSrt(it); }; }
+      else { dl.disabled=true; dl.style.opacity='.45'; dl.title=t('snapNoTl'); }
+      /* 删除用 ✕ 符号：这个词各国都一样认，不值得为它再补 27 语词条 */
+      const del=document.createElement('button');
+      del.type='button'; del.className='btn xs ghost'; del.textContent='\u2715';
+      del.onclick=function(){ SnapStore.remove(it.k); render(); };
+      row.appendChild(main); row.appendChild(dl); row.appendChild(del);
+      listBox.appendChild(row);
+    });
+  }
+  render();
+  const note=document.createElement('div');
+  note.style.cssText='color:var(--sub);font-size:12px;line-height:1.6;';
+  note.textContent=t('snapNote');
+  const btns=document.createElement('div');
+  btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;margin-top:14px;';
+  const close=document.createElement('button');
+  close.type='button'; close.className='btn'; close.textContent=t('reuseCancel');
+  close.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+  close.onclick=function(){ ov.remove(); };
+  btns.appendChild(close);
+  box.appendChild(h); box.appendChild(listBox); box.appendChild(note); box.appendChild(btns);
+  ov.appendChild(box);
+  ov.addEventListener('click',function(ev){ if(ev.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+/* ================= v0.9.398：开跑前的统一体检 =================
+   用户反馈：「在翻译风格中选择了自定义，但没填写内容，也不弹窗引导用户去填写，
+   而是直接卡住」。查下来这条路只有一个 log(t('customNeed')) + return：
+   按钮闪一下就恢复、日志滚在页面下方，用户侧就是「点了没反应」。
+   这里把它升级成显式选择：去填写 / 改用内置风格继续 / 取消。
+   与 multilang.html 的同名函数是一对手抄副本（两页不共用 js），改一边记得改另一边。 */
+function preflightCfg(cfg){
+  if(!cfg) return { ok:true };
+  if(cfg.src === cfg.dst) return { ok:false, code:'langSame' };
+  if(cfg.styleMode === 'custom' && !cfg.styleCustom) return { ok:false, code:'customEmpty' };
+  return { ok:true };
+}
+/* 三按钮弹窗：稍后再说 / 改用「均衡」/ 去填写。返回 'fill' | 'default' | false */
+function askStyleEmpty(){
+  return new Promise(function(resolve){
+    const old = document.getElementById('styleNeedModal');
+    if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'styleNeedModal';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.18);';
+    const h = document.createElement('div');
+    h.style.cssText = 'font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent = t('pfStyleTitle');
+    const b = document.createElement('div');
+    b.style.cssText = 'color:var(--ink);font-size:13.5px;line-height:1.75;white-space:pre-wrap;';
+    /* 两句都复用已有词条，不为这一处新增翻译：
+       customNeed 说明「缺什么」，styleCustomPh 正好是输入框的占位提示（该填什么）。 */
+    b.textContent = t('customNeed');
+    const n = document.createElement('div');
+    n.style.cssText = 'color:var(--sub);font-size:12.5px;line-height:1.7;margin-top:8px;white-space:pre-wrap;';
+    n.textContent = t('styleCustomPh');
+    const btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;';
+    const mk = function(txt, primary, val){
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn'; btn.textContent = txt;
+      if(primary) btn.style.cssText = 'background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick = function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('errModalLater'), false, false);
+    mk(t('pfUseDefault'), false, 'default');
+    mk(t('pfGoFill'), true, 'fill');
+    box.appendChild(h); box.appendChild(b); box.appendChild(n); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click', function(e){ if(e.target === ov){ ov.remove(); resolve(false); } });
+    document.body.appendChild(ov);
+    try{ btns.lastChild.focus(); }catch(e){}
+  });
+}
+/* 返回 true = 可以继续（用户可能刚把「自定义」改成「均衡」） */
+async function preflightGuard(){
+  const cfg = getCfg();
+  const pf = preflightCfg(cfg);
+  if(pf.ok) return true;
+  if(pf.code === 'langSame'){
+    log(t('langSame', LBY(cfg.src).zh), 'err');
+    return false;
+  }
+  if(pf.code === 'customEmpty'){
+    const r = await askStyleEmpty();
+    if(r === 'default'){
+      const el = document.querySelector('input[name=style][value=elegant]');
+      if(el){ el.checked = true; try{ el.dispatchEvent(new Event('change', { bubbles:true })); }catch(e){} }
+      log(t('pfSwitched'), 'okc');
+      return true;
+    }
+    if(r === 'fill'){
+      const box = $('styleCustom');
+      if(box){
+        box.style.display = 'block';
+        try{ box.scrollIntoView({ behavior:'smooth', block:'center' }); }catch(e){}
+        setTimeout(function(){ try{ box.focus(); box.select(); }catch(e){} }, 380);
+      }
+    }
+    return false;
+  }
+  return false;
+}
+
+// 读取左侧全部设置 → 配置对象（含校验用的错误信息）
+function getCfg(){
+  const styleMode = (document.querySelector('input[name=style]:checked')||{}).value || 'elegant';
+  return {
+    src: $('srcLang').value,
+    dst: $('dstLang').value,
+    maxW: +$('maxW').value || 21,
+    styleMode,
+    styleCustom: $('styleCustom').value.trim(),
+    /* v0.9.134：keepTerms 语义不变（true=保留原文 / false=全部译出），只是取值从复选框换成二选一；
+       原先那个逗号分隔输入框已并入下方术语表——用户条目走规则 4.5，不再拼进规则 4。 */
+    keepTerms: (document.querySelector('input[name=pnMode]:checked')||{}).value === 'keep',
+    glossRows: GLOSS_ROWS,
+    glossKey: GLOSS_ROWS.map(function(x){ return x.t+'\u0001'+x.r; }).join('\u0002'),
+    /* v0.9.139：开关从界面移除，但「翻译前自动抽一次」的行为对旧存档仍然保留——
+       界面改为「AI 抽取」按钮，勾过的人行为不变，只是不再有开关可点。 */
+    autoTerms: sv.autoTerms === '1',
+    lyricMode: (document.querySelector('input[name=lyric]:checked')||{}).value || 'keep',
+    musicMarks: $('marks').value,
+    dropFillers: $('dropFillers').checked,
+    mode: $('mode').value,
+    base: $('base').value.trim(),
+    key: $('apikey').value.trim(),
+    model: $('model').value.trim()
+  };
+}
+function styleDesc(cfg){
+  if (cfg.styleMode === 'custom' && cfg.styleCustom) return '自定义风格：'+cfg.styleCustom;
+  return STYLE_DESC[cfg.styleMode] || STYLE_DESC.elegant;
+}
+// 让界面各处的语言标签跟随选择（列头、导入区等）
+function setColLabels(){
+  // v0.9.177：源语言=自动检测时列头不能显示 "auto"（LBY 查不到 auto 会原样回传），改用界面字典的「自动检测」
+  const srcV0 = $('srcLang').value;
+  $('hSrc').textContent = t('colSrc', srcV0 === 'auto' ? t('autoDetect') : LBY(srcV0).zh);
+  $('hDst').textContent = t('colDst', LBY($('dstLang').value).zh);
+}
+
+function updateStats(){
+  const total=S.rows.length;
+  let done=0, handled=0, miss=0;
+  S.rows.forEach(r=>{
+    /* v0.9.385：翻译跑完了但这条没拿到译文——不是水词（那是主动删除），
+       是模型漏输出、补译也没救回来。单独计数，收尾弹窗与筛选都读它。 */
+    if(r.flag==='missing'){ miss++; return; }
+    if(r.flag==='drop'||r.flag==='merged'||r.noText) handled++;       // 水词清空 / 已并入上条 / 空字幕无需翻译
+    else if(r.zh && r.zh.trim()) done++;
+  });
+  S.missN=miss;
+  $('stTotal').innerHTML=t('stTotal')+' <b>'+total+'</b>';
+  $('stDone').innerHTML=t('stDone')+' <b>'+done+'</b>';
+  $('stDrop').innerHTML=t('stDrop')+' <b>'+S.dropN+'</b>';
+  $('stMerge').innerHTML=t('stMerge')+' <b>'+S.mergeN+'</b>';
+  $('stWrap').innerHTML=t('stWrap')+' <b>'+S.wrapN+'</b>';
+  $('stIssues').innerHTML=t('stIssues')+' <b>'+Math.max(0, total-(done+handled))+'</b>';
+}
+
+function zhBadge(r){
+  let b='';
+  if (r.flag==='drop') b+='<span class="badge b-drop">'+t('bDrop')+'</span>';
+  else if (r.flag==='merge') b+='<span class="badge b-merge">'+t('bMerge')+'</span>';
+  if (r.flag!=='drop' && r.zh){
+    // v0.9.25 双 speaker 对话按行独立算宽（合并算必误报）；超长 = 任一行超过行级容忍（会折行）
+    const over = C.isSpeakerText(r.zh)
+      ? r.zh.split('\n').some(l => l.trim() && C.textWidth(l.trim()) > (S.maxW||20)+4)
+      : C.textWidth(r.zh.replace(/\n/g,'')) > (S.maxW||20);
+    if (over) b+='<span class="badge b-long">'+t('bLong')+'</span>';
+  }
+  return b;
+}
+
+function renderRows(){
+  /* v0.9.278：去特效页那张卡的可用状态 = 「有没有译文」，而译文只在 renderRows 之后才成立，
+     所以挂在这里（翻译完成、导入、手动编辑、筛选都会经过它）。 */
+  if (typeof syncFxCard==='function') syncFxCard();
+  setColLabels();
+  const box=$('rows'), f=$('filter').value;
+  const list = S.rows.filter(r=>{
+    /* v0.9.385：翻失败的条目从「仅待译」里摘出去——它们不是「还没轮到」，是翻过了没成，
+       混在待译里会让人以为引擎还会再翻一遍。各自有各自的入口。 */
+    if (f==='todo') return !(r.zh && r.zh.trim()) && r.flag!=='drop' && r.flag!=='merged' && r.flag!=='missing' && !r.noText;
+    if (f==='done') return !!(r.zh && r.zh.trim());
+    if (f==='flag') return !!r.flag;
+    /* v0.9.385：仅待检查——模型漏输出、补译也没救回来的那些，集中列出来给用户逐条处理 */
+    if (f==='miss') return r.flag==='missing';
+    return true;
+  });
+  if (!S.rows.length){ box.innerHTML='<div class="empty">'+t('emptyRows')+'</div>'; updateStats(); renderEdBar(); renderTcBar(); return; }
+  if (!list.length){ box.innerHTML='<div class="empty">'+t('emptyFilter')+'</div>'; updateStats(); renderEdBar(); renderTcBar(); return; }
+  let html='';
+  list.forEach(r=>{
+    const zh = (r.zh!=null&&r.zh!=='') ? esc(r.zh) : '';
+    const dot = r.edited ? '<i class="ed-dot" title="'+esc(t('edEdited'))+'"></i>' : '';
+    /* v0.9.270：体检标红。ISS 只在点了「时长体检」之后才有内容，平时零开销 */
+    const iss = ISS[r.id];
+    const issB = (iss && iss.length) ? '<span class="badge b-time">'+esc(iss.map(issTxt).join(' · '))+'</span>' : '';
+    html += '<div class="cuegrid'+(r.edited?' ed':'')+'" data-id="'+r.id+'">'
+      + '<span class="cue">'+(r.id+1)+dot+'</span>'
+      + tcHtml(r)
+      + '<div class="en'+(canEdit()?' ed':'')+'"'+(canEdit()?' contenteditable="true"':'')+' spellcheck="false">'+esc(r.en)+'</div>'
+      + (r.flag==='drop'
+          ? '<div class="drop-note">'+t('dropNote')+'</div>'
+          : r.flag==='merged'
+            ? '<div class="drop-note">'+t('mergedNote')+'</div>'
+            : r.noText
+              ? '<div class="drop-note">'+t('emptyNote')+'</div>'
+              /* v0.9.385：翻失败的条目标出来。占位文字用琥珀色（ph-miss）而非普通灰色，
+                 一眼分得清「这条没翻出来」与「这条还没轮到」；仍然可编辑，用户能直接补写。 */
+              : '<div class="zh'+(zh?'':' placeholder'+(r.flag==='missing'?' ph-miss':''))+'" contenteditable="true" spellcheck="false">'+(zh||(r.flag==='missing'?t('missNote'):t('pending')))+'</div>'+zhBadge(r)+issB)
+      + (OV_ROW===r.id ? ovHtml(r) : '')
+      + '</div>';
+  });
+  box.innerHTML=html;
+  updateStats();
+  renderEdBar();
+  renderTcBar();
+}
+
+// 从 DOM 读回人工编辑的译文
+function collectZh(){
+  document.querySelectorAll('#rows .zh').forEach(el=>{
+    if(el.classList.contains('placeholder')) return;  // v0.9.67：占位符（待翻译…）不是译文，绝不回读——否则 missing 行导出字面占位符
+    const id=+el.closest('.cuegrid').dataset.id;
+    const r=S.rows.find(x=>x.id===id);
+    if (r) r.zh=el.innerText.trim();
+  });
+}
+
+/* ---------------- 后处理：清提示词 + 折行 + 统计 ---------------- */
+/* v0.9.189：单行重排抽成函数，applyPost（翻译后跑一次）与 reflowRows（改行宽即时重排）共用，
+   避免两处各写一份导致逻辑漂移。处理链顺序不可调换，理由见下方注释。 */
+function reflowOne(r){
+  /* v0.9.52：先并掉仅闭标点的孤行（LLM 偶发 \n”）
+     v0.9.129：再做行内格式标签配对修复——模型偶发只输出半个 <i>（缺 </i>），导出会破坏整条渲染。
+     以源文为准：源文无斜体→剥掉译文里凭空冒出的标签；源文有斜体且译文不配对→补齐缺失的一半。
+     正常输入（无标签或已配对）原样返回，零影响。
+     v0.9.131：盘古之白必须作用在折行「之前」的整段上（P1），不能折完再逐行补（P2）。
+     模型直出的译文常缺中西文之间的空格（线上 WSJ 实测「这是|更好的Whopper，」
+     「Burger King|正押注于」「要点一个|Impossible Whopper」），而 needJoinSpace
+     只管跨行拼缝、够不着行内边界。
+     之所以放折行前：实测 P2（折后逐行补）虽同样补齐空格，但有 3 行不幂等——
+     补空格后行宽变化 → 专名保护把断点推到别处 → 用户再点一次「整理」字幕就跳动。
+     P1 先归一化文本再排版，一阶二阶都收敛；顺带让超宽行从 4 降到 3（宽度算准了）。 */
+  const rawZh = C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(r.zh)), r.en);
+  const t = /^zh/.test(String(S.locale || '')) ? C.panguSpace(rawZh) : rawZh;
+  // v0.9.42：speaker 行保持 dash 行结构、按行独立折行——normalize 的 squashLines 会把
+  // 「\n- 」压成行内 dash（#17 曾靠折行巧合复原，属未定义行为）；非 speaker 行维持原 normalize 路径
+  const lines = C.isSpeakerText(t)
+    ? C.foldSpeakerLines(t, S.maxW, S.locale || 'zh-CN')
+    : C.monoFit(t, S.maxW, S.locale || 'zh-CN');
+  return { text: lines.join('\n'), changed: lines.join('\n') !== rawZh, rawZh: rawZh };
+}
+function applyPost(){
+  collectZh();
+  collectEn();   /* v0.9.270：手工改过的原文要回读，否则后处理会把旧原文写回去 */
+  let wrapN=0;
+  S.rows.forEach(r=>{
+    if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
+    /* v0.9.270：译文被手工改过的行一律不重排（此前只有 reflowRows 跳过，
+       点「仅后处理」会把用户手敲的折行、音效标记、故意留的空行一起抹掉）。
+       ⚠️ 判据是 zhHand 不是 edited —— 只改了原文/时间轴、或只是从快照恢复过来的行，
+       它那一条译文仍是新翻的，必须照常折行，否则长句会一直不换行。 */
+    if (r.zhHand) return;
+    const o = reflowOne(r);
+    if (o.changed) wrapN++;
+    r.zh = o.text;
+  });
+  S.wrapN=wrapN;
+  renderRows();
+  log(t('postDone',S.maxW), 'okc');
+}
+/* v0.9.189：手工编辑标记。用事件委托且只绑一次——renderRows 每次重建 DOM，逐个 .zh 绑会泄漏。
+   用户在译文框里敲过字 → 该行 r.edited=true → reflowRows 跳过它，保住手工折行 / 音效标记 / 空行。
+   标记挂在 row 对象上而非 DOM 上，所以重画表格不会丢；重新导入文件（S.rows 重建）自然清零。 */
+(function(){
+  const box=$('rows'); if(!box) return;
+  box.addEventListener('input', function(ev){
+    const el=ev.target && ev.target.closest ? ev.target.closest('.zh, .en.ed') : null;
+    if(!el) return;
+    const grid=el.closest('.cuegrid'); if(!grid) return;
+    const r=(S.rows||[]).find(x=>x.id===+grid.dataset.id);
+    /* v0.9.270：改过就记原始值（供「全部还原」真还原）+ 立刻落快照（刷新不丢）。
+       原文要当场回读并写回 S.srcItems——译文有 collectZh 在导出/后处理前统一回读，
+       原文若也等那时才回读，重跑翻译时 rows 已经重建，改动就蒸发了。 */
+    if(r){
+      if(el.classList.contains('en')){
+        /* 原文当场回读并写回 S.srcItems——等 collectEn 就晚了：重跑翻译时 rows 已经重建，
+           改动就蒸发了。 */
+        const v=el.innerText.replace(/\u00a0/g,' ').trim();
+        if(v!==r.en){ r.en=v; syncToSrc(r); }
+        markEdited(r);          // 只改原文：译文仍是新翻的，照常允许折行
+      }else{
+        /* 译文同样当场回读（v0.9.270 hotfix）：「改完译文立刻刷新」这条路径上，
+           快照是唯一的数据来源。原文有 syncToSrc 兜底（重跑不丢），译文如果也等到
+           collectZh 才回读，落进快照的就是上上版的旧译文，「刷新不丢」成了空话。 */
+        el.classList.remove('placeholder');
+        const v=el.innerText.replace(/\u00a0/g,' ').trim();
+        if(v!==r.zh){ r.zh=v; }
+        markZhEdited(r);        // 改了译文：连折行一起豁免
+      }
+      saveEdits(); renderEdBar();
+    }
+  });
+})();
+
+/* v0.9.189：改折行阈值后立刻按新阈值重排，让表格里看得见效果（导出本来就实时生效，
+   只是表格预览不跟着变）。
+   ⚠️ 必跳过 r.edited（用户在表格里手工编辑过的行）：monoFit 先 squashLines 压平，
+   会把手工折行、手写的音效标记（stripSoundTags 会删）、故意留的空行一起抹掉
+   （实测「我们要走了\n你别送了」→「我们要走了你别送了」）。这与 buildMonoParts R0
+   「尊重用户手工折行」的意图直接冲突，所以手工改过的行一律不动。 */
+function reflowRows(){
+  if (S.translating) return;                       // 翻译中不插手
+  if (!S.rows || !S.rows.some(r=>r && r.zh)) return; // 没译文时无事可做
+  collectZh();                                     // 先把 DOM 里的最新编辑读回（含 edited 行）
+  let n=0, skip=0;
+  S.rows.forEach(r=>{
+    if (!r || r.flag==='drop' || r.flag==='merged' || !r.zh) return;
+    if (r.zhHand) { skip++; return; }   // v0.9.270：判据收敛为 zhHand（同 applyPost）
+    const o = reflowOne(r);
+    if (o.text !== r.zh) n++;
+    r.zh = o.text;
+  });
+  S.wrapN=n;
+  renderRows();
+  if (n) log(t('postDone',S.maxW), 'okc');
+}
+
+/* ============ v0.9.270 字幕区就地编辑（时间轴 / 原文 / 译文） ============
+   改这块之前先读三条：
+   ① 主站导出的条目与 S.rows 不是一一对应（超容量会切成多条、合并句组会并入承载行、
+      丢弃行会跳过），所以编辑一律直接改 S.rows —— 导出是派生的，自动跟着变。
+      绝不要试图去改导出结果，那是无解的（切出来的子条目是引擎按宽度现算的）。
+   ② 时间轴与原文必须同步写回 S.srcItems：重跑翻译时 S.rows 由它重建，
+      不写回 = 用户改完再点一次「翻译」，改动全没。
+   ③ 指纹用导入时就固定的 S.srcFp0，不能现算 srcFingerprint(S.srcItems)：
+      改了原文会让指纹漂移，同一份字幕的快照就再也认不出来。 */
+const EDIT_KEY='srt_edit_v1';
+let editT=0, OV_ROW=null, ISS={};
+function canEdit(){ return !S.translating; }
+function editFp(){ return [S.fileBase||'', (S.rows||[]).length, S.srcFp0||''].join('|'); }
+function editedCount(){ return (S.rows||[]).filter(function(r){ return r.edited; }).length; }
+function markEdited(r){ if(!r.__o) r.__o={en:r.en,zh:r.zh,start:r.start,end:r.end}; r.edited=true; }
+/* 译文被手工改过：除 edited 之外再打一个 zhHand，专门用来豁免「自动折行」——
+   用户手敲的折行 / 音效标记 / 故意留的空行不能被 monoFit 压平。
+   ⚠️ 只改了原文或时间轴的行**不**打这个标记：那行的译文仍是引擎新翻的，必须照常折行。
+   （v0.9.270 之前豁免判据直接是 r.edited；时间轴与原文开放编辑后，edited 的覆盖面变大了，
+     再拿它当「别碰这行译文」的判据会把新译文也一起放过，所以收敛成独立标记。） */
+function markZhEdited(r){ markEdited(r); r.zhHand=true; }
+function syncToSrc(r){
+  const it=(S.srcItems||[])[r.no-1];
+  if(it){ it.start=r.start; it.end=r.end; it.text=r.en; }
+}
+/* 时间码解析：绝对 00:01:23,456 / 1:23,4；相对 +1.5s / -500 / +2m；纯数字按毫秒。
+   base 是相对值的基准（开始框用原 start、结束框用原 end）。认不出来返回 null。 */
+function parseTc(v, base){
+  const s=String(v==null?'':v).trim(); if(!s) return null;
+  let m=s.match(/^([+-])(\d+(?:\.\d+)?)\s*(ms|s|m)?$/i);
+  if(m){
+    const n=parseFloat(m[2]); if(!isFinite(n)) return null;
+    const u=String(m[3]||'ms').toLowerCase();
+    const d=(u==='s'?n*1000:u==='m'?n*60000:n);
+    return Math.max(0, Math.round((base||0)+(m[1]==='-'?-d:d)));
+  }
+  m=s.match(/^(?:(\d+):)?(\d{1,2}):(\d{1,2})[,.](\d{1,3})$/);
+  if(m){
+    const h=+(m[1]||0), mi=+m[2], se=+m[3], ms=+m[4];
+    if(mi>59||se>59) return null;
+    return (h*3600+mi*60+se)*1000+(m[4].length===1?ms*100:m[4].length===2?ms*10:ms);
+  }
+  if(/^\d+(?:\.\d+)?$/.test(s)) return Math.max(0, Math.round(parseFloat(s)));
+  return null;
+}
+/* ---------- 存盘：只存改过的行（整篇存会爆 5MB 配额） ---------- */
+function saveEdits(){
+  clearTimeout(editT);
+  editT=setTimeout(function(){
+    try{
+      const rows=(S.rows||[]).filter(function(r){ return r.edited; });
+      if(!rows.length){ localStorage.removeItem(EDIT_KEY); return; }
+      localStorage.setItem(EDIT_KEY, JSON.stringify({v:1, fp:editFp(),
+        rows:rows.map(function(r){ return [r.id,r.en,r.zh,r.start,r.end]; })}));
+    }catch(e){}   // 写满 / 隐私模式：只降级「不再存」，绝不影响编辑本身
+  },150);
+}
+/* keepZh=true：跳过译文恢复——翻译刚产出的一轮，译文永远是最新的，
+   拿快照里的旧值盖回去等于把刚翻好的译文抹掉（v0.9.270 线上事故，见下注释）。 */
+function restoreEdits(keepZh){
+  try{
+    const raw=localStorage.getItem(EDIT_KEY); if(!raw) return 0;
+    const o=JSON.parse(raw); if(!o||o.fp!==editFp()) return 0;
+    let n=0;
+    (o.rows||[]).forEach(function(a){
+      const r=(S.rows||[]).find(function(x){ return x.id===a[0]; }); if(!r) return;
+      /* ⚠️⚠️ 空译文绝不许回写。快照是在「翻译之前」落的（用户改时间轴 / 改原文 / 体检时），
+         那一刻译文还没产出，存下来的 zh 就是空的。无条件 `r.zh=a[2]` 会把模型刚翻好的
+         译文清成 null —— 编辑区只显示「待翻译…」，导出也跟着是空的（v0.9.270 线上事故）。
+         两条防线：① 翻译完成这条路径整体跳过译文（keepZh）；② 任何路径都不写空值。 */
+      const take = !keepZh && a[2]!=null && String(a[2])!=='';
+      take ? markZhEdited(r) : markEdited(r);   // ⚠️ markEdited 必须在赋值之前
+      r.en=a[1]; if(take) r.zh=String(a[2]); r.start=a[3]; r.end=a[4];
+      syncToSrc(r); n++;
+    });
+    return n;
+  }catch(e){ return 0; }
+}
+function clearEdits(){
+  (S.rows||[]).forEach(function(r){
+    if(!r.edited) return;
+    if(r.__o){ r.en=r.__o.en; r.zh=r.__o.zh; r.start=r.__o.start; r.end=r.__o.end; }
+    r.edited=false; r.zhHand=false; delete r.__o; syncToSrc(r);
+  });
+  OV_ROW=null; ISS={};
+  try{ localStorage.removeItem(EDIT_KEY); }catch(e){}
+}
+/* ---------- 渲染 ---------- */
+function renderTcBar(){ const b=$('tcBar'); if(b) b.style.display=(S.rows||[]).length?'flex':'none'; }
+function renderEdBar(){
+  const b=$('edBar'); if(!b) return;
+  const n=editedCount();
+  if(!n){ b.style.display='none'; return; }
+  b.style.display='flex';
+  b.innerHTML='<i class="ed-dot"></i><span>'+esc(t('edBarCount',n))+'</span>'
+    +'<span>'+esc(t('edBarKeep'))+'</span>';
+  const btn=document.createElement('button');
+  btn.type='button'; btn.className='btn'; btn.textContent=t('edClear');
+  btn.onclick=function(){ const k=editedCount(); clearEdits(); renderRows(); log(t('edCleared',k),'okc'); };
+  b.appendChild(btn);
+}
+/* 原文回读（译文的回读是 collectZh，两个都要在导出/重排前跑） */
+function collectEn(){
+  document.querySelectorAll('#rows .en.ed').forEach(function(el){
+    const grid=el.closest('.cuegrid'); if(!grid) return;
+    const r=S.rows.find(function(x){ return x.id===+grid.dataset.id; }); if(!r) return;
+    const v=el.innerText.replace(/\u00a0/g,' ').trim();
+    if(v!==r.en){ markEdited(r); r.en=v; syncToSrc(r); saveEdits(); }
+  });
+}
+/* ---------- 时间轴：单行精修 ---------- */
+function beginTc(span){
+  if(!canEdit()) return;
+  const grid=span.closest?span.closest('.cuegrid'):null; if(!grid) return;
+  const r=S.rows.find(function(x){ return x.id===+grid.dataset.id; }); if(!r) return;
+  const box=document.createElement('div'); box.className='tc-in';
+  const a=document.createElement('input'); a.type='text'; a.value=C.fmtTime(r.start); a.title=t('edStart');
+  const b=document.createElement('input'); b.type='text'; b.value=C.fmtTime(r.end); b.title=t('edEnd');
+  const hint=document.createElement('div'); hint.className='tc-hint'; hint.textContent=t('edTmHint');
+  box.appendChild(a); box.appendChild(b); box.appendChild(hint);
+  span.replaceWith(box);
+  a.focus(); a.select();
+  let done=false;
+  function finish(save){
+    if(done) return; done=true;
+    if(save){
+      const s=parseTc(a.value,r.start), e=parseTc(b.value,r.end);
+      if(s==null||e==null||e<=s){ log(t('edBadTime'),'err'); }
+      else { markEdited(r); r.start=s; r.end=e; syncToSrc(r); saveEdits(); OV_ROW=ovOf(r); }
+    }
+    renderRows();
+  }
+  [a,b].forEach(function(inp){
+    inp.addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); finish(true); }
+      else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); }
+    });
+    inp.addEventListener('blur',function(){
+      setTimeout(function(){ if(box.contains(document.activeElement)) return; finish(true); },150);
+    });
+  });
+}
+/* ---------- 时间轴：与邻居重叠时的三选 ---------- */
+function ovOf(r){
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  if(p && r.start<p.end-1) return r.id;
+  if(n && r.end>n.start+1) return r.id;
+  return null;
+}
+function ovHtml(r){
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  const withPrev=!!(p&&r.start<p.end-1);
+  const no=withPrev?(p?p.no:0):(n?n.no:0);
+  return '<div class="ov-bar"><span>'+esc(t('issOverlap'))+' · #'+no+'</span>'
+    /* 与上一条重叠 → 把开始往后吸；与下一条重叠 → 把结束往回收。文案跟着分支走 */
+    +'<button type="button" class="btn" data-ov="snap">'+esc(withPrev?t('tcSnapPrev'):t('tcSnapNext'))+'</button>'
+    +'<button type="button" class="btn" data-ov="push">'+esc(t('tcPushNext'))+'</button>'
+    +'<button type="button" class="btn" data-ov="keep">'+esc(t('tcKeepOv'))+'</button></div>';
+}
+function ovFix(kind){
+  const r=S.rows.find(function(x){ return x.id===OV_ROW; });
+  if(!r){ OV_ROW=null; renderRows(); return; }
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  const withPrev=!!(p&&r.start<p.end-1), withNext=!!(n&&r.end>n.start+1);
+  if(kind==='snap'){
+    if(withPrev){ markEdited(r); r.start=p.end; if(r.end<=r.start) r.end=r.start+1; }
+    else if(withNext){ markEdited(r); r.end=n.start; if(r.start>=r.end) r.start=Math.max(0,r.end-1); }
+    syncToSrc(r); saveEdits();
+  }else if(kind==='push'&&withNext){
+    const d=r.end-n.start;
+    for(let k=i+1;k<S.rows.length;k++){
+      const x=S.rows[k]; markEdited(x);
+      x.start=Math.max(0,x.start+d); x.end=Math.max(x.start+1,x.end+d); syncToSrc(x);
+    }
+    saveEdits();
+  }
+  OV_ROW=null; renderRows();
+}
+/* ---------- 时间轴：批量校正 ---------- */
+function shiftTimes(fromNo, ms){
+  let n=0;
+  (S.rows||[]).forEach(function(r){
+    if(fromNo && r.no<fromNo) return;
+    markEdited(r); r.start=Math.max(0,r.start+ms); r.end=Math.max(r.start+1,r.end+ms); syncToSrc(r); n++;
+  });
+  saveEdits(); OV_ROW=null; renderRows();
+  return n;
+}
+function scaleTimes(t1,t2){
+  const rows=S.rows||[]; if(rows.length<2) return 0;
+  const a0=rows[0].start, a1=rows[rows.length-1].start;
+  if(a1<=a0) return 0;
+  const k=(t2-t1)/(a1-a0);
+  rows.forEach(function(r){
+    markEdited(r);
+    const d=Math.max(1,Math.round((r.end-r.start)*k));
+    r.start=Math.max(0,Math.round(t1+(r.start-a0)*k)); r.end=r.start+d; syncToSrc(r);
+  });
+  saveEdits(); OV_ROW=null; renderRows();
+  return rows.length;
+}
+/* ---------- 时间轴：时长体检 ---------- */
+function timeIssues(){
+  const rows=(S.rows||[]).filter(function(r){ return r.flag!=='drop'&&r.flag!=='merged'; });
+  const items=rows.map(function(r){ return {no:r.no,start:r.start,end:r.end,text:String(r.zh||r.en||'')}; });
+  const dst=(($('dstLang')||{}).value)||'';
+  return C.validateItems(items).concat(C.readingSpeedIssues(items,dst));
+}
+function paintIssues(){
+  ISS={};
+  const iss=timeIssues();
+  iss.forEach(function(i){
+    const r=(S.rows||[]).find(function(x){ return x.no===i.at; }); if(!r) return;
+    (ISS[r.id]=ISS[r.id]||[]).push(i);
+  });
+  return iss.length;
+}
+/* v0.9.392：这里原本是「一键修」（自动解重叠 + 补最短时长），已下架。
+   理由：时间轴该怎么修取决于片子本身——顺推会连带后面几十条一起挪，
+   补时长会把该短的地方强行拉长。机器替用户拍板，改出来的往往比原来更难收拾。
+   现在体检只负责把问题报到每一行上（行内标红 + 条数），交给用户自己判断。 */
+/* 带输入框的小弹窗：沿用 askReuse 的样式与「点遮罩 = 取消」约定 */
+function askFields(title, fields, okTxt){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:12px;';
+    h.textContent=title; box.appendChild(h);
+    const ins=[];
+    fields.forEach(function(f){
+      const row=document.createElement('div'); row.style.cssText='margin-bottom:12px;';
+      const lb=document.createElement('div');
+      lb.style.cssText='font-size:12.5px;color:var(--sub);margin-bottom:4px;'; lb.textContent=f.label;
+      const ip=document.createElement('input'); ip.type='text'; ip.value=f.value||'';
+      ip.style.cssText='width:100%;box-sizing:border-box;font-family:var(--mono,ui-monospace,monospace);font-size:13px;padding:6px 8px;border:1px solid var(--line-strong);border-radius:8px;background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430);';
+      row.appendChild(lb); row.appendChild(ip); box.appendChild(row); ins.push(ip);
+    });
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px;';
+    function mk(txt,primary,val){
+      const b=document.createElement('button');
+      b.type='button'; b.className='btn'; b.textContent=txt;
+      if(primary) b.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      b.onclick=function(){
+        const vs=ins.map(function(i){ return i.value; });
+        ov.remove(); resolve(val?vs:null);
+      };
+      btns.appendChild(b);
+    }
+    mk(t('reuseCancel'),false,null);
+    mk(okTxt,true,'ok');
+    box.appendChild(btns); ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve(null); } });
+    document.body.appendChild(ov);
+    if(ins[0]) ins[0].focus();
+  });
+}
+/* 事件委托：renderRows 每次重建 DOM，逐个绑会泄漏 */
+function bindEdit(){
+  const box=$('rows'); if(!box) return;
+  box.addEventListener('click', function(ev){
+    if(!ev.target || !ev.target.closest) return;
+    const tc=ev.target.closest('.tc');
+    if(tc){ beginTc(tc); return; }
+    const ob=ev.target.closest('[data-ov]');
+    if(ob){ ovFix(ob.dataset.ov); return; }
+  });
+  const sa=$('tcShiftAll'), sf=$('tcShiftFrom'), sc=$('tcScale'), ck=$('tcCheck');
+  if(sa) sa.addEventListener('click', async function(){
+    const v=await askFields(t('tcShiftAll'), [{label:t('tcAskMs'), value:'500'}], t('assApply'));
+    if(!v) return;
+    const ms=parseInt(String(v[0]).trim(),10);
+    if(!isFinite(ms)){ log(t('edBadTime'),'err'); return; }
+    shiftTimes(0, ms);
+  });
+  if(sf) sf.addEventListener('click', async function(){
+    const v=await askFields(t('tcShiftFrom'),
+      [{label:t('tcAskFrom'), value:'1'}, {label:t('tcAskMs'), value:'500'}], t('assApply'));
+    if(!v) return;
+    const no=parseInt(String(v[0]).trim(),10), ms=parseInt(String(v[1]).trim(),10);
+    if(!isFinite(no)||!isFinite(ms)){ log(t('edBadTime'),'err'); return; }
+    shiftTimes(no, ms);
+  });
+  if(sc) sc.addEventListener('click', async function(){
+    const rows=S.rows||[]; if(rows.length<2){ log(t('edBadTime'),'err'); return; }
+    const a=rows[0], b=rows[rows.length-1];
+    const v=await askFields(t('tcScale'), [
+      {label:t('tcAskCur',C.fmtTime(a.start)), value:C.fmtTime(a.start)},
+      {label:t('tcAskCur',C.fmtTime(b.start)), value:C.fmtTime(b.start)},
+      {label:t('tcScaleHint'), value:''}
+    ], t('assApply'));
+    if(!v) return;
+    const s1=parseTc(v[0],a.start), s2=parseTc(v[1],b.start);
+    if(s1==null||s2==null||s2<=s1){ log(t('edBadTime'),'err'); return; }
+    scaleTimes(s1,s2);
+  });
+  if(ck) ck.addEventListener('click', function(){
+    collectEn(); collectZh();
+    if(Object.keys(ISS).length){ ISS={}; renderRows(); $('tcIssN').textContent=''; return; }
+    const n=paintIssues();
+    renderRows();
+    const el=$('tcIssN');
+    if(!n){ el.textContent=t('tcOk'); log(t('tcOk'),'okc'); return; }
+    el.textContent=String(n); el.title=t('stIssues');
+  });
+}
+
+bindEdit();   /* v0.9.270：事件委托只绑一次（renderRows 每次重建 DOM，逐个绑会泄漏） */
+
+/* ---------------- 翻译（API / 演练） ---------------- */
+// 把句组各行合并为一条：首行承载完整译文并把 end 延长到末条；其余标记 merged（导出时跳过）。
+// 返回被并入（跳过导出）的行数。
+function mergeGroupRows(cues, text){
+  const rows=cues.map(c=>S.rows.find(x=>x.no===c.no));
+  const first=rows[0];
+  if(!first) return 0;
+  first.zh=String(text==null?'':text).trim();
+  if(first.flag!=='drop') first.flag='';
+  const last=rows[rows.length-1];
+  if(last && last.end>first.end) first.end=last.end;
+  let n=0;
+  rows.slice(1).forEach(r=>{ if(r){ r.zh=null; r.flag='merged'; n++; } });
+  return n;
+}
+
+/* v0.9.22：非中文目标语言改用英文指令——指令语言与输出语言脱钩。
+   背景：中文指令在日/韩等与汉字有亲缘的目标语言上偶发泄漏成译文（v0.9.17、v0.9.22 两次线上评测实证），
+   英文指令经 v0.9.17 评测验证可清零该问题。中文目标（zh-CN/zh-TW）指令语言=输出语言，天然安全，沿用中文指令。 */
+const STYLE_DESC_EN = {
+  elegant: 'Balanced (default): convey the original meaning accurately, read naturally, use appropriate wording, follow the target language\'s idiomatic conventions; neither word-for-word nor over-free. Suits general use. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  plain:   'Natural colloquial: translate like people actually talk — everyday spoken style, short sentences, common words, keep the speaker\'s tone and rhythm; stiff bookish or translationese wording is a defect. Suits film/TV dialogue, anime, interviews. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  formal:  'Formal & professional: precise, concise, terminologically accurate, like professional dubbing or news narration; avoid internet slang and over-colloquialism, keep an objective declarative tone. Suits documentaries, finance, lectures, conferences. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  dubbed:  'Dubbed-film flair: like a theatrical dubbing script — punchy rhythmic short sentences, boldly localize jokes and idioms, rewrite for dramatic feel in the target language; fidelity to the literal wording is secondary. Suits entertainment content. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.'
+};
+// v0.9.73：输出示例译文表——按目标语言给出「真实译文」而非英文占位。
+// 此前示例输出一律是英文（"- Coming?" / "See you tomorrow."），每批都往上下文注入 3 句英文样本，
+// 与【MOST IMPORTANT RULE】的目标语言锚定正面冲突，deepseek-flash 尤易被 few-shot 语言带跑
+//（实测 udio-3 英→日 1194 条触发 ~100 次隔离重译）。改成目标语言真实译文后，模型有正确模仿对象。
+// 三种结构与 systemPrompt 的 input 示例一一对应：dash=双人对白、lyric=歌词分段、plain=普通句。
+// \\n 是 JSON 字符串里的换行转义（提示词中显示的是字面 \n 两字符）。
+const EX_SAMPLE = {
+  'zh-CN':{dash:'- 你来吗？\\n- 就在你后面。', lyric:'[1] 带我回家 [2] 今夜', plain:'明天见。'},
+  'zh-TW':{dash:'- 你要來嗎？\\n- 就在你後面。', lyric:'[1] 帶我回家 [2] 今夜', plain:'明天見。'},
+  'en':   {dash:'- Coming?\\n- Right behind you.', lyric:'[1] Take me home [2] tonight', plain:'See you tomorrow.'},
+  'ja':   {dash:'- 来る？\\n- すぐ後ろにいる。', lyric:'[1] 家に連れてって [2] 今夜', plain:'また明日。'},
+  'ko':   {dash:'- 갈래?\\n- 바로 뒤에 있어.', lyric:'[1] 집에 데려가 줘 [2] 오늘 밤', plain:'내일 보자.'},
+  'es':   {dash:'- ¿Vienes?\\n- Justo detrás de ti.', lyric:'[1] Llévame a casa [2] esta noche', plain:'Hasta mañana.'},
+  'pt':   {dash:'- Você vem?\\n- Logo atrás de você.', lyric:'[1] Me leva pra casa [2] hoje à noite', plain:'Até amanhã.'},
+  'de':   {dash:'- Kommst du?\\n- Direkt hinter dir.', lyric:'[1] Bring mich heim [2] heut Nacht', plain:'Bis morgen.'},
+  'fr':   {dash:'- Tu viens ?\\n- Juste derrière toi.', lyric:'[1] Ramène-moi chez moi [2] ce soir', plain:'À demain.'},
+  'id':   {dash:'- Ikut?\\n- Tepat di belakangmu.', lyric:'[1] Bawa aku pulang [2] malam ini', plain:'Sampai besok.'},
+  'hi':   {dash:'- आ रहे हो?\\n- बिल्कुल पीछे हूँ।', lyric:'[1] मुझे घर ले चलो [2] आज रात', plain:'कल मिलते हैं।'},
+  'th':   {dash:'- มาไหม?\\n- ตามหลังเลย', lyric:'[1] พาฉันกลับบ้าน [2] คืนนี้', plain:'พรุ่งนี้เจอกัน'},
+  'vi':   {dash:'- Đi không?\\n- Ngay sau bạn đây.', lyric:'[1] Đưa tôi về nhà [2] tối nay', plain:'Hẹn ngày mai.'},
+  'ru':   {dash:'- Идёшь?\\n- Прямо за тобой.', lyric:'[1] Забери меня домой [2] сегодня вечером', plain:'До завтра.'},
+  'it':   {dash:'- Vieni?\\n- Subito dietro di te.', lyric:'[1] Portami a casa [2] stasera', plain:'A domani.'},
+  'ar':   {dash:'- قادم؟\\n- خلفك مباشرة.', lyric:'[1] خذني إلى البيت [2] الليلة', plain:'أراك غدًا.'},
+  'tr':   {dash:'- Geliyor musun?\\n- Hemen arkandayım.', lyric:'[1] Götür beni eve [2] bu gece', plain:'Yarına görüşürüz.'}
+,
+  'sv':   {dash:'- Kommer du?\\n- Precis bakom dig.', lyric:'[1] Ta mig hem [2] i kväll', plain:'Vi ses i morgon.'},
+  'da':   {dash:'- Kommer du?\\n- Lige bag dig.', lyric:'[1] Tag mig hjem [2] i aften', plain:'Vi ses i morgen.'},
+  'fi':   {dash:'- Tuletko?\\n- Aivan takanasi.', lyric:'[1] Vie minut kotiin [2] tänä iltana', plain:'Nähdään huomenna.'},
+  'nb':   {dash:'- Kommer du?\\n- Rett bak deg.', lyric:'[1] Ta meg hjem [2] i kveld', plain:'Vi ses i morgen.'},
+  'cs':   {dash:'- Jdeš?\\n- Hned za tebou.', lyric:'[1] Vezmi mě domů [2] dnes večer', plain:'Uvidíme se zítra.'},
+  'sk':   {dash:'- Ideš?\\n- Hneď za tebou.', lyric:'[1] Zaveď ma domov [2] dnes večer', plain:'Vidíme sa zajtra.'},
+  'hu':   {dash:'- Jössz?\\n- Rögtön mögötted.', lyric:'[1] Vigyél haza [2] ma este', plain:'Holnap találkozunk.'},
+  'ro':   {dash:'- Vii?\\n- Chiar în spatele tău.', lyric:'[1] Du-mă acasă [2] în seara asta', plain:'Ne vedem mâine.'},
+  'ca':   {dash:'- Vens?\\n- Just darrere teu.', lyric:'[1] Porta-m a casa [2] aquesta nit', plain:'Fins demà.'},
+  'hr':   {dash:'- Dolaziš?\\n- Odmah iza tebe.', lyric:'[1] Odvedi me kući [2] večeras', plain:'Vidimo se sutra.'},
+  'el':   {dash:'- Έρχεσαι;\\n- Ακριβώς πίσω σου.', lyric:'[1] Πάρε με σπίτι [2] απόψε', plain:'Τα λέμε αύριο.'},
+  'uk':   {dash:'- Йдеш?\\n- Одразу за тобою.', lyric:'[1] Забери мене додому [2] сьогодні ввечері', plain:'До завтра.'},
+  'sr':   {dash:'- Долазиш?\\n- Одмах иза тебе.', lyric:'[1] Води ме кући [2] вечерас', plain:'Видимо се сутра.'},
+  'bg':   {dash:'- Идваш ли?\\n- Точно зад теб.', lyric:'[1] Заведи ме у дома [2] тази вечер', plain:'До утре.'},
+  'he':   {dash:'- בא?\\n- ממש מאחוריך.', lyric:'[1] קח אותי הביתה [2] הלילה', plain:'נתראה מחר.'},
+  'ur':   {dash:'- آ رہے ہو؟\\n- بالکل پیچھے ہوں۔', lyric:'[1] مجھے گھر لے چلو [2] آج رات', plain:'کل ملیں گے۔'},
+  'bn':   {dash:'- আসছ?\\n- ঠিক পিছনে আছি।', lyric:'[1] আমাকে বাড়ি নিয়ে যাও [2] আজ রাতে', plain:'কাল দেখা হবে।'},
+  'ta':   {dash:'- வர்றியா?\\n- உன் பின்னாலேயே இருக்கேன்.', lyric:'[1] என்னை வீட்டுக்கு கூட்டிச் செல் [2] இன்று இரவு', plain:'நாளை பார்க்கலாம்.'},
+  'te':   {dash:'- వస్తున్నావా?\\n- నీ వెనకాలే ఉన్నాను.', lyric:'[1] నన్ను ఇంటికి తీసుకెళ్ళు [2] ఈ రాత్రి', plain:'రేపు కలుద్దాం.'},
+  'mr':   {dash:'- येतोय का?\\n- अगदी मागे आहे.', lyric:'[1] मला घरी घेऊन जा [2] आज रात्री', plain:'उद्या भेटू.'},
+  'ne':   {dash:'- आउँदै छौ?\\n- एकदम पछाडि छु।', lyric:'[1] मलाई घर लैजाऊ [2] आज राति', plain:'भोलि भेटौँला।'},
+  'si':   {dash:'- එනවද?\\n- හරියටම පිටිපස්සෙන්.', lyric:'[1] මාව ගෙදර එක්කගෙන යන්න [2] අද රෑ', plain:'හෙට හමුවෙමු.'},
+  'my':   {dash:'- လာမလား?\\n- နောက်မှာပဲ။', lyric:'[1] အိမ်ကို ခေါ်သွားပါ [2] ဒီည', plain:'မနက်ဖြန် တွေ့မယ်။'},
+  'km':   {dash:'- មកទេ?\\n- នៅពីក្រោយអ្នក។', lyric:'[1] យកខ្ញុំទៅផ្ទះ [2] យប់នេះ', plain:'ជួបគ្នាថ្ងៃស្អែក។'},
+  'lo':   {dash:'- ມາບໍ່?\\n- ຢູ່ຫຼັງເຈົ້ານີ້ແຫຼະ.', lyric:'[1] ພາຂ້ອຍໄປບ້ານ [2] ຄືນນີ້', plain:'ພົບກັນມື້ອື່ນ.'},
+  'sw':   {dash:'- Unakuja?\\n- Nyuma yako kabisa.', lyric:'[1] Nipeleke nyumbani [2] usiku wa leo', plain:'Tutaonana kesho.'},
+  'pl':   {dash:'- Idziesz?\\n- Tuż za tobą.', lyric:'[1] Zabierz mnie do domu [2] dziś wieczorem', plain:'Do jutra.'},
+  'nl':   {dash:'- Kom je?\\n- Vlak achter je.', lyric:'[1] Neem me mee naar huis [2] vanavond', plain:'Tot morgen.'},
+  'ms':   {dash:'- Nak datang?\\n- Terus di belakang awak.', lyric:'[1] Bawa aku pulang [2] malam ini', plain:'Jumpa esok.'},
+  'fil':  {dash:'- Sasama ka?\\n- Nasa likod mo lang ako.', lyric:'[1] Iuwi mo ako [2] ngayong gabi', plain:'Kita bukas.'},
+  'fa':   {dash:'- میای؟\\n- درست پشت سرت.', lyric:'[1] منو ببر خونه [2] امشب', plain:'فردا می‌بینمت.'},
+  // v0.9.112 新增 27 种：对白 / 歌词 / 普通句 三条真实译文样本
+  'gu':{dash:'- આવે છે?\\n- તારી પાછળ જ છું.', lyric:'[1] મને ઘરે લઈ જા [2] આજે રાતે', plain:'આવતીકાલે મળીશું.'},
+  'kn':{dash:'- ಬರ್ತೀಯಾ?\\n- ನಿನ್ನ ಹಿಂದೆನೇ ಇದ್ದೀನಿ.', lyric:'[1] ನನ್ನನ್ನು ಮನೆಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು [2] ಈ ರಾತ್ರಿ', plain:'ನಾಳೆ ಸಿಗೋಣ.'},
+  'ml':{dash:'- വരുന്നോ?\\n- നിന്റെ പിന്നിലുണ്ട്.', lyric:'[1] എന്നെ വീട്ടിലേക്ക് കൊണ്ടുപോകൂ [2] ഇന്ന് രാത്രി', plain:'നാളെ കാണാം.'},
+  'pa':{dash:'- ਆਉਂਦਾ ਏਂ?\\n- ਬਿਲਕੁਲ ਪਿੱਛੇ ਹਾਂ।', lyric:'[1] ਮੈਨੂੰ ਘਰ ਲੈ ਚੱਲ [2] ਅੱਜ ਰਾਤ', plain:'ਕੱਲ ਮਿਲਾਂਗੇ।'},
+  'or':{dash:'- ଆସୁଛ?\\n- ଠିକ୍ ପଛରେ ଅଛି।', lyric:'[1] ମୋତେ ଘରକୁ ନେଇଯା [2] ଆଜି ରାତି', plain:'କାଲି ଦେଖା ହେବ।'},
+  'as':{dash:'- আহিছা?\\n- ঠিক পিছতে আছোঁ।', lyric:'[1] মোক ঘরলৈ লৈ যা [2] আজি রাতি', plain:'কাইলৈ দেখা হ’ব।'},
+  'kk':{dash:'- Келесің бе?\\n- Дәл артыңдамын.', lyric:'[1] Мені үйге апар [2] бүгін кешке', plain:'Ертең кездесеміз.'},
+  'uz':{dash:'- Kelyapsanmi?\\n- Aynan orqangdaman.', lyric:'[1] Meni uyga olib ket [2] bugun kechqurun', plain:'Ertaga ko‘rishguncha.'},
+  'mn':{dash:'- Ирж байна уу?\\n- Яг ард чинь байна.', lyric:'[1] Намайг гэрт минь хүргээд өг [2] өнөө орой', plain:'Маргааш уулзая.'},
+  'az':{dash:'- Gəlirsən?\\n- Düz arxandayam.', lyric:'[1] Məni evə apar [2] bu gecə', plain:'Sabah görüşərik.'},
+  'is':{dash:'- Kemurðu?\\n- Rétt á eftir þér.', lyric:'[1] Farðu með mig heim [2] í kvöld', plain:'Sjáumst á morgun.'},
+  'et':{dash:'- Tuled?\\n- Otse su taga.', lyric:'[1] Vii mind koju [2] täna õhtul', plain:'Näeme homme.'},
+  'lv':{dash:'- Nāc?\\n- Tūlīt aiz tevis.', lyric:'[1] Aizved mani mājās [2] šovakar', plain:'Tiksimies rīt.'},
+  'lt':{dash:'- Ateini?\\n- Tuoj pat už tavęs.', lyric:'[1] Parsivešk mane namo [2] šįvakar', plain:'Iki rytojaus.'},
+  'sl':{dash:'- Prideš?\\n- Takoj za tabo.', lyric:'[1] Pelji me domov [2] nocoj', plain:'Se vidimo jutri.'},
+  'sq':{dash:'- Vjen?\\n- Menjëherë pas teje.', lyric:'[1] Më ço në shtëpi [2] sonte', plain:'Shihemi nesër.'},
+  'mk':{dash:'- Доаѓаш?\\n- Веднаш зад тебе.', lyric:'[1] Однеси ме дома [2] вечерва', plain:'Се гледаме утре.'},
+  'eu':{dash:'- Etorriko zara?\\n- Zure atzean bertan.', lyric:'[1] Eraman nazazu etxera [2] gaur gauean', plain:'Bihar arte.'},
+  'gl':{dash:'- Vés?\\n- Xusto detrás de ti.', lyric:'[1] Levaime á casa [2] esta noite', plain:'Vémonos mañá.'},
+  'am':{dash:'- ትመጣለህ?\\n- ከኋላህ ነኝ።', lyric:'[1] ወደ ቤት ውሰደኝ [2] ዛሬ ማታ', plain:'ነገ እንገናኝ።'},
+  'ha':{dash:'- Kana zuwa?\\n- Daidai bayanka.', lyric:'[1] Mai da ni gida [2] a daren nan', plain:'Sai gobe.'},
+  'yo':{dash:'- Ṣe o n bọ?\\n- Lẹ́sẹ̀kẹ́sẹ̀ lẹ́yìn rẹ.', lyric:'[1] Mú mi lọ sílé [2] lálẹ́ yíí', plain:'A ó pàdé lọ́la.'},
+  'zu':{dash:'- Uyeza?\\n- Ngemuva kwakho nje.', lyric:'[1] Ngihambise ekhaya [2] namuhla ebusuku', plain:'Sizobonana kusasa.'},
+  'so':{dash:'- Ma imanaysaa?\\n- Waxaan ahay gadaashaada.', lyric:'[1] Guriga i gee [2] caawa', plain:'Berri ayaan kulmi doonaa.'},
+  'ps':{dash:'- راځې؟\\n- ستا په شا کې یم.', lyric:'[1] ما کور ته یوسه [2] نن شپه', plain:'سبا به سره وګورو.'},
+  'ku':{dash:'- دێیت؟\\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماڵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
+  'af':{dash:'- Kom jy?\\n- Net agter jou.', lyric:'[1] Vat my huis toe [2] vanaand', plain:'Sien jou môre.'},
+  // v0.9.338 新增 25 种：对白 / 歌词 / 普通句 三条真实译文样本（与上面三批同口径）
+  'yue':{dash:'- 你嚟唔嚟？\\n- 就喺你後面。', lyric:'[1] 帶我返屋企 [2] 今晚', plain:'聽日見。'},
+  'be':{dash:'- Ідзеш?\\n- Адразу за табой.', lyric:'[1] Забяры мяне дамоў [2] сёння ўвечары', plain:'Да заўтра.'},
+  'tg':{dash:'- Меоӣ?\\n- Рост дар паси ту.', lyric:'[1] Маро ба хона бар [2] имшаб', plain:'Пагоҳ вомехӯрем.'},
+  'ky':{dash:'- Келесиңби?\\n- Дароо артыңдамын.', lyric:'[1] Мени үйгө алып бар [2] бүгүн кечинде', plain:'Эртең көрүшкөнчө.'},
+  'tk':{dash:'- Gelýäňmi?\\n- Göni yzyňda.', lyric:'[1] Meni öýe äkit [2] şu gije', plain:'Ertir görüşeris.'},
+  'bs':{dash:'- Dolaziš?\\n- Tačno iza tebe.', lyric:'[1] Vodi me kući [2] večeras', plain:'Vidimo se sutra.'},
+  'mt':{dash:'- Ġej?\\n- Eżatt warajk.', lyric:'[1] Ħudni d-dar [2] illejla', plain:'Narak għada.'},
+  'cy':{dash:'- Ddoi di?\\n- Yn syth ar dy ôl.', lyric:'[1] Tyrd â fi adre [2] heno', plain:'Wela i di fory.'},
+  'ga':{dash:'- An dtiocfaidh tú?\\n- Díreach taobh thiar duit.', lyric:'[1] Tabhair abhaile mé [2] anocht', plain:'Feicfidh mé amárach thú.'},
+  'hy':{dash:'- Գալո՞ւ ես:\\n- Հենց քո հետևում եմ:', lyric:'[1] Տար ինձ տուն [2] այսօր երեկոյան', plain:'Կտեսնվենք վաղը:'},
+  'ka':{dash:'- მოხვალ?\\n- ზუსტად შენს უკან ვარ.', lyric:'[1] წამიყვანე სახლში [2] ამაღამ', plain:'ხვალამდე.'},
+  'ti':{dash:'- ትመጽእ ዲኻ?\\n- ኣብ ድሕሬኻ ኣለኹ።', lyric:'[1] ናብ ገዛ ውሰደኒ [2] ሎሚ ለይቲ', plain:'ጽባሕ ክንራኸብ።'},
+  'bo':{dash:'- ཡོང་ངམ།\\n- ང་ཁྱེད་རང་གི་རྒྱབ་ཏུ་ཡོད།', lyric:'[1] ང་ཁྱིམ་ལ་ཁྲིད་ [2] དེ་རིང་མཚན་མོར', plain:'སང་ཉིན་མཇལ་ཡོང།'},
+  'ug':{dash:'- كېلەمسەن؟\\n- دەل ئارقاڭدىمەن.', lyric:'[1] مېنى ئۆيگە ئاپىرىپ قوي [2] بۈگۈن كەچتە', plain:'ئەتە كۆرۈشەيلى.'},
+  'sd':{dash:'- اچين ٿا؟\\n- بلڪل توهانجي پويان آهيان.', lyric:'[1] مون کي گهر وٺي هل [2] اڄ رات', plain:'سڀاڻي ملنداسين.'},
+  'yi':{dash:'- קומסטו?\\n- גלייך הינטער דיר.', lyric:'[1] נעם מיך אהיים [2] היינט ביי נאכט', plain:'זען מיר זיך מארגן.'},
+  'jv':{dash:'- Arep melu?\\n- Tepak ing mburimu.', lyric:'[1] Gawa aku mulih [2] bengi iki', plain:'Ketemu sesuk.'},
+  'su':{dash:'- Arek indit?\\n- Persis di tukangeun anjeun.', lyric:'[1] Bawa ka imah [2] peuting ieu', plain:'Patepang isukan.'},
+  'ceb':{dash:'- Moanhi ka?\\n- Ania ra sa imong likod.', lyric:'[1] Dad-a ko sa balay [2] karong gabhiona', plain:'Magkita ta ugma.'},
+  'mg':{dash:'- Ho avy ve ianao?\\n- Eo aorianao ihany.', lyric:'[1] Ento mody aho [2] anio alina', plain:'Mifankahita rahampitso.'},
+  'ig':{dash:'- Ị na-abịa?\\n- N\'azụ gị kpọmkwem.', lyric:'[1] Kpọla m laa n\'ụlọ [2] n\'abalị a', plain:'Ka anyị zute echi.'},
+  'xh':{dash:'- Uyeza?\\n- Ndikanye emva kwakho.', lyric:'[1] Ndihambise ekhaya [2] ngobu busuku', plain:'Sobonana ngomso.'},
+  'sn':{dash:'- Uri kuuya here?\\n- Ndiri kumashure kwako.', lyric:'[1] Ndisvitsa kumba [2] nhasi manheru', plain:'Tichaonana mangwana.'},
+  'ny':{dash:'- Uli kubwera?\\n- Ndili pompopo kumbuyo kwako.', lyric:'[1] Nditengere kunyumba [2] usiku uno', plain:'Tidzaonana mawa.'},
+  'mi':{dash:'- Kei te haere mai koe?\\n- Kei muri tonu i a koe.', lyric:'[1] Haria ahau ki te kāinga [2] i tēnei pō', plain:'Ka kite anō āpōpō.'},
+};
+function systemPromptEn(cfg){
+  const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
+  const ex = EX_SAMPLE[cfg.dst] || EX_SAMPLE.en;
+  const srcFor = cfg.src === 'auto' ? '(identify it automatically)' : srcN.prompt;
+  const fixSpellEn = cfg.src === 'auto' ? 'using the correct spelling of the language you identify as the source' : 'using proper ' + srcN.prompt + ' spelling';
+  const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
+  const dstLabel = dstLangLabel(dstN, false); // v0.9.117："Japanese (日本語)"，自称已在 prompt 里时不再重复
+  const styleEn = (cfg.styleMode === 'custom' && cfg.styleCustom) ? ('Custom style: ' + cfg.styleCustom) : (STYLE_DESC_EN[cfg.styleMode] || STYLE_DESC_EN.elegant);
+  let s = 'You are a professional subtitle translator.\n'
+    + '[MOST IMPORTANT RULE] The target output language = ' + dstLabel + '. Every translated text field must be written in ' + dstNative
+    + '. This prompt is written in English only as the instruction language — it never determines the output language. Never copy the source text unchanged: every text field must be written in ' + dstNative + '.\n'
+    + 'Source subtitle language: ' + srcFor + '.\n'
+    /* v0.9.138 方案 C：有术语表时才在最高优先级区再声明一次，位置越靠前权重越高。
+       没有术语表时这一行根本不存在，提示词与 v0.9.137 逐字节一致（回归面为零）。 */
+    + (cfg.glossary ? '[Glossary precedence] The glossary in rule 4.5 has the highest priority of all: every term listed there must be rendered exactly as the glossary specifies, overriding rule 4 (the proper-noun policy) and any other rule — including when the glossary requires translating a name that rule 4 would otherwise keep in the original.\n' : '')
+    + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
+    /* v0.9.377：与中文版同一改动的英文侧（提示词中英两套，改文案必须两处都改，只改一处等于没改） */
+    + 'The input is a flat list of subtitle cues: each entry gives its cue number (no), on-screen duration in seconds (dur), and source text (src). A complete sentence may be split across several cues — any cue that continues the previous one carries a "p":"c" marker and must be read together with it; a cue without that marker is a sentence of its own.\n'
+    + 'Task: translate the source text of every cue into ' + dstNative + ' and give the translation cue by cue; when several cues belong to one sentence, their translations read in order must form one complete, fluent sentence.\n'
+    /* v0.9.381：与中文版【语序与条数】逐条对应（提示词中英两套，改文案必须两处都改）。
+       跨条重排必须保留，缺口的真正成因是「重排后没有重新切回 N 条」。 */
+    + '[Word order vs. cue count] To follow the natural expression of ' + dstNative + ', you MAY redistribute the content among the cues of that sentence and change its order — this is allowed and often necessary. But after redistributing, you must re-split the whole sentence according to the new word order into exactly N pieces, where N is the number of input cues, and every piece must carry readable, substantive content: never fold two cues into one, and never leave a cue empty or holding only a function word (the / of / and / to / の / は etc.) just to fill the count.\n'
+    + 'Content genre (film/TV dialogue, documentary narration, interviews, lectures, anime, etc.) is for you to infer from the source text; keep the register and tone consistent with that genre throughout — colloquial for dialogue, formal for narration, never mixed.\n'
+    + 'Rules you must follow:\n'
+    + '1. [Translation style] ' + styleEn + '\n'
+    /* v0.9.163：补上 repeat 禁令。2026-09-24 线上实测：结构错里 DUP（同一 cue 编号被输出多次）42 次，
+       远多于 MISSING 12 / EMPTY 7；原文案只禁了合并、跳过、改号、发明编号，唯独漏了「重复」，
+       模型在「一句拆多条」时会把同一句的两条 cue 写成同一个编号。
+       后半句的解释从句不可省——只加一个 repeat 会被理解成「别重复内容」而不是「别复用编号」。 */
+    + '2. [Output format] Return an object {"c":{...}}: the keys are the input cue numbers (copied verbatim) and the values are the ' + dstNative + ' translation of that cue. Every input cue number must appear exactly once — never merge, skip, renumber, repeat, or invent cue numbers; even when two cues belong to the same sentence, each keeps its own number and appears exactly once.\n'
+    /* v0.9.381：与中文版【长度控制】同步——删掉「每条只承载自己那段」「never fold into a neighboring cue」，
+       它们把合法的跨条语序重排一起禁掉了。 */
+    + '   [Length control] Keep the translation of a cue within two lines (generally no more than 20 character-widths); even when it is only half a sentence, do not pad it out into a full sentence. When the sentence\'s content is redistributed across cues, every cue must still get a readable share — none may be left empty or holding only a function word.\n'
+    + '   [Word-boundary splits] The split between adjacent cues must fall between words: never break a single word, fixed phrase, or inflected form in the middle (e.g. splitting Japanese なり|たい apart), never detach a bound particle or affix from the word it depends on; it is far better for one cue to run slightly longer or shorter than to split a word.\n'
+    + '   [Lyrics exception] When a lyric cue\'s source text carries segment numbers like [1] [2], keep every number exactly as-is in the translation — [1] stays [1]: never translate, renumber, add, or drop segments. If the input also carries a "lyric" array (a whole lyric group already numbered), return that group as one single text via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}.\n'
+    + '3. [Transcription fixes] The source text may come from speech transcription and may contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (' + fixSpellEn + '), then translate. Proper names are spelling-corrected the same way before handling them per rule 4' + (cfg.keepTerms ? ' (keep the corrected original spelling, still untransliterated)' : ' (render the corrected form in ' + dstNative + ')') + '.\n'
+    + '   [Guardrail — never over-correct] Correct only when the error is obvious and you are confident it is one. Dialect, accent, slang, deliberate colloquial contraction, stylized or artistic spelling, and legitimate spelling variants of proper names are NOT errors — never \"fix\" them. Never rewrite lyric wording or the markers [inaudible] / [unintelligible]. When one pronunciation maps to several legitimate spellings and you cannot tell which is right, keep the source form untouched. Note: this guardrail decides only whether to ALTER THE SOURCE SPELLING — it never decides whether to translate; whatever you conclude about the spelling, render the whole line in ' + dstNative + '. Never leave a line untranslated just because one spelling is uncertain.\n'
+    + '   [Typical cases] a proper name spelled the way it sounds (Mennerbrigitte→Brigitte), and numbers misheard across a run-on (\"1:00 37 Ventures\"→\"137 Ventures\"). These only illustrate the type of error — judge the same way whatever the source language is.\n'
+    + '   [Glossary interaction] If a form matches a glossary entry (rule 4.5) exactly, apply that entry as-is and do NOT correct it; only when it matches no entry verbatim does this rule apply — then correct the spelling first and apply that entry\'s rendering to the corrected form.\n'
+  if (cfg.keepTerms){
+    /* v0.9.134：这里原本拼的是「用户输入框里的逗号列表」，现已整体迁到规则 4.5 的术语表，
+       所以固定输出 '(none)'。
+       v0.9.138 方案 B：'(none)' 在填了术语表时是**自相矛盾**的——先说「用户没指定任何术语」，
+       下一行 4.5 又给出一整张表。实测（30 余次真实调用）绝大多数时候模型能自行判定 4.5 优先，
+       但规则 4 措辞更强、反例更多，仍有小概率倒向规则 4，把用户指定的译法丢掉且界面零提示。
+       改为：有术语表时输出豁免声明，把冲突在规则 4 内部就消解掉；
+       没有术语表时仍是 '(none)'，提示词与 v0.9.137 逐字节一致（回归面为零）。 */
+    s += '4. [Keep proper nouns] Personal names, organizations, products, and brands must keep their original spelling — never render them in ' + dstNative
+       + ': even widely known ' + dstNative + ' renderings must not be used (e.g. Elon Musk stays Elon Musk, SpaceX stays SpaceX, Taylor Swift stays Taylor Swift).'
+       + ' Even if the target language normally transliterates names (katakana, hangul, Cyrillic transliteration, Devanagari, etc.), Latin-script names and brands must keep their exact Latin spelling, letter for letter (Bobbi Thompson stays Bobbi Thompson — never 博比·汤普森 / 보비 톰슨 / Бобби Томпсон).'
+       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative        + ' conventions. Technical terms, jargon, and ordinary nouns are NOT proper nouns: they are outside this rule and must be rendered in ' + dstNative + ' like any other content.'
+       + (cfg.glossary
+           ? ' Exempt from this rule: the terms listed in the glossary (rule 4.5) are NOT covered by it — render each of them exactly as the glossary specifies, even when that means translating a name this rule would otherwise keep in the original.\n'
+           : ' User-specified terms that must stay in the original: (none).\n');
+  } else {
+    s += '4. [Translate proper nouns] Personal names, organizations, products, and brands must be translated into their established ' + dstNative
+       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists. Use an established rendering only for genuinely well-known names; whenever you are unsure whether an established rendering exists, keep the original spelling rather than inventing a transliteration. Technical terms, jargon, and ordinary nouns are NOT proper nouns: render them in ' + dstNative + ' like any other content.'
+       + '\n';
+  }
+  if (cfg.glossary){
+    s += '4.5 [Glossary] The following terms MUST be rendered exactly as specified, consistently across the whole file (callsigns / proper nouns / jargon, disambiguated from story context; this table takes precedence over rule 4 for these terms):\n'
+       + cfg.glossary.split('\n').map(l=>'  - '+l).join('\n') + '\n';
+  }
+  s += '5. [Filler handling — the default behavior is to translate]\n'
+   + '   - Normal sentences (any cue with substantive content) must receive a complete translation; this is the default and the vast majority of cases.\n'
+   + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue (its entry in "c" may be left empty).\n'
+   + '   - Only when every cue of one sentence is pure filler/sound tags with no substantive content should all of those cue numbers be listed in fillers; this is a rare exception.\n'
+   + '   - Note: listing a cue in fillers does not make the translation disappear — it only tells the program to clear that cue. Do not list everything in fillers to be "safe".\n'
+   + '   - Repetitions: when the same speaker repeats a word or phrase in a row (e.g. "No, no, no"), translating it once is usually enough; keep the repetition only when it is plot/emotion-pertinent (stuttering, emphasis, comedic rhythm).\n'
+   + '   - Straddling phrases translate once: when a phrase is split across two adjacent cues (e.g. one cue ends with "people who" and the next starts with "do that"), it must appear only once in the translation — never render it on both sides of the cue boundary as an echo. Translate the full sentence as one coherent unit.\n'
+   + '   - Ellipses are for fading lyrics only: never end or pause a dialogue line with an ellipsis (……/…) — let the next cue continue the sentence naturally; use a comma or a dash for unfinished speech.\n'
+   + (cfg.dropFillers!==false ? '   - Hesitation words need no translation: fillers embedded mid-sentence (uh, um, you know, I mean) are left out of the translation, together with any comma left over.\n' : '')
+   + '5.5 [Lyric segments] Lyric lines arrive with their music symbols (♪ ♫ etc.) already stripped by the program; the lyric text is marked with segment numbers like [1] [2]. When segment numbers appear in the input, keep every number exactly as-is — [1] stays [1]: never translate, renumber, add, or drop segments. Translate only the lyric text after each number; the program re-attaches the music symbols at their original positions. Conversely, when the input has NO segment numbers, you must NOT invent or add any numbers to your output. End lyric lines only with ? or ! (never a comma or period; commas may appear within a line); when a song fades into the background and is no longer subtitled, close with an ellipsis (…) to give precedence to dialogue.\n'
+   + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
+   + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
+   + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
+   + '8. [Content fidelity]\n'
+   + '   - Add nothing, drop nothing: never add information the source does not contain (invented facts, back-filled story), never omit a content word; the translation must carry exactly the information of the source.\n'
+   + '   - Idioms, slang, and cultural references: translate by meaning; equivalent target-language expressions may replace them to preserve their force and humor; never translate word-for-word.\n'
+   + '   - Profanity keeps its original strength and tone — never soften, sanitize, or tame it.\n'
+   + '   - Markers such as [inaudible], [crosstalk], [unintelligible] must be rendered per target-language subtitle conventions and kept — never treated as fillers.\n'
+   + '   - If the target language has honorific registers (Japanese, Korean, etc.), pick the level appropriate to the relationship between the speakers and keep it consistent across the whole file — never oscillate.\n'
+   + '   - Preserve numeric precision: never round numbers and never convert currency amounts into another currency ($50 stays 50 in the target currency word, same value).\n'
+   + '8.5 [Punctuation belongs to the target language] Punctuation is part of the language you are writing: always use the marks and spacing conventions of the TARGET language, never carry the source\'s punctuation marks through.\n'
+   + '9. [Output example] Return {"c":{...}} keyed by input cue number; lyric groups return one single text via the "lyric" array; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output must be in the same language as these samples:\n'
+   + 'Input (excerpt): {"cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."},{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow.","p":"c"}],"lyric":[{"g":2,"src":"[1] Take me home [2] tonight"}]}\n'
+   + 'Output: {"c":{"3":"' + ex.dash + '","18":"' + ex.plain + '"},"lyric":[{"g":2,"type":"text","text":"' + ex.lyric + '"}],"fillers":[17]}\n'
+   + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
+   + '{"c":{"3":"…","18":"…"},"lyric":[{"g":2,"type":"text","text":"[1] … [2] …"}],"fillers":[17,23]}\n'
+   + 'Once more: every translation must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); the keys of "c" must cover every input cue number exactly once; output JSON only, no markdown.\n'
+   + '10. [Per-cue hard constraint] Even when several cues belong to one sentence, each cue keeps its own number and appears exactly once; never fold the translation of consecutive cues into one number, never omit numbers because the sentence is unfinished. Before returning, check yourself on two things: (1) the number of keys in "c" must equal the number of input cues; (2) every value must contain a content word — none may be empty or consist only of function words.';
+  return s;
+}
+function systemPrompt(cfg){
+  // v0.9.22 分发：非中文目标 → 英文指令；中文目标 → 中文指令
+  if(cfg.dst !== 'zh-CN' && cfg.dst !== 'zh-TW') return systemPromptEn(cfg);
+  const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
+  const ex = EX_SAMPLE[cfg.dst] || EX_SAMPLE['zh-CN'];   // v0.9.73：示例译文跟随目标语言
+  const srcFor = cfg.src === 'auto' ? '（由你自动识别）' : srcN.prompt;
+  const fixSpellZh = cfg.src === 'auto' ? '按你识别出的源语言的正确写法' : '按' + srcN.prompt + '的正确写法';
+  const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
+  const dstLabel = dstLangLabel(dstN, true); // v0.9.117：自称已在 prompt 里时不再重复
+  let s = '你是专业字幕翻译。\n'
+  + '【最重要的规则】目标输出语言 = ' + dstLabel + '。所有译文 text 字段必须使用' + dstNative
+  + '书写——不要把源语言的原文原样留下。\n'
+  + '源字幕语言：' + srcFor + '。\n'
+  /* v0.9.138 方案 C：同英文版，只在有术语表时出现，没填术语表时提示词一字不变 */
+  + (cfg.glossary ? '【术语表优先】规则4.5的术语表具有最高优先级：表中列出的词必须严格按给定译法处理，优先于规则4（专名处理）以及其他任何规则——即使术语表要求译出一个本规则本会保留原文的名字。\n' : '')
+  + (cfg.synopsis ? '【影片背景】' + cfg.synopsis + '（仅供理解语境）\n' : '')
+  /* v0.9.377：输入改为平铺 cue 列表（去掉 merged 嵌套）。句组信息用 "p":"c" 编码：
+     与上一条同属一句的 cue 带该标记——与 groupSentences 的组边界 100% 等价，体积只有 2.3%。
+     实证见「报告-四臂干净对照」：D1（平铺+p）与线上原样 A 结构质量打平（4/594 vs 4/594，Fisher p=1.0），
+     输入 token −20%、输出 −46%，输出自身两遍逐字相同率 45.9%→58.9%。省 token 是它唯一被证实的收益。 */
+  + '输入是一批字幕 cue 的平铺列表：每条给出编号（no）、屏显秒数（dur）和原文（src）。一个完整句子可能被拆在多条 cue 里——凡与上一条同属一句的 cue 都带 "p":"c" 标记，要连着上一条一起理解；不带该标记的 cue 自己就是一句。\n'
+  + '任务：把每条 cue 的原文翻译成' + dstNative + '并逐条给出译文；同属一句的多条 cue，其译文按顺序连起来必须是一个完整、通顺的句子。\n'
+  /* v0.9.381：【语序与条数】跨条重排是目标语言语序的必然结果（例：「因为下雨／所以我们没去」→ 英文
+     「We didn't go／because it rained」），禁止它会让译文生硬，所以必须保留。缺号与「某条被掏空」的真正
+     成因不是重排本身，而是旧文案只许重排、没说重排后要把整句按新语序**重新切回 N 条**——模型搬完内容
+     边界就散了。补上「重排后重新切」这一步，两个压力才有执行路径。 */
+  + '【语序与条数】为符合' + dstNative + '的表达习惯，你可以在这一组的各条 cue 之间重新分配内容、调整先后顺序——这是允许的，必要时应这样做。但重新分配之后，必须按新的语序把整句重新切成与输入条数完全相同的 N 条，每条都要有可读的实义内容：既不许把两条并成一条，也不许为了凑数把某条留空、或只放一个虚词（the / of / and / to / の / は 之类）。\n'
+  + '内容体裁（影视对白、纪录片解说、访谈、讲座、动漫等）由你根据原文自行判断，并全程保持该体裁的语域与语气一致——对白用口语，解说用书面语，不得混用。\n'
+  + '必须遵守：\n'
+  + '1.【翻译风格】' + styleDesc(cfg) + '\n'
+  /* v0.9.163：同英文版，补「重复」禁令——实测结构错里 DUP 是大宗（详见 systemPromptEn 同处注释）。
+     提示词有中英两套，改文案必须两处都改，只改一处等于没改。 */
+  + '2.【输出格式】返回一个对象 {"c":{…}}：键是输入里的 cue 编号（原样照抄），值是该条的' + dstNative + '译文。每个输入编号必须恰好出现一次，严禁合并、跳过、改号、重复或发明编号；即使两条 cue 属于同一个句子，也各用各的编号、各出现一次。\n'
+  /* v0.9.377：【时长感知分配】→【长度控制】。旧措辞「很短的 cue 只放一个短词，句子其余部分放到时长
+     充裕的相邻 cue 上」是在教模型把内容挪走，执行过头就是整条被并掉——四臂实验里四个臂的并条
+     全部长在批尾与长句组，与此同源。dur 字段保留（不同秒数=独立条目的锚点，去掉会引发批尾整体错位），
+     但不再拿它教模型挪内容。措辞与实验 D1 臂逐字一致。 */
+  /* v0.9.381：【长度控制】去掉「只承担本条原文对应的那部分意思」「不得并进相邻 cue」两句——
+     它们与上面【语序与条数】的跨条重排直接对立（v0.9.377 那轮把「时长感知分配」改成这两句，
+     本意是防模型把整条内容挪走，但连合法的语序重排一起禁掉了）。改为：长度上限保留，底线改成
+     「每条都要分到可读的一部分」。 */
+  + '   【长度控制】每条 cue 的译文尽量控制在两行以内（一般不超过 20 个字符宽度）；即使它只是半句话，也不要靠补词把句子补完整。整句内容跨条重新分配后，仍要保证每条都分到可读的一部分——不允许某条被清空、或只剩虚词。\n'
+  + '   【词边界切分】相邻 cue 之间的切分点必须落在词与词之间：严禁把一个词、固定词组或活用形从中间劈开（如日语「なり｜たい」这类活用形被劈成两半），严禁把助词、词缀与它所依附的词拆到两条 cue 上；宁可某条 cue 的译文略长或略短，也绝不劈词。\n'
+  + '   【歌词例外】歌词分段的 cue 原文里带分段编号（如 [1] [2]）时，译文里这些编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段。输入里若另有 lyric 数组（整组歌词已编号的纯正文），按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文。\n'
+  + '3.【听写纠错】原文可能来自语音听写，可能含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（' + fixSpellZh + '）再翻译。专名同样先纠正拼写，再按规则4处理（' + (cfg.keepTerms ? '保留纠正后的原文写法、仍不音译' : '把纠正后的形式译成' + dstNative) + '）。\n'
+  + '   【护栏——严禁过度纠错】只在错误明显且你有把握时纠正；方言、口音、俚语、有意的口语省略、风格化或艺术化的拼写、专名的合法拼写变体都不是错误，严禁「改正」。歌词措辞与 [听不清]、[无法辨认] 等标记严禁改写。当同一发音对应多个合法写法且无法判定时，保留原文的拼写形式不再改动。注意：本护栏只决定「要不要改动原文的拼写」，并不决定「译不译」——无论拼写存疑与否，整句都要译成' + dstNative + '；不得因为某一处写法拿不准，就把整句原样保留不译。\n'
+  + '   【典型情形】专名被按发音写成近形拼写（Mennerbrigitte→Brigitte）、连读导致数字听错（1:00 37 Ventures→137 Ventures）；这些只是错误类型的举例，源语言不同时按同理判断。\n'
+  + '   【与术语表的关系】若某写法与术语表（规则4.5）条目完全一致，直接按该条目处理、不再纠错；只有在无法原样命中时才适用本规则——先纠正拼写，再按该条目的统一译法处理纠正后的形式。\n'
+  if (cfg.keepTerms){
+    /* v0.9.134 迁走用户术语列表后这里固定输出 '（无）'；
+       v0.9.138 方案 B：填了术语表时这句与 4.5 自相矛盾（详见英文版同处注释），
+       改为有术语表时输出豁免声明，无术语表时仍为 '（无）'——回归面为零。 */
+    s += '4.【专名保留】人名、机构、产品、品牌一律保留原文写法、严禁译成' + dstNative
+       + '：即使有广为人知的' + dstNative + '译名也保持原文，如 Elon Musk 保持 Elon Musk（严禁写成 埃隆·马斯克）、SpaceX 保持 SpaceX、Taylor Swift 保持 Taylor Swift（严禁写成 泰勒·斯威夫特）。'
+       + '即使目标语言习惯音译人名（片假名、谚文、西里尔字母转写、天城文等），拉丁字母的人名/品牌也必须保持拉丁字母原文写法、一个字母都不改（Bobbi Thompson 保持 Bobbi Thompson，严禁写成 博比·汤普森/보비 톰슨）。'
+       + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。技术术语、行业用语、普通名词不属于专名，不受本规则约束，一律按' + dstNative + '译出。'
+       + (cfg.glossary
+           ? '本规则的例外：术语表（规则4.5）中列出的词不受本规则约束——严格按术语表给定的译法处理，即使那意味着要译出一个本规则本会保留原文的名字。\n'
+           : '用户指定必须保留原文的术语：（无）。\n');
+  } else {
+    s += '4.【专名翻译】人名、机构、产品、品牌一律译成' + dstNative
+       + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名、或不确定是否存在通行译名的，一律保留原文拼写——只对确实广为人知的专名使用通行译名，拿不准就保留原文，严禁生造音译。技术术语、行业用语、普通名词不属于专名，按普通内容译成' + dstNative + '即可。'
+       + '\n';
+  }
+  if (cfg.glossary){
+    s += '4.5【术语表】以下术语必须严格按给定译法、全片统一处理（呼号/专名/军语，译法已按剧情语境确定；这些术语优先于规则4）：\n'
+       + cfg.glossary.split('\n').map(l=>'- '+l).join('\n') + '\n';
+  }
+s += '5.【水词处理——默认行为是翻译】\n'
+   + '   - 正常句子（含实义内容的任何 cue）一律给出完整译文；这是默认与绝大多数情况。\n'
+   + '   - 仅当某条 cue 整条都只是纯语气词或纯提示词（如 "Um."、"[music]"、"[音乐]"），把该 cue 编号列入 fillers 数组，程序会清空该条字幕（该条在 c 里的译文留空即可）。\n'
+   /* v0.9.377：句组级 type:"drop" 随句组协议一并退场——平铺后没有组可 drop。
+      语义改由 fillers 承载：一个句子的 cue 全被列进 fillers ⇔ 旧协议里该组 drop。
+      本地重建时按此映射回 m.type='drop'，下游 v0.9.76 纯哼唱 / v0.9.90 实义组救援通道完全不动。 */
+   + '   - 仅当同一个句子的全部 cue 都是水词/提示词（无任何实义内容）时，把这些 cue 编号全部列入 fillers；这是极少数例外。\n'
+   + '   - 注意：列入 fillers 不会让译文消失，只是程序据此清空该条字幕；不要为了"安全"而把所有 cue 都列进 fillers。\n'
+  + '   - 重复词：同一说话人连续重复的词或短语（如 "No, no, no"）通常译一次即可；但若重复本身有情绪或剧情作用（结巴、强调、喜剧节奏），应按语境保留。\n'
+  + '   - 跨条短语只译一次：源文短语拆在相邻两条 cue 之间（如一条以 "people who" 收尾、下一条以 "do that" 开头）时，该短语在译文中只出现一次，严禁在两侧各译一遍造成机械复读；按完整语义把整句作为整体翻译。\n'
+  + '   - 省略号仅限歌词淡出场景：对白译文严禁用省略号（……/…）收尾或表达句中停顿——半句话的延续交给下一条字幕自然承接，未说完的话用逗号或破折号处理。\n'
+  + (cfg.dropFillers!==false ? '   - 语气词不用翻译：夹在句子中间的迟疑词（uh、um、you know、I mean）连同多余的逗号一并省去，不出现在译文里。\n' : '')
+  + '5.5【歌词分段】歌词行的音乐符号（♪ ♫ 等）已由程序剥离，正文以 [1] [2] 等分段编号给出。输入出现分段编号时，编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段；只翻译编号后面的歌词正文，程序会把音乐符号按原文位置自动加回。反之，输入没有分段编号时，严禁自行发明或添加任何编号。歌词行末只用 ？和 ！，不用逗号或句号（行内可用逗号）；歌曲退到背景、不再翻译时用省略号（…）收尾给对白让位。\n'
+  + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
+  + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
+  + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
+  + '8.【内容保真】\n'
+  + '   - 不增不删：严禁添加原文没有的信息（脑补事实、自行补全剧情或结论），严禁漏译实义词——译文的信息量必须与原文严格对应。\n'
+  + '   - 习语、俚语、文化梗按意思翻译，可用目标语言等效表达替换，保住原有的力度与笑点，严禁逐字直译。\n'
+  + '   - 脏话与粗口保持原文的强度和语气，不得软化、净化或改温和。\n'
+  + '   - [听不清]、[交叉说话]、[无法辨认] 等标记按目标语言字幕惯例译出并保留，不得当作水词删除。\n'
+  + '   - 目标语言有敬语体系（日语、韩语等）时，按说话人之间的关系确定敬体级别并全片一致，不得忽上忽下。\n'
+  + '   - 数字保持原文精度：严禁四舍五入，严禁货币金额换算成其他币种（$50 译作 50 美元，数值不变）。\n'
+  + '8.5【标点跟随目标语言】标点属于你正在书写的语言：始终使用目标语言自己的标点与空格习惯，不要把源文的标点字形搬过来。\n'
+  + '9.【输出示例】返回 {"c":{…}}，键是输入 cue 编号；歌词组用 lyric 数组返回整组单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
+  + '输入（节选）：{"cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."},{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow.","p":"c"}],"lyric":[{"g":2,"src":"[1] Take me home [2] tonight"}]}\n'
+  + '输出：{"c":{"3":"' + ex.dash + '","18":"' + ex.plain + '"},"lyric":[{"g":2,"type":"text","text":"' + ex.lyric + '"}],"fillers":[17]}\n'
+  + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
+  + '{"c":{"3":"…","18":"…"},"lyric":[{"g":2,"type":"text","text":"[1] … [2] …"}],"fillers":[17,23]}\n'
+  + '再次强调：所有译文必须用' + dstNative + '书写；译文一律单行（「- 」双说话人结构除外）；c 的键必须恰好覆盖每个输入 cue 编号各一次；只输出 JSON，不要 markdown 代码块。\n'
+  /* v0.9.377：第 10 条与实验 D1 臂逐字一致（D1 = 平铺+p+改L9+本条硬约束，是与线上 A 打平的那一臂）。
+     四臂实验里凡是「只改提示词、保留句组」的臂（G/G2/G3）全部显著更差，而平铺臂带的这条约束
+     是 D1 配置的组成部分，不能只抄一半。 */
+  + '10.【逐条硬约束】即使多条 cue 属于同一句，也必须一条 cue 对应一个编号、各返回一次；严禁把连续多条 cue 的译文合并到其中一个编号上，也严禁因为句子没说完就少返回编号。返回前请自查两件事：① c 的键数必须等于输入 cues 的条数；② 每条译文都含实义词，没有任何一条是空的、或只剩虚词。';
+  return s;
+}
+
+/* v0.9.121/122：JSON 容错修复——仅在严格解析失败后尝试，修完再 parse，仍失败才抛错（对正常输出零影响）。
+   已修八类实测/高发的模型手误：①字符串值内未转义双引号（引号后跟 } ] : 或「, 且其后是 " } ]」视为收尾，
+   否则视为内容引号补转义）；②字符串内裸控制字符（换行/制表补转义）；③数字前导零（"no":03 → 3）；
+   ④成员间漏逗号（值结束后紧跟 " { [ 时补 , ）；⑤缺闭合括号（栈感知：] 前缺 } 补 }、} 前缺 ] 补 ]、
+   多余 } ] 丢弃）；⑥输入截断（结尾补字符串收尾引号 + 按栈补齐 } ]）；⑦裸 key / 错位引号 key
+   （fillers: 或 fillers": → 补引号，错位变体顺带清掉前一字符串值吞进的 }], 垃圾尾巴）；
+   ⑧引号紧跟引号歧义（内容引号 vs 收尾+漏逗号，alt 备选双策略，谁能 parse 通用谁）。
+   修过任何一处才返回新串，全未修返回 null。 */
+function repairLlmJson(s,alt){
+  let out='',i=0;const n=s.length;let inStr=false,changed=false,prev='';
+  const stack=[];
+  const ws=c=>c===' '||c==='\t'||c==='\r'||c==='\n';
+  const valEnd=()=>prev==='"'||prev==='}'||prev===']'||(prev>='0'&&prev<='9')||prev==='e'||prev==='l';
+  while(i<n){
+    const c=s[i];
+    if(inStr){
+      if(c==='\\'){
+        const d=s[i+1];
+        if(d===undefined){out+='\\';changed=true;i++;continue;}
+        if('"\\/bfnrtu'.indexOf(d)>=0){out+=c+d;i+=2;continue;}
+        out+='\\\\'+d;changed=true;i+=2;continue;
+      }
+      if(c==='"'){
+        let j=i+1;while(j<n&&ws(s[j]))j++;
+        const nx=s[j];
+        let close=(nx===undefined||nx==='}'||nx===']'||nx===':');
+        if(!close&&nx===','){let k=j+1;while(k<n&&ws(s[k]))k++;if(s[k]==='"'||s[k]==='}'||s[k]===']')close=true;}
+        /* v0.9.122：错位引号模式——引号后跟「裸词 + 可选引号 + :」（本串收尾引号被下一个 key 的
+           起始引号顶替）→ 视为收尾，后续交给裸 key 分支补引号。
+           守卫：往前跳过空白后的上一字符是引号（在字符串内 ⇒ 它刚被当内容转义，"b""c": /
+           "b" "c": 场景）则不触发；真错位引号前面是 }], 垃圾，不会紧跟被转义的引号 */
+        let pi=i-1;while(pi>=0&&ws(s[pi]))pi--;
+        if(!close&&!(pi>=0&&s[pi]==='"')&&nx!==undefined&&/[A-Za-z_$\u0080-\uFFFF]/.test(nx)){
+          let k2=j;while(k2<n&&/[A-Za-z0-9_$\u0080-\uFFFF]/.test(s[k2]))k2++;
+          let k3=k2;while(k3<n&&ws(s[k3]))k3++;
+          if(s[k3]==='"')k3++;
+          if(s[k3]===':'&&k2>j)close=true;
+        }
+        if(!close&&alt&&nx==='"')close=true;
+        if(close){inStr=false;out+=c;prev='"';i++;continue;}
+        out+='\\"';changed=true;i++;continue;
+      }
+      if(c.charCodeAt(0)<32){
+        out+=(c==='\n')?'\\n':(c==='\t')?'\\t':(c==='\r')?'\\r':'\\u'+('000'+c.charCodeAt(0).toString(16)).slice(-4);
+        changed=true;i++;continue;
+      }
+      out+=c;i++;continue;
+    }
+    if(ws(c)){out+=c;i++;continue;}
+    if(c==='"'){
+      if(valEnd()){out+=',';changed=true;}
+      inStr=true;out+=c;i++;continue;
+    }
+    if(c==='{'||c==='['){
+      if(valEnd()){out+=',';changed=true;}
+      stack.push(c);out+=c;prev=c;i++;continue;
+    }
+    if(c==='}'){
+      /* v0.9.123：多余的 }（模型每个数组元素后多打一个，实测 {"gno":2,…"text":"…"}},{"gno":3,…}）。
+         栈里没有待闭合对象时，若后面还要继续放元素（下一个非空字符是 , { 或 " ）判为杂散括号丢弃；
+         旧逻辑一律「先补 ] 关数组」会把剩余元素全挤出文档（表现为「缺少句组 2/3 的结果」） */
+      if(stack.length&&stack[stack.length-1]==='['){
+        let j2=i+1;while(j2<n&&ws(s[j2]))j2++;
+        if(s[j2]===','||s[j2]==='{'||s[j2]==='"'){changed=true;i++;continue;}
+      }
+      while(stack.length&&stack[stack.length-1]==='['){out+=']';stack.pop();changed=true;}
+      if(stack.length&&stack[stack.length-1]==='{'){stack.pop();out+=c;prev=c;i++;continue;}
+      changed=true;i++;continue;
+    }
+    if(c===']'){
+      while(stack.length&&stack[stack.length-1]==='{'){out+='}';stack.pop();changed=true;}
+      if(stack.length&&stack[stack.length-1]==='['){
+        /* v0.9.122 alt：数组收尾 ] 后紧跟 , { 或 {（明显还要继续放元素——模型多发了一个 ]）
+           → 丢弃该 ]、数组保持开放。默认策略不启用（零回归），alt 候选才试 */
+        let j2=i+1;while(j2<n&&ws(s[j2]))j2++;
+        if(alt&&(s[j2]==='{'||(s[j2]===','&&(s[j2+1]==='{'||s.slice(j2+1,j2+3).trim()==='{')))){changed=true;i++;continue;}
+        stack.pop();out+=c;prev=c;i++;continue;
+      }
+      changed=true;i++;continue;
+    }
+    if(c==='0'&&/[0-9]/.test(s[i+1]||'')){
+      let j=i+1;while(j<n&&s[j]==='0')j++;
+      if(j<n&&/[0-9]/.test(s[j])){changed=true;i=j;continue;}
+      changed=true;out+='0';i=j;continue;
+    }
+    if(/[0-9+\-]/.test(c)){
+      let j=i+1;while(j<n&&/[0-9.eE+\-]/.test(s[j]))j++;
+      out+=s.slice(i,j);prev=s[j-1];i=j;continue;
+    }
+    if(c===','){
+      let j=i+1;while(j<n&&ws(s[j]))j++;
+      if(s[j]==='}'||s[j]===']'){changed=true;i++;continue;}
+      out+=c;prev=c;i++;continue;
+    }
+    /* v0.9.122：裸 key（fillers:）或错位引号 key（fillers":）→ 补引号；错位变体顺带清掉
+       前一字符串值吞进的 }], 垃圾尾巴（实测：text 收尾引号被 key 起始引号顶替时值会吞掉 }], ） */
+    if(/[A-Za-z_$\u0080-\uFFFF]/.test(c)){
+      let j=i+1;
+      while(j<n&&s[j]!=='"'&&',{}[]:'.indexOf(s[j])<0&&!ws(s[j]))j++;
+      let k=j;while(k<n&&ws(s[k]))k++;
+      const stray=(s[k]==='"');
+      if(stray)k++;
+      if(s[k]===':'&&j>i){
+        if(stray)out=out.replace(/[\]},\t\r\n ]+(?="$)/,'');
+        if(valEnd()){out+=',';changed=true;}
+        out+='"'+s.slice(i,j)+'":';changed=true;prev=':';i=k+1;continue;
+      }
+      out+=s.slice(i,j);prev=(s[j-1]||prev);i=j;continue;
+    }
+    out+=c;prev=c;i++;continue;
+  }
+  /* v0.9.122：输入结束仍未闭合——补字符串收尾引号 + 按栈补齐 } ]（截断/重复文档场景） */
+  if(inStr){out+='"';changed=true;}
+  while(stack.length){out+=(stack.pop()==='{'?'}':']');changed=true;}
+  return changed?out:null;
+}
+/* v0.9.123：结构级抢救——字符级修复搞不定时的最后一档：不问语法，直接按键名扫描捞出句组。
+   实测畸形（弱结构化模型）：{"gno":2,"type":"text","text":"下がって！"}},{"gno":3,"type":"译文…"}}
+   ① 每个元素后多打一个 } ② 丢掉 cues 数组改用组级 text ③ 连 type 的值都被写成译文。
+   下游本来就兼容「组级 text」旧格式，所以只要捞出 (gno → 译文) 就能用；
+   仅在严格解析 + 双策略字符修复全部失败后启用（合法 JSON 永远走不到这里）。 */
+function unescStr(v){ try{ return JSON.parse('"'+v+'"'); }catch(e){ return v; } }
+/* v0.9.123：已知 type 取值白名单——模型若把译文写进了 type（实测 {"gno":3,"type":"アウトロー…"}），
+   该组既无 cues 也无 text，下游会当作空译文。此处把它搬回 text。
+   正常输出的 type 只会是 text/drop/music/song/lyric，所以对其他模型零触发。 */
+const KNOWN_GTYPE={text:1,drop:1,music:1,song:1,lyric:1};
+/* v0.9.377：平铺协议 {"c":{"编号":"译文"},"lyric":[{"g":组号,"text":"…"}],"fillers":[…]} 的三个适配器。
+   ① flatCueMap → {no:译文}。容忍三种回落形态：c 对象（标准）、cues 数组、groups 数组（模型照旧
+     输出旧协议时也能收下，不至于整批作废）。
+   ② flatLyricMap → {gno:{type,text}}，键名 lyric / ly 都认。
+   ③ salvageFlat：结构级抢救的平铺版（严格解析 + 双策略字符修复全败后的最后一档）。
+   三者只做形状收敛、不判对错——对错仍由 validateCueAlign 与锚定校验裁定。 */
+function flatCueMap(obj){
+  const out={};
+  if(!obj||typeof obj!=='object') return out;
+  const c=obj.c;
+  if(c&&typeof c==='object'&&!Array.isArray(c)){
+    Object.keys(c).forEach(k=>{
+      const n=Number(k); if(!isFinite(n)) return;
+      const v=c[k];
+      out[n]=(v&&typeof v==='object')?String(v.text==null?'':v.text):String(v==null?'':v);
+    });
+  }
+  [obj.cues,obj.groups].forEach(arr=>{
+    if(!Array.isArray(arr)) return;
+    arr.forEach(x=>{
+      if(!x||typeof x!=='object') return;
+      if(Array.isArray(x.cues)) x.cues.forEach(y=>{
+        if(!y||y.no==null) return;
+        const n=Number(y.no); if(!isFinite(n)||(n in out)) return;
+        out[n]=String(y.text==null?(y.zh==null?'':y.zh):y.text);
+      });
+      else if(x.no!=null){
+        const n=Number(x.no); if(!isFinite(n)||(n in out)) return;
+        out[n]=String(x.text==null?(x.zh==null?'':x.zh):x.text);
+      }
+    });
+  });
+  return out;
+}
+function flatLyricMap(obj){
+  const out={};
+  if(!obj||typeof obj!=='object') return out;
+  const arr=Array.isArray(obj.lyric)?obj.lyric:(Array.isArray(obj.ly)?obj.ly:null);
+  if(!arr) return out;
+  arr.forEach(x=>{
+    if(!x) return;
+    const g=Number(x.g!=null?x.g:x.gno);
+    if(!isFinite(g)||out[g]) return;
+    out[g]={ type:x.type||'text', text:String(x.text==null?(x.zh==null?'':x.zh):x.text) };
+  });
+  return out;
+}
+function normalizeFlatShape(o){
+  if(!o||typeof o!=='object') return o;
+  if(o.c&&typeof o.c==='object'&&!Array.isArray(o.c)){
+    const n={};
+    Object.keys(o.c).forEach(k=>{ const kk=String(Number(k)); if(isFinite(Number(k))) n[kk]=o.c[k]; });
+    o.c=n;
+  }
+  if(Array.isArray(o.lyric)) o.lyric.forEach(x=>{ if(x&&typeof x.g==='string'&&/^-?\d+$/.test(x.g.trim())) x.g=+x.g.trim(); });
+  return o;
+}
+function salvageFlat(s){
+  if(!s||typeof s!=='string') return null;
+  /* 平铺协议才有 c / lyric 键；纯旧协议串（{"groups":[{"gno":…}]}）一律不接，
+     否则 "gno":N …"text":"…" 会被误当成 lyric 组收下——那部分归 salvageGroups 管。 */
+  if(!/"c"\s*:\s*\{/.test(s) && !/"lyric"\s*:\s*\[/.test(s) && !/"ly"\s*:\s*\[/.test(s)) return null;
+  const out={ c:{}, lyric:{} };
+  /* c 段：从 "c":{ 起按花括号栈截到配对的 }，再逐条扫 "编号":"译文" */
+  const ci=s.search(/"c"\s*:\s*\{/);
+  if(ci>=0){
+    const i=s.indexOf('{',ci); let d=0,j=i;
+    for(;j<s.length;j++){ const ch=s[j]; if(ch==='{')d++; else if(ch==='}'){ d--; if(!d) break; } }
+    const seg=s.slice(i,j+1);
+    const re=/"?(\d+)"?\s*:\s*"((?:[^"\\]|\\.)*)"/g; let m;
+    while((m=re.exec(seg))){ const n=+m[1]; if(!(n in out.c)) out.c[n]=unescStr(m[2]); }
+  }
+  /* lyric 段："g" 与它后面紧跟的 text（容忍中间夹 type 等字段） */
+  const lre=/"(?:g|gno)"\s*:\s*"?(-?\d+)"?[^}]{0,200}?"(?:text|zh)"\s*:\s*"((?:[^"\\]|\\.)*)"/g; let lm;
+  while((lm=lre.exec(s))){ const g=+lm[1]; if(!out.lyric[g]) out.lyric[g]={type:'text',text:unescStr(lm[2])}; }
+  if(!Object.keys(out.c).length && !Object.keys(out.lyric).length) return null;
+  return out;
+}
+function normalizeGroupsShape(o){
+  if(!o||!Array.isArray(o.groups)) return o;
+  o.groups.forEach(function(g){
+    if(!g) return;
+    /* v0.9.124：gno 被写成字符串（"gno":"7"）时下游用数字 gno 取值必然查不到
+       → 直接报「缺少句组 N」。这里统一转成数字 */
+    if(typeof g.gno==='string'&&/^-?\d+$/.test(g.gno.trim())) g.gno=+g.gno.trim();
+    const hasCues=Array.isArray(g.cues)&&g.cues.length;
+    const txt=(g.text!=null?String(g.text):(g.zh!=null?String(g.zh):''));
+    if(!hasCues&&!txt.trim()&&typeof g.type==='string'&&g.type&&!KNOWN_GTYPE[g.type]){
+      g.text=g.type; g.type='text';
+    }
+  });
+  return o;
+}
+function salvageGroups(s){
+  if(!s||s.indexOf('"gno"')<0) return null;
+  const marks=[], re=/"gno"\s*:\s*"?(-?\d+)"?/g; let m;
+  while((m=re.exec(s))) marks.push({gno:+m[1], pos:m.index});
+  if(!marks.length) return null;
+  const groups=[], seen={};
+  for(let i=0;i<marks.length;i++){
+    const end=(i+1<marks.length)?marks[i+1].pos:s.length;
+    const seg=s.slice(marks[i].pos,end), g={gno:marks[i].gno};
+    if(seen[g.gno]) continue;                        // 重复文档：只保留首份
+    const cues=[], cre=/"no"\s*:\s*(\d+)\s*,\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g; let cm;
+    while((cm=cre.exec(seg))) cues.push({no:+cm[1], text:unescStr(cm[2])});
+    if(cues.length){ g.type='text'; g.cues=cues; }
+    else{
+      const tm=/"(?:text|zh|target|trans|translation)"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(seg);
+      if(tm){ g.type='text'; g.text=unescStr(tm[1]); }
+      else{
+        const ty=/"type"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(seg);
+        const tv=ty?unescStr(ty[1]):'';
+        if(tv&&!KNOWN_GTYPE[tv]){ g.type='text'; g.text=tv; }   // 模型把译文写进了 type
+        else { g.type=tv||'text'; g.text=''; }
+      }
+    }
+    seen[g.gno]=1;
+    groups.push(g);
+  }
+  const usable=groups.filter(g=>(g.text!=null&&String(g.text).trim())||(g.cues&&g.cues.length));
+  return usable.length?{groups:usable}:null;
+}
+/* v0.9.121/122：严格解析 → 失败先 repairLlmJson（双策略）再试 → 仍失败抛错并带「响应开头 + 出错处上下文」。
+   v0.9.122 新增：模型把整份文档重复输出（…} {"groups":…）时，追加「第二个 {"groups": 起点截断」候选，
+   截断体配 repairLlmJson 的栈补齐可救回首份文档 */
+function parseWithRepair(str){
+  let firstErr=null;
+  const cands=[str];
+  /* v0.9.377：锚点加上平铺协议的三个入口键（groups 保留，模型回落旧协议时仍能截断/解析） */
+  const anchor=/\{\s*"(?:groups|cues|c|lyric)"\s*:/g;let m,cnt=0;
+  while((m=anchor.exec(str))){ cnt++; if(cnt===2){ if(m.index>0)cands.push(str.slice(0,m.index).replace(/[\s,]+$/,'')); break; } }
+  for(const cd of cands){
+    try{ return normalizeFlatShape(normalizeGroupsShape(JSON.parse(cd))); }
+    catch(e){ if(firstErr===null)firstErr=e; }
+    for(const fixed of [repairLlmJson(cd),repairLlmJson(cd,true)]){
+      if(fixed!==null){ try{ return normalizeFlatShape(normalizeGroupsShape(JSON.parse(fixed))); }catch(e2){} }
+    }
+  }
+  /* v0.9.123 最后一档：结构级抢救（对数组型 payload 返回 null，不影响术语表等场景）
+     v0.9.377：平铺协议走 salvageFlat——salvageGroups 只认 "gno"，平铺输出里根本没有。 */
+  for(const cd of cands){
+    const sv=salvageGroups(cd); if(sv) return sv;
+    const sf=salvageFlat(cd); if(sf) return sf;
+  }
+  const e=firstErr||new Error('JSON parse failed');
+  const m2=/position (\d+)/.exec(String(e.message||''));
+  const p=m2?Math.min(+m2[1],str.length):0;
+  const ctx=p>0?(' · 出错处: '+str.slice(Math.max(0,p-40),p+60).replace(/\s+/g,' ')):'';
+  throw new Error(String(e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
+}
+
+function parseLlmJson(raw){
+  let s=String(raw||'');
+  s=s.replace(/```json|```/g,'').trim();
+  // v0.9.28：术语表等场景返回 JSON 数组——[ 在 { 之前时先按数组解析，失败回落对象路径（对既有调用零影响）
+  const a2=s.indexOf('['), a1=s.indexOf('{');
+  if (a2>=0 && (a1<0 || a2<a1)){
+    const b2=s.lastIndexOf(']');
+    if (b2>a2){
+      try { return parseWithRepair(s.slice(a2,b2+1)); } catch(e){}
+    }
+  }
+  /* v0.9.120：对象路径优先从 {"groups": 锚点起切——部分模型会在正文里先复述输入/示例再给答案，
+     首个 { 可能落在复述段里；锚不中再回落旧逻辑（首 {），对正常输出零影响 */
+  /* v0.9.377：锚点同 parseWithRepair——平铺输出的首个 { 可能是 "c"|"cues"|"lyric"，
+     术语表等 {synopsis,terms} 形态匹配不到，仍回落首 {（与旧行为一致）。 */
+  const ga=s.search(/\{\s*"(?:groups|cues|c|lyric)"\s*:/);
+  const a=(ga>=0?ga:s.indexOf('{')), b=s.lastIndexOf('}');
+  if (a<0||b<=a) throw new Error(t('errNotJson'));
+  const slice=s.slice(a,b+1);
+  return parseWithRepair(slice);
+}
+
+/* v0.9.124：自定义引擎「附加请求参数」——读 UI 输入框，只接受 JSON 对象；撤销/清空 tolerable；
+   保留键 model / messages / temperature / stream 不可被覆盖（核心字段优先，防误配导致崩坏）
+   v0.9.125：max_tokens 从保留键里移除——它直接关系到输出是否被截断，
+   平台默认值不够时必须允许用户自行上调（见 ENGINE_DEFAULTS 说明） */
+const EXTRA_RESERVED={model:1,messages:1,temperature:1,stream:1};
+/* v0.9.232：递归清洗——与服务端 normParams（v0.9.210）同一套口径。
+   此前前端只收「平铺标量」，值是对象的一律被静默丢弃：OpenRouter 这类
+   {"provider":{"sort":"price","allow_fallbacks":true}} 保存后界面回显有值、
+   请求里却什么都没有，用户只能判定「参数没生效」。服务端早已修好，前端没跟上。
+   深度封顶 4 层、叶子只留标量；保留键只在顶层拦截（嵌套里的同名是人家自己的结构）。 */
+const EXTRA_MAX_DEPTH = 4;
+function cleanParamVal(node, depth){
+  if(depth > EXTRA_MAX_DEPTH) return undefined;
+  if(node === null) return null;
+  const ty = typeof node;
+  if(ty === 'string' || ty === 'number' || ty === 'boolean') return node;
+  if(Array.isArray(node)){
+    const arr = [];
+    for(let i=0;i<node.length;i++){ const x = cleanParamVal(node[i], depth+1); if(x !== undefined) arr.push(x); }
+    return arr;
+  }
+  if(ty === 'object'){
+    const o = {};
+    for(const k in node){ if(!Object.prototype.hasOwnProperty.call(node,k)) continue;
+      const x = cleanParamVal(node[k], depth+1); if(x !== undefined) o[k]=x;
+    }
+    return o;
+  }
+  return undefined;   /* function / undefined / symbol 一律不要 */
+}
+function extraParamsFront(){
+  try{
+    const el=document.getElementById('extra');
+    const v=el?String(el.value||'').trim():'';
+    if(!v) return {};
+    const o=JSON.parse(v);
+    if(!o||typeof o!=='object'||Array.isArray(o)) return {};
+    const top = cleanParamVal(o,0) || {};
+    const keep={};
+    for(const k in top){ if(!Object.prototype.hasOwnProperty.call(top,k)) continue;
+      if(EXTRA_RESERVED[k]) continue;
+      keep[k]=top[k];
+    }
+    return keep;
+  }catch(e){ return {}; }   /* 非法 JSON → 静默忽略（保存时另有校验提示） */
+}
+/* v0.9.232：温度——后台 B 槽一直是配置项（cfg.temperature，admin 可调，默认 0.2），
+   前端直连却把它写死成 0.2，两边不一致。这里读 UI，空/非法 → null（沿用 0.2）。 */
+function tempFront(){
+  try{
+    const el=document.getElementById('temp'); if(!el) return null;
+    const raw=String(el.value||'').trim(); if(!raw) return null;
+    const v=parseFloat(raw); if(!Number.isFinite(v)) return null;
+    return Math.min(2, Math.max(0, v));
+  }catch(e){ return null; }
+}
+/* v0.9.232：是否走「经本站服务器转发」（用户勾选，默认关 = 保持直连与原有隐私承诺） */
+function relayOn(){
+  try{ const el=document.getElementById('viaSrv'); return !!(el && el.checked); }catch(e){ return false; }
+}
+/* v0.9.125：按平台/模型的默认请求参数——各家 OpenAI 兼容端的「服务端默认值」差异极大，
+   其中输出上限是最致命的一个：我们直连时从不发送 max_tokens，平台侧就用自己的默认值。
+   SiliconFlow 官方文档 FAQ「输出截断」第一条就是「Set the max_tokens to an appropriate
+   value」，其官方 DeepSeek 插件默认 maxTokens=8192；而多个第三方集成文档把它标成 512。
+   实测表象：28 个句组的批次被服务端在配额用完处一刀切断 → 报错位置每次不同（105/191/200/233）、
+   缺的句组编号每次都变（3/4/7，都是靠前的），而且换任何模型都一样——因为跟模型无关，是请求缺字段。
+   这里按平台给出核对过的安全默认值；用户在「附加请求参数」里填的同名键优先级更高（DEFAULTS < 用户 < 核心字段）。
+   未收录的平台/自定义端点一律不注入任何额外字段（未知 API 表面不猜）。 */
+const ENGINE_DEFAULTS=[
+  /* SiliconFlow：max_tokens 8192（与其官方 DeepSeek harness 默认值一致）；
+     Qwen3 系默认开思考（实测 9.8s/597tok vs 关掉 1.8s/89tok），字幕翻译不需要推理过程 */
+  { test:/siliconflow\.cn|siliconflow\.com/i, params:{max_tokens:8192} },
+  { test:/siliconflow\.cn|siliconflow\.com/i, model:/qwen3|deepseek-r1|glm-4\.[56]|glm-5/i, params:{enable_thinking:false} },
+  /* 阿里百炼 DashScope（含新加坡 dashscope-intl / 美西 dashscope-us 节点）：
+     v0.9.126 Qwen3 默认开思考——大批次要先写几百到上千 token 的推理再出译文，
+     直连场景下极易拖过 300s 上限，用户侧的症状就是「点了之后半天没反应」。
+     阿里云官方给的 OpenAI 兼容写法是 extra_body={"enable_thinking": False}，即请求体顶层同名字段。
+     ⚠️ 刻意不注入 max_tokens：阿里云文档写「不指定具体值时以所选模型默认值为准」，而各模型输出上限
+     差异极大（qwen-plus 32K / qwen-max 8K / qwen-flash 仅 4K），写死一个值反而会被判超限报错。 */
+  { test:/dashscope[a-z\-]*\.aliyuncs\.com/i, model:/qwen3/i, params:{enable_thinking:false} },
+  /* GLM-5.3 系（含 ZHIPU/GLM-5.3-Flash）：思考永远开启（enable_thinking:false 会让 API 报错），
+     默认 reasoning_effort=max 深度推理——大批次要写完整个推理链才出译文，直连 300s 必超时。
+     官方给的可选值 max/high/low，字幕翻译不需要推理，降到 low。 */
+  { test:/dashscope[a-z\-]*\.aliyuncs\.com/i, model:/glm-5\.3/i, params:{reasoning_effort:'low'} },
+  /* GLM-5.2/5.1/5：支持思考/非思考双模式，字幕翻译直接关思考 */
+  { test:/dashscope[a-z\-]*\.aliyuncs\.com/i, model:/glm-5(\.[12])?($|-)/i, params:{enable_thinking:false} },
+  /* Anthropic OpenAI 兼容层：max_tokens 是必填字段，不给会直接报错 */
+  { test:/anthropic\.com/i, params:{max_tokens:8192} }
+];
+/* v0.9.132：response_format 默认注入——把「事后救」变「事前防」的前提，是这个参数必须真的被平台接受。
+   实测（2026-09-20，线上 api.deepseek.com / deepseek-chat 真 key）：
+     不带该参数                        → 200
+     带该参数但 prompt 不含 json 字样  → **400** "Prompt must contain the word 'json' in some form
+                                          to use 'response_format' of type 'json_object'."
+     带该参数且 prompt 含大写 JSON     → 200（我们 systemPrompt 的真实形态）
+     带该参数且 prompt 含小写 json     → 200
+   ⚠️ 因此**绝不能全局注入**——「测试连接」那条请求正文是 "Reply with exactly: OK"（不含 json），
+      逐组直译通道（Hunyuan-MT）要的更是纯译文而非 JSON，两者被注入必然 400 或直接逻辑错乱。
+      注入与否由调用点在 opts.json 里显式声明，这里只负责「该平台是否支持」这一层。
+   白名单而非黑名单：未知的第三方端点一律不注入（未知 API 表面不猜，与 ENGINE_DEFAULTS 同一原则）。
+   Anthropic / Gemini 原生端点的 OpenAI 兼容语义里没有这个字段，显式排除。 */
+const RF_SUPPORT=[
+  /api\.deepseek\.com/i,
+  /api\.openai\.com/i,
+  /api\.moonshot\.(cn|ai)/i,
+  /dashscope[a-z\-]*\.aliyuncs\.com/i,
+  /open\.bigmodel\.cn/i,
+  /api\.z\.ai/i,
+  /api\.siliconflow\.(cn|com)/i,
+  /openrouter\.ai/i,
+  /api\.groq\.com/i,
+  /api\.together\.xyz/i,
+  /api\.x\.ai/i,
+  /localhost/i, /127\.0\.0\.1/i, /\[::1\]/i   /* vLLM / Ollama / LM Studio 本地 OpenAI 兼容端 */
+];
+const RF_DENY=[
+  /anthropic\.com/i,                        /* 原生 Anthropic：无此字段 */
+  /generativelanguage\.googleapis\.com/i    /* Gemini 原生：走 generationConfig.responseMimeType */
+];
+/* 会话内「该端点不支持」的墓碑——白名单填错或平台变更时，首个批次会多花一次往返，
+   之后一律直发，不会让整片翻译卡死。 */
+const RF_BANNED={};
+function banRf(base){ try{ RF_BANNED[String(base||'')]=1; }catch(e){} }
+function jsonFormatParam(base,model,opts){
+  try{
+    if(!opts || !opts.json) return {};
+    const b=String(base||'');
+    if(!b || RF_BANNED[b]) return {};
+    for(const re of RF_DENY) if(re.test(b)) return {};
+    for(const re of RF_SUPPORT) if(re.test(b)) return {response_format:{type:'json_object'}};
+    return {};
+  }catch(e){ return {}; }
+}
+/* 该错误是否由 response_format 引起（平台拒收 / 不支持）→ 摘掉参数重试一次 */
+function isRfReject(err){
+  const s=String((err&&err.message)||'');
+  if(!/HTTP (400|404|415|422)/.test(s) && !/\b(400|422)\b/.test(s)) return false;
+  return /response[_ -]?format|json[_ -]?object|json[_ -]?mode|response[_ -]?schema|unsupported/i.test(s);
+}
+function engineDefaults(base,model){
+  try{
+    const b=String(base||''), m=String(model||'');
+    if(!b) return {};
+    const out={};
+    for(const rule of ENGINE_DEFAULTS){
+      if(!rule.test.test(b)) continue;
+      if(rule.model && !rule.model.test(m)) continue;
+      Object.assign(out, rule.params);
+    }
+    return out;
+  }catch(e){ return {}; }
+}
+// v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
+// 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
+let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'length' = 输出被长度上限截断）
+/* v0.9.146：整批失败原因的一次性上报标记。声明必须在 chatOnce（下方 6674 处读取它）之前，
+   否则若将来有人在脚本求值阶段就触发请求，let 的暂时性死区会直接抛 ReferenceError。 */
+let _failWhy = null;
+/* v0.9.380：补救通道（rt=4）专属的失败原因。全局那个 _failWhy 会被并发的 cue 重译请求
+   先一步吃掉（mkBody 里谁先发谁消费），10-25 实测 367 次补救只记到 7 条原因。
+   补救标记单独一份、只让 rt=4 的请求消费，条数才对得上「失败了几批」。 */
+let _failWhy4 = null;
+/* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
+   → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
+   埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
+const PACE_BUDGET_MS = 90000;
+async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
+  const ctl=new AbortController();
+  const builtin = (base===BUILTIN_API);
+  /* v0.9.232：relay = 自定义 API 经本站服务端代发（用户在引擎面板勾选）。
+     直连有两类死局：①端点网关不放行 CORS 预检——实测 api.z.ai 的 OPTIONS 只回 200
+     且不带 Access-Control-Allow-*，浏览器一律抛 "Failed to fetch"（它的 POST 反而带 CORS 头）；
+     ②用户所在网络到不了该端点。两者服务端代发都能通，且错误可见（401 / 模型不存在 / 超时）。 */
+  const relay = !builtin && relayOn();
+  /* v0.9.123：浏览器直连（自定义 API）没有服务端排队，但第三方中转/思考型模型慢得多——
+     恒定 90s 会让大批次必然 abort（实测表象："signal is aborted without reason"，换任何慢模型都一样）。
+     直连默认放宽到 300s；内置通道仍 90s；显式传值（测试连接 20s、术语提取 240s）优先。 */
+  /* v0.9.185：内置通道 90s → 105s。服务端最多替客户端静默排队 15 秒（HOLD_MAX_MS），
+     那段等待客户端也在等同一个 HTTP 响应，必须算进总预算——否则「帮你排队」反而
+     变成「吃掉模型调用的时间」，排队结束后只剩几十秒就 abort。
+     v0.9.365：105s → 135s。E 槽（网页桥接）的模型预算放宽到 120 秒（服务端 CALL_BUDGET_E_MS），
+     外层 HTTP 超时同步跟上（120 + 15 秒排队冗余）。非 E 槽位服务端仍是 90 秒预算，
+     这里只是上限，对它们没有影响。
+     v0.9.381：135s → 255s。服务端回退链改为共享 240 秒总预算（CHAIN_BUDGET_MS）后，
+     一次请求最坏 = 240 秒；此前每级各拿一份、最坏 390 秒，而这里 135 秒就放弃 ——
+     服务端还在算、连接已经断，用户只看到失败，算力全白烧，接着还重试一次。
+     240 + 15 秒排队冗余 = 255。不回退时仍是 90~120 秒返回，放宽的只是上限。 */
+  const ms = timeoutMs>0 ? timeoutMs : (builtin?270000:300000);
+  let timer=setTimeout(()=>ctl.abort(), ms);
+  /* v0.9.185：排队等待期间暂停计时。排队是「上游额度不够、晚点再来」，不是模型在计算——
+     此前它照样扣模型调用的超时预算，于是出现「排了 60 秒、只剩 30 秒就 abort」：
+     用户以为在排队，实际是被超时打断，接着走批重试，比直接吃一记 429 降级还糟。 */
+  let pacing=false;
+  const pauseTimer =function(){ clearTimeout(timer); };
+  const resumeTimer=function(){ clearTimeout(timer); timer=setTimeout(()=>ctl.abort(), ms); };
+  /* v0.9.185：服务端 FIFO 排队的顺序号。首次被要求排队时服务端下发，之后每次重发原样带回——
+     不带上它，服务端会当成新请求重新发号，先来先出就失效了。 */
+  let qTok='';
+  LAST_FINISH='';
+  /* v0.9.126：等待可视化。网关排队 / 超长输出 / 平台侧异常时，一次请求可能几分钟不吐一个字节，
+     而界面在此期间毫无变化（非流式请求没有任何中间态），用户只能判断为「卡死/没反应」。
+     30 秒后才开始每 60 秒报一次已等待秒数——能从日志上区分「请求已发出、平台没回来」。 */
+  const t0=Date.now();
+  let hbI=null;
+  /* v0.9.400：把「放开停止按钮」与「打印等待心跳」拆成两个定时器。
+     原来 30 秒就写一行「已等待 N 秒」，而 E 槽正常单批就要 40~66 秒 —— 每批必刷一行，
+     一次任务白刷十几行。现在 30 秒只放开按钮（平台不回话时用户要能停），心跳推到 90 秒，
+     那之后才是真的「卡住了」。排队中不报：进度条右侧正在倒数「N 秒后继续」，
+     两条文案同时出现会让用户以为卡了两遍（v0.9.185 的结论，保留）。 */
+  const hbZ=setTimeout(()=>{ try{ var b=$('btnGo'); if(b) b.disabled=false; }catch(e){} }, 30000);
+  const hbT=setTimeout(()=>{
+    try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){}
+    hbI=setInterval(()=>{ try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){} }, 60000);
+  }, 90000);
+  try{
+    const url = builtin ? BUILTIN_API : (relay ? RELAY_API : base.replace(/\/+$/,'')+'/chat/completions');
+    const headers={'Content-Type':'application/json'};
+    /* v0.9.232：转发时 Key 走请求体给本站（HTTPS 加密、服务端用完即弃），不再作为跨域请求头
+       发出去——否则第三方端点的 CORS 预检还是会因为 Authorization 头而先失败一次。 */
+    if(!builtin && !relay && key) headers.Authorization='Bearer '+key;
+    /* Anthropic OpenAI 兼容层：浏览器直连必须带此 header（否则 CORS 拒绝） */
+    if(!builtin && /anthropic\.com/.test(url)) headers['anthropic-dangerous-direct-browser-access']='true';
+    /* v0.9.132：请求体构造抽成函数——withRf 决定本次是否带 response_format。
+       自定义直连链路优先级：平台默认参数 < response_format 默认值 < 用户附加参数 < 核心字段。
+       用户在「附加请求参数」里显式写了 response_format（含置 null 关闭）→ 完全以用户为准，不注入默认值。
+       内置通道：那一套注入发生在服务端（浏览器看不到上游地址与 Key），这里只通过 meta.json 传递意图。 */
+    const ex = builtin ? {} : extraParamsFront();
+    const userHasRf = !builtin && Object.prototype.hasOwnProperty.call(ex,'response_format');
+    /* v0.9.154：自定义 API 的降级裁定——三条判定都靠上游错误文案识别，不维护模型名名单。
+       MAX_TOKENS 改名（OpenAI o 系列 / gpt-5 只认 max_completion_tokens）与 TEMPERATURE
+       （同一批模型只接受默认 1）常常在同一个端点上先后报错，所以要能连修多项。
+       ⚠️ 三者都以 "Unsupported" 开头，会被最宽泛的 isRfReject 一并命中，故判定顺序必须
+       由具体到宽泛（点名具体参数的在前），否则后面两项永远轮不到，成为死代码。 */
+    const isTokNameReject=(e)=>{ const s=String((e&&e.message)||'');
+      return /HTTP (400|404|415|422)/.test(s) && /max_tokens/i.test(s) && /max_completion_tokens/i.test(s); };
+    const isTempReject=(e)=>{ const s=String((e&&e.message)||'');
+      return /HTTP (400|404|415|422)/.test(s) && /temperature/i.test(s) && /(does not support|not supported|only the default)/i.test(s); };
+    /* 把已确认的修复落到请求体上。max_tokens 可能来自平台默认表，也可能来自用户附加参数，
+       统一在最终 body 上改名，来源无关。内置通道不在此处理——那一侧由服务端统一降级。 */
+    const applyDegrade=(body,plan)=>{
+      if(builtin) return body;
+      if(plan.newTok && Object.prototype.hasOwnProperty.call(body,'max_tokens')){
+        body.max_completion_tokens=body.max_tokens; delete body.max_tokens;
+      }
+      if(!plan.temp) delete body.temperature;
+      return body;
+    };
+    const mkBody=(plan)=>{
+      if(builtin){
+        /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
+      直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
+      否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+        _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
+        if(rt===4) _failWhy4=null; /* v0.9.380：补救标记只让补救请求消费 */
+        return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
+      }
+      const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
+      /* v0.9.232：temperature 由 UI 决定（未填 → 0.2，与后台 cfg.temperature 默认一致） */
+      const tp=tempFront();
+      return applyDegrade(Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:(tp===null?0.2:tp),stream:false}), plan);
+    };
+    /* v0.9.232：转发体——端点三件套 + 正文 + 温度 + 附加参数交给服务端，
+       由服务端用与内置通道同一套 callModel 组装（含 response_format、max_tokens 改名、
+       temperature 降级、超时）。这里不再自己做平台默认值与降级裁定。 */
+    const mkRelayBody=(plan)=>{
+      const b={ base:base, key:key, model:model, messages:msgs };
+      const tp=tempFront(); if(tp!==null) b.temperature=tp;
+      const exo=extraParamsFront(); if(Object.keys(exo).length) b.extra=exo;
+      if(opts && opts.json) b.json=1;
+      /* 服务端预算留出 5 秒给网络往返：让确切的上游错误先于前端超时到达 */
+      b.timeoutMs=Math.max(5000, Math.min(300000, ms-5000));
+      const mt=(opts&&opts.maxTokens)||plan.maxTokens;
+      if(mt) b.maxTokens=mt;
+      return b;
+    };
+    /* v0.9.183：once 自带排队重发。服务端额度不够时回 200 {wait:N}——这不是错误，
+       等 N 秒后把同一批原样重发：既不降级换模型（一集里前后两个模型会让语气不一致），
+       也不弹窗打断用户，进度条只是停了一下又继续。 */
+    const once=async(plan)=>{
+      let paceBudget=PACE_BUDGET_MS;   /* v0.9.185：等待预算按「秒」算，不按轮数 */
+      for(;;){
+        const r=await fetch(url,{
+          method:'POST',
+          headers,
+        /* v0.9.125：自定义链路的请求体 = 平台默认参数 < 用户附加参数 < 核心字段（模型/正文……）。
+           此前核心字段之外只有用户附加参数，max_tokens 从未被发送——平台侧按自己的默认值截断输出。 */
+          body:JSON.stringify(relay?mkRelayBody(plan):mkBody(plan)),
+          signal:ctl.signal
+        });
+        if(!r.ok){
+          const tx=await r.text().catch(()=>'');
+          /* v0.9.232：转发通道的失败体是本站的 {error:{message}}——取出来给人话，
+             而不是把一整段 JSON 塞进「✗ 失败：HTTP 502 {"error":…}」。 */
+          if(relay){
+            let em=''; try{ const ej=JSON.parse(tx); em=(ej&&ej.error&&ej.error.message)||''; }catch(e){}
+            if(em) throw new Error(em.slice(0,200));
+          }
+          throw new Error('HTTP '+r.status+' '+tx.slice(0,200));
+        }
+        const j=await r.json();
+        /* v0.9.183：服务端算出来「额度不够，等 N 秒再来」。只有内置通道会有（直连没有服务端）。 */
+        if(builtin && j && +(j.wait||0)>0){
+          /* v0.9.185：记住排队号，重发时带回——服务端靠它判断「还有没有比我更早的」 */
+          if(typeof j.q==='string' && j.q) qTok=j.q;
+          const psec=Math.min(60, Math.max(1, Math.round(+j.wait)));
+          /* 预算不够排这一轮 → 放弃本批，抛独立的「排队超时」。
+             ⚠️ 绝不能因为排太久就放行去撞上游：那必然 429 → 服务端回退 A 槽，
+             一集里前后两个模型语气会不一致（用户 9/27 拍板：等再久也不换道）。 */
+          if(psec*1000 > paceBudget){
+            _failWhy='pace_giveup';      /* v0.9.146 起的一次性标记：让后台能分辨「排队超时」而不是「上游返空」 */
+            /* v0.9.186：再带一个稳定的机器标识，供下游「不再重试」的判定用。
+               不能靠文案匹配（会随界面语言变），也不能靠 _failWhy（全局且一次性）。 */
+            const e9=new Error(t('pgGiveUp')); e9.paceGiveUp=true; throw e9;
+          }
+          paceBudget -= psec*1000;
+          pacing=true; pauseTimer();     /* 排队不吃模型调用的超时预算 */
+          let why='';
+          try{ why=await pgPace(psec); } finally { pacing=false; resumeTimer(); }
+          if(why==='stop') throw new Error(t('userStop'));   /* 排队期间点停止要立刻响应 */
+          continue;
+        }
+        /* v0.9.183：累加本次消耗，供完成态展示。缓存命中两种字段名都要读：
+           OpenAI 系在 prompt_tokens_details.cached_tokens，DeepSeek 是 prompt_cache_hit_tokens。 */
+        try{
+          if(j && j.usage){
+            const u=j.usage;
+            if(!S.tkSum) S.tkSum={in:0,out:0,cache:0};
+            S.tkSum.in   += (+u.prompt_tokens||0);
+            S.tkSum.out  += (+u.completion_tokens||0);
+            S.tkSum.cache+= ((u.prompt_tokens_details && +u.prompt_tokens_details.cached_tokens)||+u.prompt_cache_hit_tokens||0);
+          }
+        }catch(e){}
+        /* v0.9.125：记录 finish_reason——'length' 表示输出撞到上限被服务端截断（不是模型写完），
+           下游据此给出「请加大 max_tokens」的确切提示，而不是拿半截 JSON 去修 */
+        try{ LAST_FINISH=String((j.choices&&j.choices[0]&&j.choices[0].finish_reason)||''); }catch(e){ LAST_FINISH=''; }
+        /* v0.9.156：服务端「模型 B 失败 → 已回退模型 A」的回执（仅内置通道，直连通道没有服务端）。
+           此前回退完全静默，加上后台记账又记着 A 的名字，用户只能判定「分流没生效」。 */
+        try{ if(builtin && j && j._fb){ log(t('fbRoute', String(j._fb.from||''), String(j._fb.to||''), String(j._fb.msg||'').slice(0,80)), 'warn'); } }catch(e){}
+        let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+        if(!out) throw emptyErr();
+        /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
+           推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
+           （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
+           未闭合（思考中输出被截断）→ 其后没有有效内容，一并弃掉。 */
+        out=String(out).replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi,'');
+        const openTag=String(out).match(/<think(?:ing)?>/i);
+        if(openTag) out=String(out).slice(0, openTag.index);
+        /* v0.9.380：剥掉思考段后只剩空白，同样算空响应（否则下游会拿空串去解析 JSON） */
+        if(!String(out).trim()) throw emptyErr();
+        return out;
+      }
+    };
+        const withRf = !!(opts&&opts.json) && (builtin || !!jsonFormatParam(base,model,opts).response_format);
+    /* v0.9.154：逐项降级重发（与服务端 callModel 同一套），取代原先「一次 rf 兜底」。
+       每轮只修一个维度并沿用上一轮已生效的修复，最多四轮；超时/用户主动停止不重试；
+       三条判定都拿不到匹配就立刻抛出原错误，不做无谓尝试。端点只在第一次吃亏。 */
+    let plan={rf:withRf,newTok:false,temp:true};
+    let lastErr=null;
+    for(let round=0; round<4; round++){
+        try{
+          return await once(plan);
+        }catch(e){
+          lastErr=e;
+          if(e&&e.name==='AbortError') throw e;
+          if(ctl.signal.aborted) throw e;
+          /* v0.9.232：转发时降级已在服务端做完（同一套 callModel 四轮裁定），
+             前端再按错误文案重试只会把同一个请求白跑几遍。 */
+          if(relay) throw e;
+          if(!plan.newTok && isTokNameReject(e)){ plan={rf:false,newTok:true,temp:plan.temp}; continue; }
+          if(plan.temp && isTempReject(e)){ plan={rf:false,newTok:plan.newTok,temp:false}; continue; }
+          /* v0.9.132：平台拒收 response_format（白名单错判 / 平台侧变更 / 该模型不支持）。
+             摘掉参数重发，并给该端点在会话内立墓碑——代价只有一次往返。 */
+          if(plan.rf && isRfReject(e)){ banRf(base); plan={rf:false,newTok:plan.newTok,temp:plan.temp}; continue; }
+          throw e;
+        }
+      }
+      throw lastErr;
+  }catch(e){
+    /* v0.9.126：AbortController 到点后 fetch 抛的是浏览器原生 DOMException
+       （"signal is aborted without reason"），用户完全无法据此判断发生了什么。
+       换算成「等了多少秒 + 下一步该干什么」。仅限我们自己 timer 触发的 abort；
+       用户点停止时抛的也是同一类错误，届时 S.stop 为真，文案同样成立。 */
+    if(e && (e.name==='AbortError' || /aborted|signal is abort/i.test(String(e.message||e)))){
+      throw new Error(t('errTimeout', Math.round(ms/1000)));
+    }
+    throw e;
+  } finally { clearTimeout(timer); clearTimeout(hbT); clearTimeout(hbZ); if(hbI) clearInterval(hbI); }
+}
+
+/* v0.9.387：sameLangHit（同语言任务判定）随语言跑偏检测一并移除——
+   它存在的唯一理由是「照抄源文的组会被判跑偏、进而重译」；那条通道没了，它也就没有输入。
+   v0.9.383 的「源语言 == 目标语言」非阻塞提示不走这里，仍然有效。 */
+
+/* v0.9.72：受限并发映射——隔离重译并行用（各重译是独立的单组重发，结果与串行一致；
+   worker 自行 try/catch，此处不拦截异常） */
+/* v0.9.377：把坏组切成 ≤n 个小批——按 cue 条数均衡，保持原顺序（相邻坏组留在同一小批，
+   跨批衔接不因此被打乱）。条数而不是组数当砝码：一个 6 条的长句组和三个 1 条的短组
+   不该被算成同等重量。n 大于组数时每组自成一个小批（等价于旧行为，隔离度最高）。 */
+function splitBadChunks(gs, n){
+  const list=(gs||[]).filter(Boolean);
+  if(!list.length) return [];
+  const w=g=>(g.cues?g.cues.length:1);
+  const k=Math.max(1, Math.min(+n||1, list.length));
+  if(k===1) return [list];
+  const per=list.reduce((s,g)=>s+w(g),0)/k;
+  const out=[]; let cur=[], curN=0;
+  for(let i=0;i<list.length;i++){
+    cur.push(list[i]); curN+=w(list[i]);
+    if(out.length>=k-1) continue;              // 已是最后一批：剩下的全归它
+    const next=list[i+1];
+    if(!next) break;
+    /* 贪心：加上下一条若更接近目标条数就继续攒，否则就在这里切 */
+    if(Math.abs(curN+w(next)-per) <= Math.abs(curN-per)) continue;
+    out.push(cur); cur=[]; curN=0;
+  }
+  if(cur.length) out.push(cur);
+  return out;
+}
+async function poolMap(items, limit, worker){
+  const n = items.length; if(!n) return;
+  let idx = 0;
+  const runners = [];
+  for(let i=0; i<Math.max(1, Math.min(limit, n)); i++){
+    runners.push((async function go(){
+      while(true){
+        const k = idx++;
+        if(k >= n) return;
+        await worker(items[k], k);
+      }
+    })());
+  }
+  await Promise.all(runners);
+}
+// v0.9.73：结构错误码 → 自然语言。此前把 MISSING_17 / DUP_3 这类内部错误码原样喂给模型，
+// 模型看不懂代码含义，纠错命中率打折；改成人话后一次重译即可修复的比例明显提升。
+function describeCueErrs(errs, zh){
+  const out=[];
+  (errs||[]).forEach(function(e){
+    const m=String(e); let n;
+    if(m==='NO_CUES_ARRAY') out.push(zh?'该组没有输出 cues 数组——必须逐条输出，不能用单个 text 代替':'this group returned no "cues" array — output one entry per cue, not a single "text"');
+    else if(m==='BAD_ENTRY') out.push(zh?'cues 数组里有格式损坏的条目（缺少 no 字段）':'one entry in the cues array is malformed (missing the "no" field)');
+    else if((n=m.match(/^UNKNOWN_(\d+)$/))) out.push(zh?('你写了输入里不存在的 cue 编号 '+n[1]+'——严禁发明编号'):('you invented cue number '+n[1]+', which does not exist in the input'));
+    else if((n=m.match(/^DUP_(\d+)$/))) out.push(zh?('cue 编号 '+n[1]+' 重复出现了多次——每个编号只能出现一次'):('cue number '+n[1]+' appears more than once — each number exactly once'));
+    else if((n=m.match(/^EMPTY_(\d+)$/))) out.push(zh?('cue 编号 '+n[1]+' 的译文是空的，且没有被列入 fillers'):('cue number '+n[1]+' has empty text and is not listed in fillers'));
+    else if((n=m.match(/^MISSING_([\d,]+)$/))) out.push(zh?('漏掉了 cue 编号 '+n[1].split(',').join('、')+'——输入里每个编号都必须有一条译文'):('you omitted cue number(s) '+n[1]+' — every input cue number must have one entry'));
+    else out.push(m);
+  });
+  return out;
+}
+/* v0.9.380：空响应的统一出口。带 _empty 机器标记 —— 文案走 t('errEmpty')（多语言），
+   标记本身固定，供 failWhyOf 与下游熔断判断使用。 */
+function emptyErr(){ const e0=new Error(t('errEmpty')); e0._empty=1; return e0; }
+/* v0.9.146：整批请求失败原因分类——只用于统计，不参与任何流程判断。
+   events 此前只记「重试了几次」，看不出整批为什么失败（截断 / JSON 畸形 / 网络），只能靠猜。
+   _failWhy 为一次性标记（声明在 LAST_FINISH 旁）：随补救通道的第一个请求上报后立即清除，
+   绝不残留到后续请求。
+   判据：LAST_FINISH==='length' 是服务端回填的确切截断信号，优先于错误消息文本（后者随界面语言变化）。 */
+function failWhyOf(msg){
+  const s = String(msg == null ? '' : msg);
+  /* v0.9.380：空响应单列一类。判据只认两个稳定标识 —— 客户端自己打的 _empty 标记，
+     以及服务端回执里的 upstream_empty 机器码。文案（errEmpty）多语言，不能当判据。 */
+  if ((msg && msg._empty) || /upstream_empty/.test(s)) return 'empty';
+  if (LAST_FINISH === 'length') return 'trunc';
+  if (/HTTP\s*(5\d\d|429)/.test(s) || /Failed to fetch|NetworkError|ETIMEDOUT|timeout/i.test(s)) return 'net';
+  if (/JSON|Unexpected|errNoGroups|errNoGno|组/i.test(s)) return 'json';
+  return 'other';
+}
+/* v0.9.383：缺号补译的止损阈值。**任务级**，不是批级 —— 单批最多补一次，
+   单批数据看不出效率，只有跨批累计的「尝试 / 救回」比值才说明这条路走不走得通。
+   两数怎么定：线上 381 埋点里正常任务补译修复率 93%（30 试 28 中），
+   而一个 276 句的 en→en 任务 172 试只中 3 条（1.7%）。15% 落在两者中间的空档里，
+   留足余量；15 次是让比值有统计意义的最小样本（低于它宁可不动手）。 */
+const GAP_TRY_MIN = 15;    /* 累计补译尝试达到这么多次才开始评估 */
+const GAP_EFF = 0.15;      /* 修复率低于此值 → 判定补译对本任务无效 */
+async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
+  // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
+  // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
+  const send = groups.filter(g=>!g.pureMusic && !g.lyricLocal && !g.fillerLocal);
+  /* v0.9.377：输入改为平铺 cue 列表（原 toArr 的句组嵌套：merged 与各 cue 原文高度重复，
+     是输入体积的大头）。
+     句组信息不再靠嵌套表达，改用 p:"c" 编码——组内非首条带该标记，与 groupSentences 的组边界
+     100% 等价（本素材实测与「按标点反推」分叉 0 条）。
+     音乐帧组（mFrames）单独走 lyric 数组：♪ 依旧一个都不进模型（v0.9.45 语义原样保留），
+     整组以 [N] 编号纯正文发送，译文按整组一个 text 回收。
+     v0.9.124 的「抽成函数供补译复用」保留：onlyNos 用于只补缺失的那几条。 */
+  const toFlat = (arr, onlyNos)=>{
+    const cues=[], lyric=[];
+    for(const g of arr){
+      /* 音乐帧组只能整组发（一个 text 覆盖整组，没有逐条可切的东西），所以不受 onlyNos 过滤——
+         调用方（缺号补译）只会把「整组缺失」的帧组放进 arr，不会重复翻译已成功的组。 */
+      if(g.mFrames){ lyric.push({ g:g.gno, src:g.mFrames.plainText }); continue; }
+      /* v0.9.379：onlyNos（缺号补译）模式下改成「按句组整体取舍」——组内任一条命中缺口，
+         就把这一组全部 cue 都发出去。
+         此前是逐条过滤：句内第 1 条没缺、第 2/3 条缺时，发出的第一条原本带着 p:"c"
+         （"与上一条同句"），可它参照的那条压根没被发出 —— 整个请求里一个句首都没有，
+         模型拿到的是没有头的半截句子，既不知道这句还剩多少内容，也不知该给这条分配多少词。
+         与 v0.9.377 为 splitBadChunks 定的原则同源：同一句的各条要留在同一个请求里，别拆开。
+         多发几条邻居 cue 的成本远小于重新翻一轮整批。 */
+      if(onlyNos && !g.cues.some(c=>onlyNos.has(c.no))) continue;
+      g.cues.forEach((c,i)=>{
+        const o={ no:c.no, dur:+((c.end-c.start)/1000).toFixed(2), src:c.text };
+        if(i>0) o.p='c';      // 与上一条同属一句（组边界 = groupSentences 的边界，不是标点猜的）
+        cues.push(o);
+      });
+    }
+    return { cues, lyric };
+  };
+  const dstN = LBY($('dstLang').value);
+  // v0.9.22：用户消息与系统提示词同语言（非中文目标用英文，防指令语言泄漏）
+  const zhDst = $('dstLang').value==='zh-CN' || $('dstLang').value==='zh-TW';
+  // v0.9.57：纠错重试——顽固跑偏组盲重发（同输入→同输出）零效果，把上次跑偏的译文
+  // 明确喂回给模型让它自我纠正（Qualcomm CFO 访谈泰文版实测案例：整句前半漂成中文，
+  // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
+  /* v0.9.392：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
+     （缺号 parseSegMarkers 覆盖不全 / 丢词 musicLost），可 rt=5 这条通道的反馈仍写着「语言跑偏」——
+     等于把模型往错的方向推：它会去纠正语言，而真正的问题是少了一段歌词，改完照样缺段。
+     rt=4（整批失败后的逐组补救）保留原有文案：它取的是组级 m.text，cue 对齐格式下恒为空，实际不触发。 */
+  const fb = (Array.isArray(feedback) && feedback.length)
+    ? (rt===5
+        ? (zhDst
+            ? '\n【歌词纠错】你上次的歌词译文缺了分段——下列歌词的分段编号没有全部覆盖，或有分段的内容是空的：\n'
+              + JSON.stringify(feedback)
+              + '\n请把这组歌词重新翻译一遍：译文里每个 [1] [2] 等分段编号必须原样保留、各自后面跟着一句非空的歌词正文；严禁漏段、合并分段、改写或重排编号。'
+            : '\n[LYRIC RETRY] Your previous lyric translation was missing segments — the segment numbers below are not all covered, or some segment came back empty:\n'
+              + JSON.stringify(feedback)
+              + '\nRe-translate this lyric group: keep every [1] [2] … segment number verbatim, each followed by a non-empty line of lyric text — never drop a segment, merge segments, renumber, or reorder them.')
+        : (zhDst
+            ? '\n【纠错重试】你上次的翻译语言跑偏了——下列 cue 的译文混入了非' + dstN.zh + '的字符，这是错误的：\n'
+              + JSON.stringify(feedback)
+              + '\n请重新翻译这些 cue：译文必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
+            : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the translations below contain characters that are NOT ' + dstN.prompt + ':\n'
+              + JSON.stringify(feedback)
+              + '\nThese translations are WRONG. Re-translate these cues: every translation must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.'))
+    : '';
+  // v0.9.66：cue 对齐结构纠错反馈——重发时把上一轮的结构错误清单喂回模型（实验实证一次即可修复）
+  const cueFb = (feedback && Array.isArray(feedback.cueErrs) && feedback.cueErrs.length)
+    ? (zhDst
+        ? '\n【结构纠错】你上次的 cue 对齐输出有结构错误，必须修正：\n- ' + describeCueErrs(feedback.cueErrs, true).join('\n- ')
+          + '\n请修正后重新输出：每个输入 cue 编号必须恰好出现一次且文本非空（列入 fillers 的纯水词条目可留空）。'
+        : '\n[STRUCTURE RETRY] Your previous cue-aligned output had validation errors:\n- ' + describeCueErrs(feedback.cueErrs, false).join('\n- ')
+          + '\nFix them and re-output: every input cue number must appear exactly once with non-empty text (pure-filler cues listed in fillers may be empty).')
+    : '';
+  // v0.9.62：跨批上下文——前批末尾句组的原文+已定译文（只读参考，防模型重复输出/改写）
+  const ctxBlk = (Array.isArray(ctx) && ctx.length)
+    ? (zhDst
+        ? '【前文衔接】此前字幕的原文与已定译文（仅供语境衔接参考，不得重复输出、不得修改、不得重新翻译）：\n'+JSON.stringify(ctx)+'\n'
+        : '[PREVIOUS CONTEXT] Source text and final translation of preceding subtitles (for continuity only — do NOT re-output, modify, or re-translate them):\n'+JSON.stringify(ctx)+'\n')
+    : '';
+  /* v0.9.124：mkMsg(arr) 只依赖 arr——主请求拼 fb+cueFb，补译缺失句组时单独用（更小的请求更容易成功） */
+  const mkMsg = arr => {
+    const f = toFlat(arr);
+    const body = JSON.stringify(f.lyric.length ? { cues:f.cues, lyric:f.lyric } : { cues:f.cues });
+    return zhDst
+      ? ctxBlk+'字幕 cue（第 '+batchNo+'/'+totalBatch+' 批）：\n'+body
+        +'\n请把每条 cue 翻译成'+dstLangLabel(dstN,true)+'，按 {"c":{"编号":"译文"}} 返回——键必须原样照抄输入里的每个 cue 编号、每个恰好一次；lyric 数组的组按 {"lyric":[{"g":组号,"type":"text","text":"译文"}]} 返回整组一个译文；整条纯水词的 cue 编号进 fillers。译文必须用'+dstN.zh+'书写。只输出 JSON。'
+      : ctxBlk+'Subtitle cues (batch '+batchNo+'/'+totalBatch+'):\n'+body
+        + '\nTranslate every cue into '+dstLangLabel(dstN,false)+' and return {"c":{"<cue number>":"<translation>"}} — copy every input cue number verbatim as a key, each exactly once; lyric groups return one single text via {"lyric":[{"g":<group id>,"type":"text","text":"…"}]}; pure-filler cue numbers go to fillers. Write the translations in '+dstN.zh+'. Output JSON only.';
+  };
+  /* 补译用（onlyNos = 真正缺译文的 cue 编号集合）。
+     v0.9.124 的做法是保证命中率（请求越小越容易成功）；v0.9.379 只改了一件事：
+     不再把缺失条目从句子里摘出来单独发，而是连同它所在句组的邻居 cue 一起发（见 toFlat），
+     为此文案要额外说清「哪些编号才需要产出」——否则模型会把整句又回一遍，
+     白白重翻已经翻好的那几条。
+     v0.9.385：上面那句文案整个作废——指令从「只产出缺失的那几条」改成「整组重新翻译」。
+     实证（_probe-merge.js 四档对照）：模型把相邻 cue 合并成一条时，「只补缺失」即便补成功
+     结果也更糟——合并的那条留着三句合起来的长译文，补回来的两条又把同样内容各说一遍，
+     行数全对、内容重复三遍。根因是任务给错了：「补编号 2」在模型看来 2 就不该单独存在，
+     于是继续合并；「整组三条各给一份」是硬要求，照做就干净，不照做当场露馅（还是缺号）。 */
+  const mkMsgSome = (arr, onlyNos)=>{
+    const f = toFlat(arr);
+    const body = JSON.stringify(f.lyric.length ? { cues:f.cues, lyric:f.lyric } : { cues:f.cues });
+    /* v0.9.379：lyric 组的输出格式此前一个字都没写进补译指令——请求体带了 lyric 数组，
+       指令却只教 {"c":{…}}，模型即使翻了歌词也不知道往哪儿放，这组就永久缺着，
+       最后以「缺少句组 N」抛错，整个批次重发一遍。
+       措辞与 systemPrompt 的【歌词例外】（本文件 3289 行）同口径，尤其要带上分段编号约束：
+       mFrames.plainText 是 "[1] … [2] …" 形态，回填靠编号映射到各行 ♪ 段，
+       编号一旦被翻译/篡改/增删/重排，歌词行就会错行或整段丢失。 */
+    const lyricHint = f.lyric.length
+      ? (zhDst
+          ? '\n歌词组（输入里的 lyric 数组，整组歌词已编号的纯正文）按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文：译文里的 [1] [2] 等分段编号必须原样照抄，严禁翻译编号、改写数字、增删或重排分段。'
+          : '\nLyric groups (the "lyric" array — one numbered plain-text line per group) return one single text per group via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}: copy the [1] [2] segment numbers verbatim — never translate, renumber, drop or reorder them.')
+      : '';
+    /* v0.9.385：整组重出指令。注意它不再逐个点名缺失编号——点名等于暗示「别的编号不用管」，
+       与整组重出自相矛盾。组内每个编号都必须给一条，一条都不能合并、不能漏。 */
+    const needHint = zhDst
+      ? '上面是若干个完整的句子组（一句常横跨多条 cue）。请把这些句组全部重新翻译，按编号逐条返回，每个编号恰好一条译文；严禁把相邻编号合并成一条，也严禁漏掉任何一个编号。'
+      : 'The cues above form complete sentence groups (a sentence often spans several cues). Re-translate ALL of them and return one translation per cue number, each number exactly once: never merge adjacent numbers into a single entry, and never omit any number.';
+    return zhDst
+      ? ctxBlk+'字幕 cue（第 '+batchNo+'/'+totalBatch+' 批，补译缺失编号）：\n'+body
+        +'\n'+needHint+'请按 {"c":{"编号":"译文"}} 返回——键必须原样照抄、每个恰好一次。译文必须用'+dstN.zh+'书写。只输出 JSON。'
+        +lyricHint
+      : ctxBlk+'Subtitle cues (batch '+batchNo+'/'+totalBatch+', re-translating the missing numbers):\n'+body
+        + '\n'+needHint+' Return {"c":{"<cue number>":"<translation>"}} — copy every listed cue number verbatim as a key, each exactly once. Write the translations in '+dstN.zh+'. Output JSON only.'
+        + lyricHint;
+  };
+  const userMsg = mkMsg(send) + fb + cueFb;
+  /* v0.9.127：纯翻译模型专用分流。Hunyuan-MT 系列是纯机器翻译模型：输入文本 → 输出译文，
+     完全不理会 JSON 句组协议——返回的是把 JSON 当正文翻译出来的东西，解析后恒缺几个组，
+     整批重试死循环（用户实测 Hunyuan-MT-7B 每 30 秒报一次「缺少句组 N」，换批不换命）。
+     这类模型改走逐组直译：一组一个小请求只要纯译文（无 JSON、无 cue 分配），
+     组级结果复用既有「按时长切分回填」机制。仅命中 PURE_MT_RE（或附加参数 pureMT 显式指定）
+     才进本通道，其他模型一行不受影响；{"pureMT":false} 可强制关闭。 */
+  const _ex=(()=>{ try{ return extraParamsFront()||{}; }catch(e){ return {}; } })();
+  const pureMT = _ex.pureMT!==undefined ? !!_ex.pureMT : PURE_MT_RE.test(String(model||''));
+  let raw, obj;
+  if(pureMT){
+    log(t('pureMTMode', model, send.length));
+    obj={groups:await pureMTTranslate({base,key,model,send,rt,dstN}),fillers:[]};
+  }else{
+    /* v0.9.126：请求发出前留痕。此前日志停在「开始整片翻译」，平台几秒到几分钟不回话时，
+       用户无法区分是「请求没发出」还是「平台没回来」——两者处理方式完全不同。 */
+    /* v0.9.400：rt=6 是主通道的「重发」，与首批共用同一条日志行（key 归到 0），
+       否则同一批会拆成「首批一行、重发一行」，又回到一行一条。 */
+    logSticky('b'+batchNo+'-'+((rt===6||!rt)?0:rt), t('reqSent', batchNo, send.length));
+    raw=await chatOnce(base,key,model,[
+      {role:'system',content:sys},
+      {role:'user',content:userMsg}
+    ],undefined,rt,{json:1});
+    /* v0.9.125：输出被长度上限截断（finish_reason='length'）→ 内容必然不完整。
+       此前这种情况会落到容错修复里「整形成功但丢句组」，表现为随机位置的 JSON 语法错 / 缺少句组 N，
+       看起来像模型不行，实际是我们没发 max_tokens。这里直接报出确切原因。 */
+    if(LAST_FINISH==='length') throw new Error(t('errTruncOut'));
+    obj=parseLlmJson(raw);
+  }
+  /* v0.9.377：平铺协议的解析 + 组级重建。
+     下游三十余处（锚定校验、drop 救援、单组隔离重译、回填、断点续传快照）一律按组工作，
+     这里把 {"c":{…},"lyric":[…]} 映射回原来的 {gno:{type,text,cues}} 契约——那些代码一行都不用改。
+     errNoGroups 的判定同步改为「一个 cue 编号都没捞到」（send 为空时不抛，与旧行为一致）。 */
+  if(!obj) throw new Error(t('errNoGroups'));
+  /* v0.9.127 的纯翻译模型通道（Hunyuan-MT 系列）返回的是组级 [{gno,text}]，与平铺协议无关：
+     整组一个 text，由 backfillGroup 按时长切分回填。这里单独收下，其余一律走平铺重建。 */
+  const pmMap = {};
+  if(pureMT && Array.isArray(obj.groups)) obj.groups.forEach(x=>{
+    if(x&&x.gno!=null) pmMap[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh) };
+  });
+  const cMap = flatCueMap(obj);
+  const lyMap = flatLyricMap(obj);
+  if(!pureMT && send.length && !Object.keys(cMap).length && !Object.keys(lyMap).length) throw new Error(t('errNoGroups'));
+  /* fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）。
+     v0.9.379：从 4351 行提到这里——必须在 buildByGno / gapSet 之前算出来。
+     「译文为空」在协议里有两种完全相反的合法含义：
+       ① 该编号在 fillers 里 → 模型按约定把它当水词删掉，这是正确结果；
+       ② 不在 fillers 里 → 模型漏翻了，属于违规，必须追回来的那种。
+     此前 fillers 比这两处晚了一百多行，区分不了 ① 和 ②，只好一律当作"已经翻好了"（见 gapPair）。 */
+  const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
+  const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
+  const buildByGno = ()=>{
+    const o={};
+    for(const g of send){
+      if(pureMT){
+        const pm=pmMap[g.gno];
+        if(pm) o[g.gno]={ type:pm.type||'text', text:pm.text, cues:null };
+        continue;
+      }
+      if(g.mFrames){
+        const m=lyMap[g.gno];
+        if(m) o[g.gno]={ type:m.type||'text', text:(m.text!=null?m.text:m.zh), cues:null };
+        continue;
+      }
+      const cues=g.cues.map(c=>({ no:c.no, text:String(cMap[c.no]==null?'':cMap[c.no]) }));
+      /* 整组全空 ⇔ 旧协议里该组 type:"drop"（提示词已要求模型把这些编号列进 fillers）。
+         下游 v0.9.76 纯哼唱豁免 / v0.9.90 实义组救援照旧按 m.type==='drop' 分流，语义不丢。 */
+      o[g.gno] = cues.every(x=>!String(x.text||'').trim())
+        ? { type:'drop', text:'', cues:null }
+        : { type:'text', text:'', cues };
+    }
+    return o;
+  };
+  let byGno = buildByGno();
+  /* v0.9.123 的结构级抢救照旧，只是换平铺版：字符级修复搞不定时直接扫编号捞译文。
+     缺口判定下沉到 cue 级——平铺输出缺的是编号，不是组。 */
+  /* v0.9.379：缺口拆成硬软两档，此前只有硬的那档。
+     hard = 模型压根没输出这个编号（cMap[no]==null）——必须补回来，补不回就抛错让外层整批重来；
+     soft = 模型输出了空译文，却没把这个编号列进 fillers。协议只承诺「列入 fillers 的可以留空」，
+            没列还留空属于违规，值得追一次，但**追不回来就维持原样**（继续走水词同路径），
+            绝不因此把整批判死——它很可能本来就是句水词。
+     此前 flatCueMap 会把空值归一成空串（3491 行），而 ''==null 是 false，
+     于是 soft 这一类连补译都进不去，直接由 buildByGno 归成整组 drop 静默删掉：
+     用户看到的症状是「字幕少了一句，日志干干净净」，追都不知道从哪儿追。 */
+  /* v0.9.402：硬缺口的唯一判定入口——「模型没给这个编号」不等于「模型漏翻了」。
+     只认本地判定：整条无实义（纯音效标注 / 纯语气词）的 cue，模型不给译文不算缺口。
+     成因：提示词规则 5 明写「列入 fillers 的条目，在 c 里的译文留空即可」，规则 9 的输出示例
+     就是 {"c":{"3":"…","18":"…"},"fillers":[17]}——17 压根不在 c 里。模型照示例做，
+     这里却判硬缺口 → 补译（模型仍返回 fillers）→ 三连败 → errMissGroup 抛错整批判死。
+     实测（Mayday.2026.en.SDH / da，v0.9.401）：gno 905 = "[car engine rumbles]"，
+     导出结果该行被 fillers 正确删除、全篇 0 空译文，却为此多发 27 个请求（gapGiveUpN=3）。
+     为什么不拿「编号在 fillers 里」当条件：模型若把实义句误列进 fillers，那等于静默删行；
+     漏一行必须可查，不能由模型单方面说了算。isSrcMeaningless 的判据很紧：Yes./No./Go!/
+     Help me! 这类短实义句全部判 false（已逐条验证），只有纯音效标注与纯语气词为 true；
+     本片 135 条被删音效行里 134 条判 true（唯一例外 "[sighs] Why… [stammers]" 含实义词，
+     判 false 是正确的）。
+     已知取舍：模型若漏翻 [inaudible] 这类「必须保留」的标记，也会被放过——宁可少一行标记，
+     不要为它把整批重发三次。
+     两处 missing 重算（主请求后 / 补译后）必须共用这个函数，否则口径一漂就白改。 */
+  const isHardGap = c => cMap[c.no]==null && !C.isSrcMeaningless(c.text);
+  const gapPair = ()=>{
+    const hard=new Set(), soft=new Set();
+    if(pureMT) return {hard, soft};   // 纯翻译模型通道不做编号级补译（它本就不参与 cue 分配）
+    for(const g of send){
+      if(g.mFrames){ if(!byGno[g.gno]) hard.add('g'+g.gno); continue; }
+      g.cues.forEach(c=>{
+        if(cMap[c.no]==null){ if(isHardGap(c)) hard.add(c.no); return; }
+        if(!String(cMap[c.no]).trim() && !fillers.has(c.no)) soft.add(c.no);
+      });
+    }
+    return {hard, soft};
+  };
+  // 拼 request 用的补译清单：hard 与 soft 都要发给模型试一次
+  const gapSet = ()=>{ const p=gapPair(); return new Set([...p.hard, ...p.soft]); };
+  const totalUnits = send.reduce((n,g)=>n+(g.mFrames?1:g.cues.length),0);
+  const mergeFlat = o=>{
+    if(!o) return false;
+    let hit=false;
+    Object.keys(o.c||{}).forEach(k=>{
+      if(cMap[k]==null){ cMap[k]=o.c[k]; hit=true; }
+      /* soft 缺口原来占着的是空串，补译给回非空才算补上 */
+      else if(!String(cMap[k]).trim() && String(o.c[k]||'').trim()){ cMap[k]=o.c[k]; hit=true; }
+    });
+    Object.keys(o.lyric||{}).forEach(k=>{
+      if(!lyMap[k]){ lyMap[k]=o.lyric[k]; hit=true; return; }
+      if(!String(lyMap[k].text||'').trim() && String((o.lyric[k]||{}).text||'').trim()){ lyMap[k]=o.lyric[k]; hit=true; }
+    });
+    if(hit){ byGno=buildByGno(); }
+    return hit;
+  };
+  /* v0.9.385：补译结果按「整组采纳」落地——与 mkMsgSome 的整组重出必须成对，
+     只改指令不改落地等于白改（新翻的两条会被「先到的赢」挡在门外，组内一半新一半旧）。
+     mergeFlat 那条「先到的赢」是对的：补译视野窄（只看那几个组），不该拿它的输出盖住
+     主请求在全局视野下产出的译文。但整组重出改的是前提——这些组是被明确要求重翻的，
+     组内要么全新要么全旧，绝不留半新半旧。
+     三道安全阀：① 新值非空才覆盖（绝不把翻好的冲成空白）
+                 ② 新值缺失/为空 → 保留旧值（模型漏给的格子不背锅）
+                 ③ 范围严格限于本次补译发出的组（groups 参数），组外一条不碰 */
+  const mergeGroups = (o, groups)=>{
+    if(!o) return false;
+    let hit=false;
+    (groups||[]).forEach(g=>{
+      if(g.mFrames){
+        const m=(o.lyric||{})[g.gno];
+        if(m && String(m.text||'').trim()){
+          const ov=lyMap[g.gno];
+          if(!ov || String(ov.text||'').trim()!==String(m.text).trim()){ lyMap[g.gno]=m; hit=true; S.gapCoverN=(S.gapCoverN||0)+1; }
+        }
+        return;
+      }
+      (g.cues||[]).forEach(c=>{
+        const v=(o.c||{})[c.no];
+        if(v==null) return;
+        const nv=String(v).trim();
+        if(!nv) return;
+        if(String(cMap[c.no]==null?'':cMap[c.no]).trim()!==nv){ cMap[c.no]=nv; hit=true; S.gapCoverN=(S.gapCoverN||0)+1; }
+      });
+    });
+    if(hit){ byGno=buildByGno(); }
+    return hit;
+  };
+  if(gapSet().size) mergeFlat(salvageFlat(String(raw||'')));
+  /* v0.9.124：缺号自动补译——弱模型最典型的失败不是语法错，而是「少输出了几个编号」
+     （v0.9.123 解决掉解析后暴露出来：三连败全是「缺少句组 N 的结果」）。
+     这里只对缺的那几条发一个小请求（输入更少 → 命中率显著更高，成本远低于整批重发），
+     最多补一次；仍有缺才抛错交给外层重试。正常模型永远走不到这里。
+     v0.9.377：粒度从句组改成 cue 编号——平铺输出缺的就是编号，补译也只发这些编号。
+     v0.9.379：① 触发条件从 missing.length 放宽成 missSet.size —— 只有 soft（空译文）缺口时
+          此前压根不发补译（missing 只看 hard），那条通道形同虚设；
+          ② 发出的不再是孤立的缺失编号，而是它所在的整个句组（见 toFlat 的注释）。
+     —— 注意 missing 的口径没变，仍然只认 hard：soft 补不回来不判死这一批。 */
+  let missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(isHardGap));
+  let missSet = gapSet();
+  // v0.9.383：止损后不再发补译请求——已经证明补了也补不回来，再问只是纯烧钱
+  if(missSet.size && missSet.size < totalUnits && !S.gapAbort){
+    try{
+      /* v0.9.379：埋点。此前这条通道触发多少次、救回多少条完全没有记录，
+         所有关于"要不要继续投入"的判断只能靠猜。三个数回答三件事：
+         gapTryN=尝试补的条数、gapFixN=补回来的条数、gapGiveUpN=最终判死的批数。 */
+      const tryN = missSet.size;
+      S.gapTryN = (S.gapTryN||0) + tryN;
+      const arr2 = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>missSet.has(c.no)));
+      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsgSome(arr2, missSet)}],undefined,rt,{json:1});
+      const obj2 = parseLlmJson(raw2);
+      if(obj2){
+        const flat2 = { c: flatCueMap(obj2), lyric: flatLyricMap(obj2) };
+        // v0.9.385：整组采纳先跑（覆盖），再让 mergeFlat 填空补漏（组内新值缺的格子）
+        mergeGroups(flat2, arr2);
+        mergeFlat(flat2);
+        // 补译结果同样做结构级抢救（这批模型的畸形率不会因为请求变小而下降）
+        mergeFlat(salvageFlat(String(raw2||'')));
+      }
+      S.gapFixN = (S.gapFixN||0) + (tryN - gapSet().size);
+      missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(isHardGap));
+    }catch(e){ /* 补译失败：保持 missing 原样，走下面抛错 */ }
+  }
+  // 校验齐全：每个输入 cue 必须有结果（v0.9.45：只校验真正发给模型的 send 集）
+  if(missing.length){ S.gapGiveUpN=(S.gapGiveUpN||0)+1; throw new Error(t('errMissGroup',missing[0].gno)); }
+  // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
+  const dstV = $('dstLang').value;
+  /* v0.9.387：语言跑偏检测已移除（误报代价 > 漏报收益，用户决策：让用户自己看）。
+     badAnchor 现在只剩「歌词缺词」这一类与语言无关的成员。 */
+  const badAnchor = [];
+  const musicDropGnos = [];
+  const subDropGnos = [];
+  for(const g of send){
+    const m = byGno[g.gno];
+    if(!m) continue;
+    // v0.9.47：含歌词音乐组的显式 drop 走独立通道 musicDropGnos，不再并入 badAnchor（整批重发通道）——
+    // 实测 Gemini 对纯哼唱（♪ Oh-oh, oh-oh ♪）8/8 语言整批重发 2 次后仍 drop：模型对「无实义」的
+    // 判断救不回，白付整批重发成本。改由外层单组隔离重译一次，再 drop 就接受模型判断
+    // v0.9.76：纯哼唱组（每个词都是感叹词）跳过救援——救援实测必失败，直接接受 drop（isPureHumming
+    // fail-safe：词表外/含实词一律返回 false，仍走救援，不会误删真歌词）
+    // v0.9.90：实义组（无音乐标记但有效字符 ≥6 且非纯哼唱，与 subDrop 遥测同口径）也进 drop 救援——
+    // 防「实义句 + Um. 等语气词混组」被模型整组连坐 drop 后静默删除（线上实测已出现 subDrop=1）
+    if(m.type==='drop' && !String(m.text||'').trim()){
+      const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
+      const eff = C.effChars(dropSrc);
+      if(C.musicRe().test(String(g.text)) && eff > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
+      else if(eff >= 6 && !C.isPureHumming(g.text)) subDropGnos.push(g.gno);
+      /* v0.9.380：eff<6 但确有实词 → 保留原文，不再静默删帧。
+         上面两档都不成立时，此前是 continue 掉什么都不做 → 回填层按 explicitDrop 整组删除，
+         rows 里连 dropAiDrop 都不加（那行记的是 m.type==='drop' 才有），日志一片干净。
+         实测 effChars("Okay.")=4、"Wait!"=4 —— 这类短实义句跨不过 6 的门槛，被删就是丢帧。
+         判据用项目自有的 isFillerCue（「去除水词」开关的同一口径）：组内只要有一条 cue
+         不被判成水词，就不该删。纯水词组（Um./Yeah.）照旧删——那是用户勾这个开关的本意。
+         注意是「保留原文」而非「进救援」：救援要发一次请求，而这里原文就是完全可接受的答案。 */
+      else if(eff > 0 && !C.isPureHumming(g.text)){
+        const realCue = g.mFrames
+          ? (g.mFrames.segs||[]).some(sg=>String(sg&&sg.text||'').trim() && !C.isFillerCue(sg.text))
+          : (g.cues||[]).some(c=>String(c&&c.text||'').trim() && !C.isFillerCue(c.text));
+        if(realCue){
+          m.type='text'; m.text=dropSrc; m.cues=null;
+          /* 光改 m.type 还不够：这份 fillers 返回给外层后会并进 fillerSet，
+             最终由「应用去水词」那一遍按编号统一把行 flag='drop' 删掉——
+             编号不摘出来，前面改得再对也白改（线上实测：Wait! 照删）。
+             只摘 cue 级编号：mFrames 组本来就不进 fillers（它是整组一个 text）。 */
+          if(!g.mFrames) (g.cues||[]).forEach(c=>fillers.delete(c.no));
+          S.shortDropKeepN=(S.shortDropKeepN||0)+1;
+        }
+      }
+      continue;
+    }
+    const txt = String(m.text||'').trim();
+    /* v0.9.380：歌词缺号检测。mFrames 组从不进 cueBadGnos 的结构校验（下方循环跳过），
+       模型少译一行时编号就缺一个，而 reassembleMusic 在「编号不全」时会改走按权重切分：
+       实测源 3 段歌词、模型只返回 [1][2] 时产出 `♪ 也许我只是想成 ♪ ♪ 为那个人 ♪ ♪ …`——
+       第 1 句被从中间劈开归到第 2 行，第 3 段源歌词彻底消失，全程没有任何通道察觉。
+       判据：只有在译文里解得出编号时才检查。不带编号 → 走权重兜底，实测把整段完整译文
+       切回 3 行是准的，不去打扰；能解出编号 → 编号必须覆盖 1..segs.length 且各自非空。
+       （全角 ［１］／【２】等变体 parseSegMarkers 已兼容。） */
+    if(g.mFrames && txt){
+      const want=(g.mFrames.segs||[]).length;
+      const map=C.parseSegMarkers(txt);
+      if(map && want){
+        const miss=[];
+        for(let i=1;i<=want;i++){ const v=map[i]; if(v==null||!String(v).trim()) miss.push(i); }
+        if(miss.length){
+          if(!badAnchor.includes(g.gno)) badAnchor.push(g.gno);
+          S.lyricShortN=(S.lyricShortN||0)+1;
+        }
+      }
+    }
+    /* v0.9.387：语言跑偏检测整体移除（用户决策：误报 → 每组白跑 2 次请求，代价高于漏报，
+       译文语言交给用户自己看）。anchorOk / sameAsSource 不再参与本通道，
+       badAnchor 只剩这条与语言无关的「歌词丢词」检查。 */
+    if(txt && C.musicLost(txt, g.mFrames ? g.mFrames.plainText : g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
+  }
+  // （fillers 已于 v0.9.379 提到 buildByGno 之前计算，此处不再重复声明）
+  // v0.9.66：cue 对齐结构校验——非音乐/非纯符号组带 cues 数组时逐组校验；
+  // 通过 → m.cueTexts 直写回填；结构错 → cueBadGnos（外层单组重发）；模型未采用 cues（旧格式 text）→ 照旧路径
+  // v0.9.67：① 移除 speaker 豁免（提示词从未豁免 dash 组，代码侧豁免属口径不一致）；
+  // ② 校验失败不再清空 m.cues——保留给回填层抢救拼接（模型部分 cue 缺文时好过整组 missing）
+  const cueBadGnos = [];
+  /* v0.9.381：分配失衡软统计——跨条语序重排是允许的，但重排后某条只剩虚词/符号就是读不出内容。
+     只累加计数，不进 errs、不触发重译（重译会把合法的语序重排改坏）。先观察命中率再决定是否接拦截。 */
+  let thinN = 0; const thinSample = [];
+  for(const g of send){
+    if(g.mFrames || g.pureMusic || g.filler) continue;
+    const m = byGno[g.gno];
+    if(!m || !m.cues) continue;
+    if(m.type==='drop') continue;
+    const v = C.validateCueAlign(g.cues, m.cues, {
+      maxW: (S.maxW||21), cpsLimit: C.cpsLimitOf(dstV), fillerSet: fillers
+    });
+    if(v.ok){
+      m.cueTexts = v.texts; m.cpsWarns = v.cpsWarns; m.cues = null;
+      if(v.thinWarns && v.thinWarns.length){
+        thinN += v.thinWarns.length;
+        if(thinSample.length < 8) v.thinWarns.forEach(w=>{ if(thinSample.length<8) thinSample.push({g:g.gno, no:w.no, src:w.srcLen}); });
+      }
+    }
+    else { cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
+  }
+  return { byGno, fillers, badAnchor, musicDropGnos, subDropGnos, cueBadGnos, thinN, thinSample };
+}
+
+/* v0.9.403：拆半重发的结果合并。两半各自返回一份 {byGno,fillers,badAnchor,...}，
+   必须并成一份再交给外层那套统一后处理（drop 救援 / 歌词隔离 / cue 重译），
+   否则这些通道会对半批各跑一遍，日志、计数和请求数都会翻倍。
+   fillers 是 Set（4401 行），不能直接 concat，用 Set 去重合并。 */
+function mergeBatchOut(a,b){
+  if(!a) return b;
+  if(!b) return a;
+  return {
+    byGno: Object.assign({}, a.byGno, b.byGno),
+    fillers: new Set([...(a.fillers||[]), ...(b.fillers||[])]),
+    badAnchor: (a.badAnchor||[]).concat(b.badAnchor||[]),
+    musicDropGnos: (a.musicDropGnos||[]).concat(b.musicDropGnos||[]),
+    subDropGnos: (a.subDropGnos||[]).concat(b.subDropGnos||[]),
+    cueBadGnos: (a.cueBadGnos||[]).concat(b.cueBadGnos||[]),
+    thinN: (a.thinN||0)+(b.thinN||0),
+    thinSample: (a.thinSample||[]).concat(b.thinSample||[]),
+  };
+}
+
+/* v0.9.127：纯翻译模型（Hunyuan-MT 系列）逐组直译通道。
+   协议：一组一个小请求——官方推荐模板的 system + 组原文，只要纯译文。
+   多 cue 组返回单个 text，由既有 backfillGroup 按时长切分回填（与旧格式同路径，零新机制）。
+   缓存：会话内「模型+目标语+原文」→译文 去重；整批重试 / 单组补救（都走 translateBatch）
+   时已成功的组直接命中缓存，只补真正失败的组——打破「缺 1 组 → 整批重发 → 又缺」的循环。 */
+const PURE_MT_RE=/hunyuan[-_]?mt/i;
+const PURE_MT_CACHE=new Map();
+function cleanPureMTOut(s){
+  let x=String(s||'').trim();
+  x=x.replace(/^```[a-zA-Z]*\s*/,'').replace(/```\s*$/,'').trim();
+  /* 整体被引号包住才剥一层——字幕内文里正常的引用不动 */
+  if(x.length>=2 && /^[“"「『‘]/.test(x) && /[”"」』’]$/.test(x)) x=x.slice(1,-1).trim();
+  x=x.replace(/^(译文|翻译|翻译结果|訳文|翻訳)\s*[:：]\s*/,'');
+  return x.trim();
+}
+async function pureMTTranslate(o){
+  /* Hunyuan-MT 官方推荐模板：中文指令 + 不解释（中文模型，中文指令最稳） */
+  const sys='你是一个翻译专家，将下面的文本翻译成'+o.dstN.zh+'，不要额外解释。';
+  const out=new Array(o.send.length);
+  let okN=0;
+  await poolMap(o.send, 4, async (g,k)=>{
+    const src=g.mFrames?g.mFrames.plainText:g.text;
+    const ck=String(o.model)+'\u0000'+o.dstN.zh+'\u0000'+src;
+    if(PURE_MT_CACHE.has(ck)){ out[k]={gno:g.gno,text:PURE_MT_CACHE.get(ck)}; okN++; return; }
+    let lastE=null;
+    for(let a=0;a<2;a++){
+      try{
+        const r=await chatOnce(o.base,o.key,o.model,[
+          {role:'system',content:sys},
+          {role:'user',content:String(src)}
+        ],120000,o.rt);
+        const txt=cleanPureMTOut(r);
+        if(txt){ PURE_MT_CACHE.set(ck,txt); out[k]={gno:g.gno,text:txt}; okN++; return; }
+      }catch(e){ lastE=e; if(e&&e.paceGiveUp) throw e; if(a===0) await new Promise(r=>setTimeout(r,1200)); }
+    }
+    throw (lastE||new Error('pureMT: empty translation for gno '+g.gno));
+  });
+  if(PURE_MT_CACHE.size>2000) PURE_MT_CACHE.clear();
+  log(t('pureMTDone', okN, o.send.length));
+  return out;
+}
+
+// B1 孤儿尾巴收并落地（v0.9.23）：collapseThinTail 命中后，末行转 merged（复用既有机制：
+// 单语导出过滤、双语源文并入承载行、表格显示"已并入"）、承载行 end 延展到末行 end
+//（行业允许 out-cue 延至语音结束，无重叠、无新 gap）。
+function applyTailCollapse(active){
+  if(!active || active.length<2) return;
+  const tailC=active[active.length-1], prevC=active[active.length-2];
+  const tailR=S.rows.find(x=>x.no===tailC.no), prevR=S.rows.find(x=>x.no===prevC.no);
+  if(!tailR || !prevR) return;
+  tailR.zh=null; tailR.flag='merged';
+  if((tailC.end||0)>(prevR.end||0)) prevR.end=tailC.end;
+}
+
+// 句组回填：优先合并为单条（时长/行数达标），否则按时长切分回填；返回回填方式（v0.9.21 抽出复用）
+// v0.9.23：切分后加 B1 孤儿尾巴收并（末条 cue <700ms 且译文只剩 ≤2 字/1 词尾巴 → 并回前条）
+// v0.9.42：音乐组歌词行对齐（backfillGroup 与 fitsCapacity 共用同一判定，保证容量预判与实际回填一致）。
+// 组内全部 cue 都是「含音乐符号且有实词」的歌词行时，按译文 ♪ 边界切 n 行逐 cue 回填；
+// 每行折行须 ≤2（容量守卫）。任一条件不满足返回 null → 回落既有合并/时长切分路径（零行为变化）。
+function musicAlignedSegs(active, text, cfg){
+  if(!(active.length>1)) return null;
+  if(!active.every(c=>C.musicRe().test(String(c.text)) && C.effChars(String(c.text))>0)) return null;
+  const segs=C.splitMusicLines(text, active.length);
+  if(!segs) return null;
+  return segs.every(p=>C.wrapToWidth(C.stripSoundTags(p),cfg.maxW,{normalize:true,locale:cfg.dst}).length<=2) ? segs : null;
+}
+function backfillGroup(active, text, cfg){
+  // v0.9.38：speaker 换行修复（与主回填循环同款，覆盖压缩重译路径）
+  if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
+  // v0.9.64：盘古之白（压缩重译路径同享；幂等，主路径已处理过则无变化）
+  if(/^zh/.test(String(cfg.dst||''))) text = C.panguSpace(text);
+  // v0.9.42：音乐组优先按歌词行对齐——歌词跟随各自 cue 时间轴，杜绝「♪ 孤行」/行中夹 ♪/词中硬切
+  if(active.length>1){
+    const mSegs=musicAlignedSegs(active, text, cfg);
+    if(mSegs){
+      active.forEach((c,i)=>{
+        const r=S.rows.find(x=>x.no===c.no);
+        if(r){ r.zh=mSegs[i]; if(r.flag!=='drop') r.flag=''; }
+      });
+      return 'music';
+    }
+  }
+  if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); return 'merged'; }
+  const times=active.map(c=>({start:c.start, end:c.end}));
+  const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
+  const pieces=col.pieces;
+  active.forEach((c,i)=>{
+    const r=S.rows.find(x=>x.no===c.no);
+    if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
+  });
+  if(col.collapsed) applyTailCollapse(active);
+  return col.collapsed ? 'collapsed' : 'split';
+}
+
+// 容量校验：译文按该句组时间轴切分回填后，每条 cue 折行均 ≤2 行（物理放得下）
+function fitsCapacity(text, active, cfg){
+  // v0.9.42：音乐组按对齐段判定（musicAlignedSegs 已含 ≤2 行守卫，与 backfillGroup 同一口径）
+  if(active.length>1 && musicAlignedSegs(active, text, cfg)) return true;
+  if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})) return true;
+  const times=active.map(c=>({start:c.start, end:c.end}));
+  const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+  return pieces.every(p=>{
+    const ps=String(p!=null?p:'').trim();
+    return !ps || C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length<=2;
+  });
+}
+
+// 超容压缩重译：句组译文过长放不下画面时，请模型在保留核心语义的前提下压缩改写（v0.9.21）
+// v0.9.22：非中文目标用英文指令（与主翻译提示词语言一致，防中文泄漏）
+async function compressBatch(base,key,model,items,dstLang){
+  const dstN = LBY(dstLang);
+  const zhDst = dstLang==='zh-CN' || dstLang==='zh-TW';
+  const groups=items.map(x=>{
+    const over=C.textWidth(C.stripSoundTags(x.current));
+    const target=Math.floor(x.cap*0.95);
+    const pct=over>0 ? Math.max(10, Math.round((1-target/over)*100)) : 20;
+    return zhDst
+      ? { gno:x.gno, 容量上限:target, 当前宽度:Math.round(over*10)/10, 原文:x.src, 当前译文:x.current, 要求:'改写后约缩短'+pct+'%，显示宽度（半角字符每个0.5、中日韩全角每个1）不超过容量上限' }
+      : { gno:x.gno, capacityLimit:target, currentWidth:Math.round(over*10)/10, source:x.src, currentTranslation:x.current, requirement:'Shorten by about '+pct+'%; display width (half-width chars count 0.5 each, CJK full-width chars count 1 each) must not exceed capacityLimit' };
+  });
+  const userMsg = zhDst
+    ? '以下字幕句组的译文过长，超出画面可显示的容量，请逐组把译文改写得更简洁：压缩冗余表述、去掉可有可无的修饰词、合并同义成分，但必须保留核心语义与通顺度，不得丢句。\n'
+      +JSON.stringify({groups})
+      +'严禁用省略号截断或砍掉半句来凑宽度——必须通过改写压缩；数字、专名、术语表译法保持原样。\n'
+      +'\n所有 text 字段必须用'+dstN.zh+'书写。只输出 JSON：{"groups":[{"gno":…,"text":"…"}]}。'
+    : 'The following subtitle translations are too long to fit the on-screen capacity. Rewrite each one more concisely: compress redundant phrasing, drop dispensable modifiers, merge synonymous parts — but keep the core meaning and fluency, and never drop a sentence.\n'
+      +JSON.stringify({groups})
+      +'Never meet the limit by truncating with an ellipsis or cutting a sentence in half — rewrite it shorter instead; keep numbers, proper names and glossary renderings intact.\n'
+      +'\nEvery text field must be written in '+dstN.zh+'. Output JSON only: {"groups":[{"gno":…,"text":"…"}]}.';
+  const raw=await chatOnce(base,key,model,[
+    {role:'system',content: zhDst ? '你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。' : 'You are a professional post-translation subtitle editor skilled at shortening translations without losing readability. Output JSON only.'},
+    {role:'user',content:userMsg}
+  ],undefined,undefined,{json:1});
+  const obj=parseLlmJson(raw);
+  if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
+  const byGno={};
+  obj.groups.forEach(x=>{ if(x&&x.gno!=null) byGno[x.gno]={ text:(x.text!=null?x.text:x.zh) }; });
+  return byGno;
+}
+
+/* ---------------- 自动术语表（v0.9.28） ----------------
+   翻译前一次调用：仅提取 专名（人名/呼号/地名/机构/品牌/作品）与 语境歧义词（军语/行话/多义词），
+   锁定全片统一译法注入规则 4.5；原文超长时均匀采样覆盖全片。 */
+function sampleSrcText(groups, budget){
+  const texts = groups.filter(g=>!g.filler && g.text).map(g=>g.text);
+  const all = texts.join('\n');
+  if(all.length<=budget) return all;
+  const stride = Math.ceil(all.length/budget);
+  const picked=[]; let len=0;
+  for(let i=0;i<texts.length && len<budget;i+=stride){ picked.push(texts[i]); len+=texts[i].length+1; }
+  return picked.join('\n');
+}
+/* ================= v0.9.134：术语表解析/过滤 =================
+   行语法（三种都归一成 {t, r, note}）：
+     SpaceX                          → 只给 t：保留原文（r 取 t）
+     Burger King → 汉堡王            → 指定译法（箭头也认 -> / => / =）
+     Outlaw 1 → 亡命徒1（战机呼号）   → 尾部括号是语境注释，不进译法
+   注：裸 t 之所以等价于 r=t，是因为规则 4.5 明文优先于规则 4——
+   「这条保留原文」因此能盖过全局的「全部译出」，无需在提示词里另加分支。 */
+const GLOSS_ARROW = /(?:->|→|=>|=)/;
+/* v0.9.137：RFC4180 引号切分。Excel 导出的 CSV 在字段含逗号时必然加双引号包裹——
+   原来「一行只认单个逗号」的规则会把 "Burger King, Inc.","汉堡王" 切成三段而解析错。
+   行里没有双引号就返回 null，交回原来的 Tab / 单逗号规则，旧输入行为完全不变。 */
+function glossCsvCells(s){
+  if(s.indexOf('"')<0) return null;
+  const out=[]; let cur=''; let inQ=false;
+  for(let i=0;i<s.length;i++){
+    const c=s.charAt(i);
+    if(inQ){
+      if(c==='"'){ if(s.charAt(i+1)==='"'){ cur+='"'; i++; } else inQ=false; }
+      else cur+=c;
+    } else {
+      if(c==='"') inQ=true;
+      else if(c===','||c==='，'){ out.push(cur); cur=''; }
+      else cur+=c;
+    }
+  }
+  out.push(cur);
+  return out.map(function(x){ return String(x).trim(); });
+}
+const GLOSS_HEAD = /^(term|terms|source|src|original|原文|源|t|t\u00e9rmino|translation|trans|target|dst|译文|目标|译名|r|note|notes|comment|注释|备注)$/i;
+// 剥掉尾部注释括号，返回 [主串, 注释]
+function glossSplitNote(line){
+  const m = String(line).match(/[（(]([^（()）]*)[）)]\s*$/);
+  if(!m) return [String(line).trim(), ''];
+  return [String(line).slice(0, m.index).trim(), m[1].trim()];
+}
+// 单个写入条目 → 提示词里的一行
+/* v0.9.141：一条可以有多个拼写（原文 | 变体），共用一个译法。
+   此前 AI 抽出的变体各占一行，用户改主条目的译法时变体行不跟随——
+   片里凡是用变体拼写的句子就完全不走新译法，表现为「改了没用」。 */
+function glossSplitForms(s){
+  return String(s==null?'':s).split('|').map(function(x){ return String(x).trim(); }).filter(Boolean);
+}
+function glossForms(x){
+  const out=[];
+  const push=v=>{ const s=String(v==null?'':v).trim(); if(s && out.indexOf(s)<0) out.push(s); };
+  push(x && x.t);
+  ((x && x.alts)||[]).forEach(push);
+  return out;
+}
+function glossRowText(x){ return glossForms(x).join('|') + ' → ' + x.r + (x.note ? '（' + x.note + '）' : ''); }
+function glossParseRow(line){
+  let s = String(line||'').trim();
+  if(!s || /^#|^\/\//.test(s)) return null;
+  let [body, note] = glossSplitNote(s);
+  let t = body, r = '';
+  if(GLOSS_ARROW.test(body)){
+    const i = body.search(GLOSS_ARROW);
+    t = body.slice(0, i).trim();
+    r = body.slice(i).replace(GLOSS_ARROW, '').trim();
+  }
+  if(!t) return null;
+  let alts=[];
+  if(t.indexOf('|')>=0){
+    const parts=glossSplitForms(t);
+    t=parts.shift()||'';
+    alts=parts;
+    if(!t) return null;
+  }
+  /* 只给了多个拼写、没给译法 → 每个拼写各自保留原文。
+     统一成第一个拼写等于把变体「改正」成主拼写，与「保留原文」正好相反。 */
+  if(alts.length && !r) return [t].concat(alts).map(function(f){ return {t:f, r:f, note:note}; });
+  // 没有变体时不要留空数组：条目形状与旧版保持一致（单测有 deepStrictEqual 钉着）
+  const row = { t, r: r || t, note };
+  if(alts.length) row.alts = alts;
+  return row;
+}
+// 整份文本 → 条目数组。自动识别 纯文本 / TSV / CSV / JSON，并跳过表头。
+// 返回 {rows, bad}：bad = 无法识别的行数（用于给用户明确反馈）
+function glossParse(text){
+  const raw = String(text||'').replace(/\r/g,'');
+  const trimmed = raw.trim();
+  const rows=[]; let bad=0;
+  const push=obj=>{
+    if(!obj) return;
+    if(Array.isArray(obj)){ obj.forEach(push); return; }   // v0.9.141：一条可能展开成多条
+    const k=obj.t.toLowerCase();
+    const hit=rows.findIndex(y=>y.t.toLowerCase()===k);
+    if(hit>=0) rows[hit]=obj; else rows.push(obj);   // 同名后者覆盖前者（上传的表因此能盖住旧内容）
+  };
+  if(trimmed.charAt(0)==='[' || trimmed.charAt(0)==='{'){
+    let arr=null;
+    try{
+      const j=JSON.parse(trimmed);
+      if(Array.isArray(j)) arr=j;
+      else if(j && Array.isArray(j.terms)) arr=j.terms;
+      else if(j && typeof j==='object') arr=Object.keys(j).map(k=>({t:k, r:j[k]}));
+    }catch(e){ arr=null; }
+    if(arr){
+      arr.forEach(o=>{
+        if(o==null) { bad++; return; }
+        if(typeof o==='string'){ const p=glossParseRow(o); p?push(p):bad++; return; }
+        const t=o.t!=null?o.t:(o.term!=null?o.term:(o.src!=null?o.src:(o.source!=null?o.source:o[Object.keys(o)[0]])));
+        const r=o.r!=null?o.r:(o.translation!=null?o.translation:(o.dst!=null?o.dst:(o.target!=null?o.target:o.render)));
+        if(t==null||r==null){ bad++; return; }
+        push({t:String(t).trim(), r:String(r).trim()||String(t).trim(), note:String(o.note||o.comment||'').trim()});
+      });
+      return {rows, bad};
+    }
+    /* JSON 看着像 JSON 但解析失败：按行逐条再试一次（有些导出是每行一个对象的 NDJSON） */
+  }
+  const lines=raw.split('\n').filter(l=>l.trim());
+  if(!lines.length) return {rows, bad};
+  /* v0.9.137：先探测表头。第一行全是列名 → 说明这是表格文件，整份按表格处理，
+     多逗号也要切（三列 source,target,note 是最常见的导出形式，旧规则只看单逗号根本读不了）。
+     没有表头的手写纯文本仍走保守的「单逗号」规则，旧输入行为不变。 */
+  let hdrCols=0;
+  {
+    const first=lines[0].trim();
+    if(first && !GLOSS_ARROW.test(first)){
+      const hc=glossCsvCells(first) || (first.indexOf('\t')>=0 ? first.split('\t') : first.split(/[,，]/));
+      const cc=hc.map(function(x){ return String(x).trim(); }).filter(Boolean);
+      if(cc.length>=2 && cc.every(function(x){ return GLOSS_HEAD.test(x); })) hdrCols=cc.length;
+    }
+  }
+  /* 逐行判定分隔符，而不是「先在整份文件上投票」——投票法遇到混合内容就失效
+     （实测：3 行箭头语法 + 1 行 CSV，CSV 那行会被当成裸词，整条变成 "Prism,棱晶"）。
+     优先级 箭头 > 制表符 > 单个逗号：箭头最无歧义，逗号最容易与术语本身冲突。 */
+  lines.forEach((l,idx)=>{
+    const s=l.trim();
+    if(!s || /^#|^\/\//.test(s)) return;
+    /* v0.9.137：表头判定独立做，不再挂在「单逗号」分支里——三列表头 source,target,note
+       有两个逗号，按旧逻辑根本切不开，表头会整行变成一条垃圾术语（模板自己都读不对）。 */
+    if(idx===0 && !GLOSS_ARROW.test(s)){
+      const hc = glossCsvCells(s) || (s.indexOf('\t')>=0 ? s.split('\t') : s.split(/[,，]/));
+      const cc = hc.map(function(x){ return String(x).trim(); }).filter(Boolean);
+      if(cc.length>=2 && cc.every(function(x){ return GLOSS_HEAD.test(x); })) return;
+    }
+    let cells=null;
+    if(GLOSS_ARROW.test(s)){
+      const i=s.search(GLOSS_ARROW);
+      cells=[s.slice(0,i), s.slice(i).replace(GLOSS_ARROW,'')];
+    } else {
+      const q=glossCsvCells(s);                       // v0.9.137：带引号的行按 RFC4180 切
+      if(q) cells=q;
+      else if(s.indexOf('\t')>=0){ cells=s.split('\t'); }
+      else {
+        const n=(s.match(/[,，]/g)||[]).length;
+        if(n===1 || (hdrCols>=2 && n>=1)) cells=s.split(/[,，]/);
+      }
+    }
+    if(cells){
+      const c=cells.map(x=>String(x).trim()).filter(Boolean);
+      // 表头：第一行的字段全是列名
+      if(idx===0 && c.length>=2 && c.every(x=>GLOSS_HEAD.test(x))) return;
+      if(c.length<1 || !c[0]){ bad++; return; }
+      const nb=glossSplitNote(c[1]||'');   // 译法里的括号仍是语境注释，不是译法的一部分
+      /* v0.9.141：原文侧可能是 `主拼写|变体`——多个拼写共用这一条给出的译法。 */
+      const forms=glossSplitForms(c[0]);
+      if(!forms.length){ bad++; return; }
+      const note=(c[2]||nb[1]||'');
+      if(forms.length>1 && !nb[0]){
+        // 只列了拼写、没给译法 → 各自保留原文（统一成主拼写等于把变体「改正」，语义相反）
+        forms.forEach(function(f){ push({t:f, r:f, note:note}); });
+        return;
+      }
+      const _row={t:forms[0], r:nb[0]||forms[0], note:note};
+      if(forms.length>1) _row.alts=forms.slice(1);
+      push(_row);
+      return;
+    }
+    const p=glossParseRow(s);
+    p?push(p):bad++;
+  });
+  return {rows, bad};
+}
+/* 按批次的源文本过滤：只保留这批里真的出现的条目。
+   动机是成本而非准确性——线上实测（deepseek-chat，术语表 8~3000 条）命中率恒为 8/8，
+   无关条目不会稀释注意力；但 3000 条 ≈ 8.5 万字/批，账单会被拖垮。
+   匹配规则：含拉丁/西里尔/希腊字母的术语要求词边界（避免 AI 因 said 命中 AI 这种误伤），
+   其余（中日韩等无空格书写系统）用包含匹配。 */
+/* v0.9.140：归一化——只做「无信息量差异」的抹平（大小写 / 空白 / 标点），
+   不做模糊编辑距离。目的是吃掉 `St. Paul` vs `St.Paul`、多余空格、全半角标点这类
+   肉眼等价但逐字不等的写法；至于 `Whopper` vs `Whoppers` 这种真实形变仍不命中——
+   放宽到那个程度会误伤相近词（Bob 命中 Bobby），代价比漏命中大得多，宁可明示给用户。 */
+function glossNorm(s){
+  /* 标点一律换成空格再压空白，而不是直接删：`St.Paul` 删点号会连成 `stpaul`，
+     与 `St. Paul`（→ `st paul`）反而对不上——这正是要抹平的差异，删了等于没抹。 */
+  return String(s||'').toLowerCase()
+    .replace(/[.,;:!?'"‘’“”`·、。，；：！？…—\-_/\\]/g,' ')
+    .replace(/[\s\u3000]+/g,' ')
+    .trim();
+}
+function glossHit(row, srcText){
+  const forms=glossForms(row);
+  for(const f of forms){ if(glossHitForm(f, srcText)) return true; }
+  return false;
+}
+function glossHitForm(t, srcText){
+  const src=String(srcText||'');
+  if(!t) return false;
+  if(!src) return false;
+  const latin=/[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u05D0-\u05EA\u0600-\u06FF]/.test(t);
+  if(!latin){
+    if(src.indexOf(t)>=0) return true;
+    return glossNorm(src).indexOf(glossNorm(t))>=0;
+  }
+  const esc=t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
+  try{ if(new RegExp('(^|[^\\p{L}\\p{N}])'+esc+'([^\\p{L}\\p{N}]|$)','iu').test(src)) return true; }
+  catch(e){ if(src.toLowerCase().indexOf(t.toLowerCase())>=0) return true; }
+  const nt=glossNorm(t); if(!nt) return false;
+  const nesc=nt.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  try{ return new RegExp('(^|[^\\p{L}\\p{N}])'+nesc+'([^\\p{L}\\p{N}]|$)','iu').test(glossNorm(src)); }
+  catch(e){ return glossNorm(src).indexOf(nt)>=0; }
+}
+function glossFilter(rows, srcText){ return rows.filter(r=>glossHit(r, srcText)); }
+// 本次运行的术语表快照（由 runTranslate 在抽取/换表后重建）
+let GLOSS_ROWS=[];
+let GLOSS_BAD=0;
+function glossRefresh(){
+  const p=glossParse(($('terms')||{}).value||'');
+  GLOSS_ROWS=p.rows; GLOSS_BAD=p.bad;
+  return p;
+}
+// 一批原始建议方案的源文本（merged + 各 cue 原文都要——merged 是拼好的整句，cue 是原始分行）
+function glossBatchSource(gBatch){
+  const parts=[];
+  (gBatch||[]).forEach(function(g){
+    if(g && typeof g.merged==='string') parts.push(g.merged);
+    (g.cues||[]).forEach(function(c){ if(c && typeof c.text==='string') parts.push(c.text); });
+  });
+  return parts.join('\n');
+}
+/* 生成这一批要用的提示词。没有术语表时直接返回基础 sys——
+   与旧逻辑完全等价（旧版整个文件共用一个 sys），所以不用术语表的用户不受任何影响。 */
+function glossSysFor(gBatch, cfg, baseSys){
+  if(!GLOSS_ROWS.length) return baseSys;
+  const hit=glossFilter(GLOSS_ROWS, glossBatchSource(gBatch));
+  return systemPrompt(Object.assign({}, cfg, {glossary: hit.map(glossRowText).join('\n')}));
+}
+async function extractGlossary(base,key,model,cfg,srcText){
+  const dstN=LBY(cfg.dst), zhDst=(cfg.dst==='zh-CN'||cfg.dst==='zh-TW');
+  const sys = zhDst
+    ? '你是字幕翻译的术语审定员，负责在翻译开始前锁定全片统一译法。只输出 JSON，不要解释。'
+    : 'You are a terminology curator for subtitle translation, locking file-wide renderings before translation starts. Output JSON only, no explanation.';
+  // v0.9.42：提取提示词尊重 keepTerms——此前术语表一律给目标语言译法，而规则 4.5 又优先于
+  // 规则 4，导致勾选「专名保留原文」时 CJK 等非拉丁目标仍被音译（两个默认勾选的功能互相打架）。
+  // 现在：keepTerms 开 → ①类专名 r 必须与 t 完全一致（原文原样，不音译不转写），
+  // 仅通用地名与②类歧义词给目标语言译法，术语表与规则 4 方向一致。
+  const usr = zhDst
+    ? '从下面的字幕原文中提取术语表。只收两类：\n'
+      + '① 专有名词：人物名、呼号/代号、地名、机构、品牌、作品名；\n'
+      + '② 语境歧义词：军语、行话、俚语、多义词——正确译法依赖剧情语境，不看上下文容易译错。\n'
+      + '严格排除：普通词汇、常见短语、数字、时间表达、通用军衔。只收「全片统一译法真正重要」的词。\n'
+      + '原文可能来自语音听写，同一专名在片中可能出现多种拼写变体（听写错误所致）：把它们归并为同一个条目，严禁把同一个人/事物拆成多条。t 必须填「片中实际出现次数最多的那个拼写」——术语表按原文逐字匹配，填了片中不存在的规范拼法这一条就永远不会生效；片中出现过的其它拼写放进 variants（最多 2 个，程序会把它们和 t 写在同一行、共用同一个译法）。方言、口音、俚语等口语变体不是听写错误，不要归并、也不要「改正」。\n'
+      + (cfg.keepTerms
+          ? '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、统一译法 r。r 的规则：①类专有名词（人物名/呼号/品牌/机构/作品名）的 r 必须与 t 完全一致——原文写法原样保留，严禁音译或转写（如 Bobbi Thompson 的 r 就是 Bobbi Thompson，严禁写成 博比·汤普森）；只有通用地名（国家/城市/地标）与②类歧义词的 r 用'+dstN.zh+'通行译法。最多 25 条；确实没有就返回 []。\n'
+            + '只输出 JSON 对象：{"synopsis":"60 字以内的一句话影片概要（题材+主要人物，供翻译时理解语境）","terms":[{"t":"Bobbi Thompson","note":"受访者、房产经纪人","r":"Bobbi Thompson","variants":["Bobbi Thomson"]}]}；variants 填片中出现过的其它拼写（没有就省略或给 []），没有可收术语时 terms 为 []。\n\n字幕原文：\n'+srcText
+          : '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、'+dstN.zh+'统一译法 r。最多 25 条；确实没有就返回 []。\n'
+            + '只输出 JSON 对象：{"synopsis":"60 字以内的一句话影片概要（题材+主要人物，供翻译时理解语境）","terms":[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1","variants":["Outlaw One"]}]}；variants 填片中出现过的其它拼写（没有就省略或给 []），没有可收术语时 terms 为 []。\n\n字幕原文：\n'+srcText)
+    : 'Extract a glossary from the subtitle source text below. Include ONLY two kinds:\n'
+      + '(1) proper nouns: character names, callsigns/code names, place names, organizations, brands, work titles;\n'
+      + '(2) context-ambiguous terms: military jargon, technical slang, polysemous words whose correct rendering depends on the story context.\n'
+      + 'Strictly EXCLUDE common vocabulary, generic phrases, numbers, time expressions, generic ranks. Only terms whose file-wide consistent rendering truly matters.\n'
+      + 'The source may come from speech transcription, so the same proper noun may appear under different misspelled variants: merge them into ONE entry, never split one person/entity into multiple entries. For t use the spelling that actually occurs MOST OFTEN in the source — the glossary is matched against the source text literally, so a "canonical" spelling that never appears in the film would silently never apply; put any other spellings that do occur into "variants" (max 2; they are written on the same line as t and share one rendering). Dialect, accent and slang variants are not transcription errors - do not merge or "correct" them.\n'
+      + (cfg.keepTerms
+          ? 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r. Rules for r: for proper nouns (people / callsigns / brands / organizations / work titles), r MUST be exactly identical to t — keep the original spelling verbatim, never transliterate or transcribe it (e.g. the r for "Bobbi Thompson" is "Bobbi Thompson", not 博比·汤普森); only generic place names (countries / cities / landmarks) and category (2) ambiguous terms take the established '+dstN.zh+' rendering. Max 25 items; return [] if none.\n'
+            + 'Output a JSON object only: {"synopsis":"one-sentence synopsis of the film, max 60 words (genre and main subjects, for translation context)","terms":[{"t":"Bobbi Thompson","note":"interviewee, real-estate agent","r":"Bobbi Thompson","variants":["Bobbi Thomson"]}]}; variants lists other spellings that occur in the film (omit or [] when none); terms is [] when none.\n\nSource subtitles:\n'+srcText
+          : 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r in '+dstN.zh+'. Max 25 items; return [] if none.\n'
+            + 'Output a JSON object only: {"synopsis":"one-sentence synopsis of the film, max 60 words (genre and main subjects, for translation context)","terms":[{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1","variants":["Outlaw One"]}]}; variants lists other spellings that occur in the film (omit or [] when none); terms is [] when none.\n\nSource subtitles:\n'+srcText);
+  // v0.9.29：术语表单独放宽到 240s（一次性成本；DeepSeek 拥塞时 8.6K 实测 161.5s，90s 必然误杀）
+  const raw=await chatOnce(base,key,model,[
+    {role:'system',content:sys},
+    {role:'user',content:usr}
+  ],240000,undefined,{json:1});
+  const arr=parseLlmJson(raw);
+  // v0.9.62：返回 {terms, synopsis}——synopsis 为全片一句话概要，注入 systemPrompt 作语境 primer；
+  // 兼容旧数组返回（模型偶发无视对象指令直接给数组）
+  const terms = Array.isArray(arr) ? arr : (arr && Array.isArray(arr.terms) ? arr.terms : []);
+  if(!terms.length && !(arr && !Array.isArray(arr) && typeof arr.synopsis==='string' && arr.synopsis.trim())) throw new Error(t('errNoArray'));
+  const synopsis = (arr && !Array.isArray(arr) && typeof arr.synopsis==='string') ? arr.synopsis.trim().slice(0,200) : '';
+  /* v0.9.140：① note 先剥首尾括号——AI 常把注释写成「（受访者）」，原样拼进
+     `t → r（note）` 就成了「（（受访者））」，行尾注释正则匹配不到，整串被算进译文；
+     ② variants 一并带出，写回时补成同译法的独立条目，避免 AI 给的规范拼写片中不出现。 */
+  return { terms: terms.filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim()).slice(0,25).map(function(x){
+      return { t:x.t.trim(), r:x.r.trim(), note:glossNormNote(x.note),
+               variants:(Array.isArray(x.variants)?x.variants:[]).slice(0,2) };
+    }), synopsis };
+}
+
+/* ---------------- 主流程 ---------------- */
+/* 会话生命周期上报（fire-and-forget 不阻塞不报错；云端与自带 Key 模式都上报）
+   ev: 'finish' 翻译完成 | 'download' 下载字幕 | 'copy' 复制到剪贴板（v0.9.298，与下载同口径）；model：自带 Key 模式带用户填的模型名
+   v0.9.244：fmt = 本次导出（下载）的字幕文件格式（srt/vtt/sbv/ass/txt），仅 download 时传。
+     后台此前只有「下载了几次」，看不出用户到底把字幕导成什么格式；只传格式码，
+     不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。 */
+function reportEvent(ev, extra, fmt){
+  if(!S.trMeta) return;
+  try{
+    // v0.9.86：捎带丢弃遥测——dropN 被删总行数、subDrop 其中「源文仍有实义」的行数（纯统计，不影响任何行为）
+    /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
+       dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
+    /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
+    /* v0.9.380：补号冤魂（v0.9.379 埋的三个 gap* 计数此前只累加、没上报，等于没埋）+ v0.9.380 新增
+       短实义组保底、歌词缺号。与既有 drop* 和 cue* 同为纯统计，服务端白名单读取（见 server.js GAP_FIELDS）。
+       gapTryN/gapFixN = 缺号补译的分子分母（值不值得再做第二轮，靠这个比）；gapGiveUpN = 最终判死的批数；
+       shortDropKeepN = 差点被静默删掉、改为保留原文的组数；lyricShortN = 检出歌词缺号的次数。 */
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',pg:'translate',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+      /* v0.9.381：分配失衡样本（某条只剩虚词/符号）——与 cueSample 一样只在 finish 带一次 */
+      thinSample:(ev==='finish'&&S.thinSamples&&S.thinSamples.length)?S.thinSamples:undefined,
+      /* v0.9.375：编号级样本只在 finish 带一次（download/copy 再带就是同一份数据重复传） */
+      cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
+    // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
+    if(navigator.sendBeacon && typeof Blob==='function'){
+      try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
+    }
+    fetch('/api/event',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:body
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+/* v0.9.151：cue 结构错的类型归因（纯统计，不影响任何行为）。
+   validateCueAlign 的 errs 元素形如 EMPTY_17 / MISSING_3,4 / DUP_5 / UNKNOWN_9 / BAD_ENTRY / NO_CUES_ARRAY。
+   此前服务端只有 retryCue 一个总数，看不出是「模型漏条目」还是「译文被判空」——
+   前者的解法是调小批次，后者是把短叹词加进 fillers 白名单，方向完全相反，不该猜。
+   单位统一为「受影响的 cue 条数」：MISSING 按逗号列表里的编号个数计，其余每个错误码计 1。
+   只在主批解析失败时计一次（单组重译的返回不再计），避免同一组被重复累加。 */
+const CUE_ERR_FIELD = { EMPTY:'cueEmpty', MISSING:'cueMissing', DUP:'cueDup', UNKNOWN:'cueUnknown', BAD_ENTRY:'cueBadEntry', NO_CUES_ARRAY:'cueNoArr', OTHER:'cueOther' };
+function bumpCueErrs(list){
+  if(!Array.isArray(list)) return;
+  for(const cb of list){
+    const errs = (cb && Array.isArray(cb.errs)) ? cb.errs : [];
+    for(const raw of errs){
+      const s = String(raw == null ? '' : raw);
+      let kind = 'OTHER', n = 1, m = /^MISSING_([\d,]+)$/.exec(s);
+      if(m){ kind = 'MISSING'; n = m[1].split(',').length || 1; }
+      else if((m = /^(EMPTY|DUP|UNKNOWN)_\d+$/.exec(s))) kind = m[1];
+      else if(s === 'BAD_ENTRY' || s === 'NO_CUES_ARRAY') kind = s;
+      /* 白名单映射必须 hasOwnProperty：命中原型链上的键会返回 truthy 的垃圾值，把计数写进脏字段 */
+      const k = Object.prototype.hasOwnProperty.call(CUE_ERR_FIELD, kind) ? CUE_ERR_FIELD[kind] : 'cueOther';
+      S[k] = (S[k] || 0) + Math.max(1, Math.min(1000, Math.floor(+n || 1)));
+    }
+  }
+}
+
+/* v0.9.375：cue 结构错的「编号级」样本（纯统计；只记编号与错误码，不记任何原文/译文）。
+   为什么还要这一层：v0.9.151 起只记 cueMissing=56 / cueUnknown=56 这种**计数**，而两种
+   完全不同的故障在计数上一模一样，解法却相反 ——
+     ① 编号串组：模型把邻组的一条挂到本组（本组 MISSING_n、邻组 UNKNOWN_n），
+        两组内容其实都对，把 n 挪回真正的主人就能救回，0 次重试；
+     ② 编号写错：本组确实少一条、号又写成邻组的，照 ① 挪过去会把译文搬错位（比不救更糟）。
+   离线验证（_rehome_lab.js）里 ① 的收益区间是 5.9%~40.8% —— 收不拢的唯一原因就是
+   线上数据分不出这两类。补上编号样本后才能把它收敛成一个数，再决定要不要上归位规则。
+   只记四样：坏组+错误码、本批各组占哪几个号（**仅当出现 UNKNOWN 才记**，否则用不上）、
+   本组「多的那条其实是自己这条的重复」的条数、批序号。
+   上限硬编码，超了宁可不记 —— 别让一条遥测把事件撑大。 */
+const CUE_SAMPLE_MAX = 3;        // 每个任务最多留几批（同一单内不同批的出错形态往往不同）
+const CUE_SAMPLE_CHARS = 1200;   // 单批样本序列化后的字符上限
+const CUE_SAMPLE_TOTAL = 2400;   // 整包上限（⚠️ /api/event 的请求体只收 4KB，超了整条 finish 报不上去）
+const CUE_ERR_RE = /^(?:MISSING_[\d,]+|EMPTY_\d+|DUP_\d+|UNKNOWN_\d+|BAD_ENTRY|NO_CUES_ARRAY)$/;
+/* 「本该搬走、但内容只是本组自己那条的重复」的条数 —— 归位规则的最后一道路障就靠它，
+   只记个数、不记文本。没有这个数时，「串组」（该搬）与「编号写错·多一条」（不该搬）
+   在编号层面长得一样，上界永远收不拢。 */
+function dupOfOwnN(group, entryList){
+  try{
+    const own = new Set((group && Array.isArray(group.cues) ? group.cues : [])
+      .map(c => Math.floor(+(c && c.no))).filter(n => isFinite(n)));
+    const norm = t => String(t == null ? '' : t).replace(/\s+/g, ' ').trim();
+    const arr = Array.isArray(entryList) ? entryList : [];
+    let n = 0;
+    for(const e of arr){
+      if(!e) continue;
+      const no = Math.floor(+e.no);
+      if(own.has(no)) continue;                 // 自己的号，不在「该搬」之列
+      const tx = norm(e.text);
+      if(!tx) continue;
+      if(arr.some(x => x && x !== e && own.has(Math.floor(+x.no)) && norm(x.text) === tx)) n++;
+    }
+    return n;
+  }catch(e){ return 0; }
+}
+function noteCueSample(batchGroups, badList, bi, byGno){
+  try{
+    if(!Array.isArray(badList) || !badList.length) return;
+    if(!Array.isArray(S.cueSamples)) S.cueSamples = [];
+    if(S.cueSamples.length >= CUE_SAMPLE_MAX) return;
+    const bad = [];
+    let hasUnknown = false;
+    for(const cb of badList.slice(0, 40)){
+      if(!cb) continue;
+      const gno = Math.floor(+cb.gno);
+      if(!isFinite(gno) || gno < 0) continue;
+      /* 错误码走白名单：模型/未来改动带进来奇怪字符串时，别原样进遥测 */
+      const errs = (Array.isArray(cb.errs) ? cb.errs : [])
+        .map(s => String(s == null ? '' : s))
+        .filter(s => CUE_ERR_RE.test(s))
+        .slice(0, 20);
+      if(!errs.length) continue;
+      if(errs.some(s => s.indexOf('UNKNOWN_') === 0)) hasUnknown = true;
+      const g = (batchGroups || []).find(x => x && Math.floor(+x.gno) === gno);
+      const o = byGno && byGno[gno];
+      bad.push([gno, errs, dupOfOwnN(g, o && o.cues)]);
+    }
+    if(!bad.length) return;
+    const one = { i: Math.max(0, Math.floor(+bi || 0)), b: bad };
+    if(hasUnknown){
+      /* 只有出现 UNKNOWN 才需要「这批有哪些组、每组占哪几个号」：分析要据此判断那个多出来
+         的号属于同批的某一组（串组，可救），还是压根不在本批（跨批串号，只能丢）。 */
+      const map = [];
+      for(const g of (batchGroups || []).slice(0, 60)){
+        if(!g || !Array.isArray(g.cues)) continue;
+        const gno = Math.floor(+g.gno);
+        if(!isFinite(gno) || gno < 0) continue;
+        const nos = g.cues.map(c => Math.floor(+(c && c.no))).filter(n => isFinite(n) && n > 0);
+        if(nos.length) map.push([gno, nos.join(',')]);
+      }
+      if(map.length) one.m = map;
+    }
+    const s1 = JSON.stringify(one);
+    if(s1.length > CUE_SAMPLE_CHARS) return;
+    /* 整包预算：/api/event 的 readBody 只收 4KB，超了不是「少一份样本」，而是整条 finish
+       被 400 掉（完成时间、cue 计数、槽位全都记不上）。宁可少留一批。 */
+    let used = 0;
+    for(const x of S.cueSamples) used += JSON.stringify(x).length + 1;
+    if(used + s1.length > CUE_SAMPLE_TOTAL) return;
+    S.cueSamples.push(one);
+  }catch(e){}
+}
+
+async function runTranslate(){
+  if(S.translating) return;
+  if(!S.srcItems.length){ log(t('noSrc'),'err'); return; }
+  /* v0.9.87：函数体整体纳入 try——此前 getCfg→systemPrompt→pgStart→按钮置忙 这段在保护块外，
+     任何一处抛错都是异步静默失败（无日志、按钮无变化），用户侧表现为「点了没反应」且无从排查。
+     btnText 提前到 try 外留存，finally 恢复按钮用 */
+  let btnText=$('btnGo').textContent;
+  try{
+  glossRefresh();   // v0.9.134：以输入框的当前内容为准重建术语表快照（用户可能刚改过还没失焦）
+  /* v0.9.398：这两条原先只 log 一行就 return —— 按钮闪一下就恢复、日志滚在下面，
+     用户侧就是「点了没反应」。现在统一走 preflightGuard：弹窗说清楚缺什么，
+     还能一键改用内置风格继续跑。守卫要排在取配置之前（它自己读一遍 getCfg），
+     用户若在那里改成「均衡」，下面的 cfg 自然是改后的值。 */
+  if(!(await preflightGuard())) return false;
+  const cfg = getCfg();
+  S.maxW = cfg.maxW;
+  /* v0.9.170：开翻前统一拦一次。换片那条路只覆盖「换了文件」，同一部片改目标语言不会触发，
+     而术语表真正在用的时刻是开翻这一刻，守在这里最准。false = 用户取消，直接返回不动任何东西。 */
+  if(!(await glossLangGuard(cfg.dst, true))) return;
+  S.reuse = 0;   // v0.9.167：每轮重置。为 1 时说明本轮是「取回上次结果」，不调用模型、不上报 finish
+  const apiReady = (cfg.mode==='api' && cfg.base && cfg.key && cfg.model);
+  const builtinReady = (cfg.mode==='builtin' && BUILTIN_INFO.configured);
+  const useApi = builtinReady || apiReady;
+  if(cfg.mode==='api' && !apiReady){ log(t('degradeDemo'), 'err'); }
+  if(cfg.mode==='builtin' && !builtinReady){ log(t('builtinOff'), 'err'); }
+  // v0.9.78：应用用户设置的歌词标记（须早于 groupSentences——分组阶段就用它判断歌词行）
+  C.setMusicMarks(cfg.musicMarks);
+  const lyricMode = cfg.lyricMode || 'keep';
+  const dropFillers = cfg.dropFillers !== false;   // v0.9.78：默认开（未设置/旧配置都视为开）
+  let sys = systemPrompt(cfg);
+  pgStart();
+  // v0.9.74：改按「字符预算」切批（原按固定条数切：短剧 15字/条 批次过小浪费固定开销，
+  // 纪录片 120字/条 批次过大输出失控）。句组仍是原子单位，切批只发生在句子边界。
+  const CHAR_BUDGET = Math.max(1000, Math.min(6000, +$('batch').value || 3000));
+  /* v0.9.164：编号上限按目标语言分化。此前所有语言一律 60，而 2026-09-24 的运营数据显示
+     「每批条数高」与「重试高」两条同时成立的只有 ja / nl / sv：
+     日语每批 54.6 条 / 每批重试 0.497，荷兰 55.8 / 0.282（重复编号 199 次每千批，全站最高），
+     瑞典 58.0 / 0.300。反例同样重要，说明为什么不能一刀切全局降：
+       法语每批 55.9 条但重试仅 0.036 —— 不出错，降了纯浪费；
+       意大利语重试率最高（0.888）但每批只有 41 条 —— 病因不是密度，降了无效。
+     v0.9.166：中文原本不在这张表里（9/24 取数时它每批 43.7 条、重试 0.053，看着没必要），
+     但 9/25 实测它每批涨到 55.8 条，且扛下了当天 19 次 EMPTY 里的 18 次（每千行 1.07，活跃最高）。
+     更关键的是分桶证据：近 24h 每批 <45 的 13272 行、45~52 的 2802 行，EMPTY 都是 0；
+     只有 52~60 这一桶（35280 行）吃下了全部 54 次 EMPTY（1.53 每千行）。
+     把中文拉到 45 就是让它落进零区间，与 ja/nl/sv 同一个阈值、同一套理由。
+     zh-TW 一并纳入：与 zh-CN 同源（英文源 → 中文目标、同一套提示词、同一个模型），
+     目前样本极小（1 个任务 218 行），留着不降只会让同样的问题换个入口再犯一次。
+     目标值 45 的依据：gpt-6-luna 上每批 <50 条重试为 0.000、50 条以上升到 0.26~0.28，
+     是目前唯一可复现的拐点（deepseek 上的分档不单调，被语言构成混淆，不能拿来定阈值），取 45 留余量。
+     代价已实测（ja/nl/sv 降密度）：每千行全价输入只 +1.5%、输出 +5%，真实代价是墙钟时间而非钱。
+     ⚠️ 该值已计入 snapFp，改它会让旧断点续传快照失效——批数本来就不一样，失效是正确行为。 */
+  const CUE_CAP_BY_LANG = { ja:45, nl:45, sv:45, 'zh-CN':45, 'zh-TW':45 };
+  /* 用 `+x || 60` 而不是直接取键：cfg.dst 是外部字符串，命中原型链上的键（如 '__proto__'）
+     会返回 truthy 的对象，让后面的数值比较全变 NaN 而静默不切批。复数运算把这种情况兜回 60。 */
+  const CUE_CAP = +CUE_CAP_BY_LANG[cfg.dst] || 60;
+  const effBase = cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
+  const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
+  const effModel= cfg.mode==='builtin' ? '' : cfg.model;
+  /* v0.9.403：整批重发从「同一请求连发 3 次」改成「1 次整批 + 1 轮拆半」。
+     原来 attempt 1、2 的请求体逐字节相同（sysB / ctx / feedback 全不变），只对网络抖动、
+     上游返空这类偶发失败有效；对「模型稳定地这么输出」零效果——三次会截在同一个位置。
+     线上实测（10-27 全天）：retryBatch 只触发 18 次 / 2041 批，是六条通道里最少的一条，
+     而这 18 次全是「再抽一次同样的签」。改拆半后请求数不变（1 整批 + 2 半批 = 3 个），
+     但每次尝试的规模减半、命中率显著提高，「换动作」也终于比「重复同一动作」有意义。
+     两半里只要有一半成功就先落库，失败的半边交下方逐组补救（≤3 组一请求）接手——
+     补救粒度比半批更细，等于把第三次机会让给了修复率更高的通道。 */
+  const maxTry  = 2;
+  let lastCall = 0;
+  let deadStreak = 0;   // v0.9.56：连续整批零成功计数（熔断判定用）
+  // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
+  // builtin：随翻译请求捎带（模型由服务器端记录）；自带 Key：随 finish/download 上报轻量记录
+  /* v0.9.159：每次点「开始翻译」生成一个任务号。此前服务端按「IP+文件名+语言+30 分钟」合并会话，
+     同一文件连翻两次会被并进同一条记录，后台看不出第二次；不合并则一次任务（十几批）会刷出十几条。
+     改成按任务号合并：同一任务的各批归到一条，重新点翻译就是新的一条。 */
+  S.taskId = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  /* v0.9.179：src=源语言（'auto' 或具体语言码），随每次翻译请求捎带给服务端记进 events.json。
+     此前只记目标语言 lang，无法回答「源语言默认改成 auto 之后翻译质量是变好还是变差」——
+     重试率、cue 结构错这些指标只能按 lang 分组，看不出 auto 组与手动指定组的差异。
+     纯统计字段，不参与任何判定（分批 CUE_CAP 只看 dst，分词方言由 srcLocaleForExport 单独处理）。 */
+  /* v0.9.407：pg=任务来源，随 meta 与 finish/download 上报一起带给服务端。
+     本页是「翻译页」（单文件/选中的文件，翻一种目标语言）；批量多语页（multilang.html）
+     走同一套 /api/translate，不标记的话后台把两条链路算成一笔账。 */
+  S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '', taskId: S.taskId, src: cfg.src || '', pg: 'translate' };
+  clearLog();
+  /* v0.9.126：点击到达代码的留痕必须写在 clearLog 之后——写在之前会被立刻擦掉。
+     有这一行，用户一眼就能分清「点击没进来」还是「请求发出去了对方没回」。 */
+  log(t('gotClick'));
+  /* v0.9.126：模式错配守卫——三个字段都填着、模式却不是「自定义 API」时，界面上看着像已配好，
+     实际这些值一个都不会被使用（切模式不清空输入框，值一直留着）。此前零提示。
+     ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
+  if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
+  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
+  /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
+  S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
+  /* v0.9.375：编号级样本与重试修复率同口径随任务重置（跨任务不累加） */
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];
+  $('btnGo').disabled=true;
+  $('btnGo').textContent=t('btnGoStop');
+
+  // 初始化工作行（深拷贝源）。v0.9.84：空文本 cue（歌曲间隙等）不会进任何句组、永不被翻译，
+  // 标记 noText 让界面显示「无需翻译」而非误导性的「待翻译…」，统计计入已处理
+  /* v0.9.270：重跑 = 整张表重建，先说一句手工编辑的处境——
+     时间轴与原文在编辑时已同步写回 S.srcItems（上面这行 map 会带上，真不丢）；
+     译文会被重新翻译覆盖，那是翻译本来的语义，但不该让人猜。 */
+  { const ne=editedCount(); if(ne) log(t('edBarCount',ne)+' · '+t('edBarKeep'),'warn'); }
+  S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null, noText:!String(it.text||'').trim()}));
+
+    // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
+    const groups = C.groupSentences(S.srcItems);
+    // v0.9.45 音乐帧预处理：♪/♫ 等符号不进模型——有歌词段的音乐组改发 [1][2]… 编号的纯正文，
+    // 译文回来按编号映射、符号按源文序列复原；纯符号行（只有 ♪）不进模型直接原文回填。
+    // v0.9.45b：不再因组文本含 \n 跳过（歌词 cue 几乎都是多行，cue 内换行是常态，
+    // extractMusicFrames 已把 \n 当空白归一化）；speaker 组（dash 结构）仍走旧路径
+    for(const g of groups){
+      if(g.speaker) continue;
+      // v0.9.78：歌词设置须先于 filler 判定——纯哼唱（♪ Oh oh oh ♪）在分组阶段就被 isFillerCue
+      // 判为水词组，若沿用「filler 直接跳过」，用户选删除/保留时这类歌词会被整组漏掉。
+      if(lyricMode!=='trans'){
+        const mf0 = C.extractMusicFrames(g.text);
+        if(mf0){
+          // 混合组保护——组内只要有一条 cue 不含标记（歌词与对白混排），drop 一律降级为 keep，
+          // 宁可留下未翻译的原文，也绝不把对白一起删掉（不规范字幕常见「一行歌词一行对白」）。
+          const allMarked = g.cues.every(c=>C.musicRe().test(String(c.text||'')));
+          g.lyricLocal = (lyricMode==='drop' && allMarked) ? 'drop' : 'keep';
+          continue;   // 已按歌词处理，不再做音乐帧预处理（这些组不进模型）
+        }
+      }
+      // v0.9.116：两档分明——勾选时本地判定的水词组直接清空、不进模型（结果确定，且省一轮调用）；
+      // 不勾选时全部送模型，由模型逐条决定「翻 / 留 / 删」（v0.9.78 的 fillerKeep 本地扣留已取消，
+      // 模型判 drop 因此成为用户显式选择的结果，不再是设置被绕过的 bug）。
+      if(g.filler){ if(dropFillers) g.fillerLocal = true; continue; }
+      const mf = C.extractMusicFrames(g.text);
+      if(!mf) continue;
+      if(!mf.segs.length) g.pureMusic = true;
+      else g.mFrames = mf;
+    }
+    const gMultiN = groups.filter(g=>!g.filler && g.cues.length>1).length;
+    log(t('groupInfo', groups.length, gMultiN));
+    // v0.9.78：歌词本地处理统计。占比过高几乎一定是标记字符设太宽（误把普通对白当歌词）
+    const lyricAll = groups.filter(g=>g.lyricLocal);
+    if(lyricAll.length){
+      const nDrop = lyricAll.filter(g=>g.lyricLocal==='drop').length;
+      const nKeep = lyricAll.length - nDrop;
+      if(nDrop) log(t('lyricSkipDrop', nDrop));
+      if(nKeep) log(t('lyricSkipKeep', nKeep));
+      const pct = Math.round(lyricAll.length / Math.max(1, groups.length) * 100);
+      if(pct >= 40) log(t('lyricWarn', pct), 'err');
+    }
+
+    if(!useApi){
+      log(t('demoNote'));
+      let drop=0, gMulti=0, mG=0;
+      groups.forEach(g=>{
+        if(g.filler){
+          if(dropFillers){
+            const row=S.rows.find(x=>x.no===g.cues[0].no);
+            if(row){ if(row.flag!=='drop') S.dropLocal++; row.zh=null; row.flag='drop'; }
+            drop++;
+          }else{
+            // v0.9.116：不勾选且无模型可交由判断 → 保留原文（本地能给出的最接近「交给模型」的结果）
+            g.cues.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(c.text).trim(); r.flag=''; } });
+          }
+          return;
+        }
+        if(g.cues.length>1){
+          gMulti++;
+          // 短句组（总时长 <=7s 且译文 <=2 行）直接合并为一条，译文天然完整
+          if(C.mergeableGroup(g.cues, g.text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(g.cues, g.text); mG++; return; }
+        }
+        const times=g.cues.map(c=>({start:c.start, end:c.end}));
+        // B1 孤儿尾巴收并（v0.9.23，规则演练路径同样生效）
+        const col=C.collapseThinTail(C.splitCues(g.text, times, {maxW:cfg.maxW, locale:cfg.dst}), g.cues, {maxW:cfg.maxW, locale:cfg.dst});
+        const pieces=col.pieces;
+        g.cues.forEach((c,i)=>{
+          const row=S.rows.find(x=>x.no===c.no);
+          // v0.9.25 双 speaker 对话：保留行结构（wrapToWidth normalize 会 squash \n），
+          // 折行延后到导出时按行独立处理（buildMonoParts SP 分支）
+          if(row){ row.zh=C.isSpeakerText(pieces[i]||'') ? String(pieces[i]).trim() : C.monoFit(pieces[i]||'',cfg.maxW,cfg.dst).join('\n'); }
+        });
+        if(col.collapsed) applyTailCollapse(g.cues);
+      });
+      S.dropN=drop; S.mergeN=gMulti; S.mergedN=mG;
+      log(t('mergeInfo', gMulti, mG, gMulti-mG));
+      renderRows();
+      return;
+    }
+
+    log(t('startT',LBY(cfg.src).zh,LBY(cfg.dst).zh,S.srcItems.length,CHAR_BUDGET));
+
+    /* v0.9.134：AI 抽出的条目写进术语表输入框（可见、可改），而不是藏进 cfg 直接喂提示词。
+       此前抽取结果对用户完全不可见——抽错没机会发现、也没机会补一条自己的。
+       优先级沿用「框里的内容就是唯一的真相」：同名的已有条目不动，AI 只补缺。 */
+    if(cfg.autoTerms){
+      setPrText(t('autoTermsRun')); setProg(0,true);
+      try{
+        const gl = await extractGlossary(effBase,effKey,effModel,cfg,sampleSrcText(groups,20000));
+        const have = glossParse(($('terms')||{}).value||'').rows;
+        const added = glossAIEntries(gl, have);
+        if(added.length){
+          $('terms').value = have.concat(added).map(glossRowText).join('\n');
+          glossRefresh();
+          save();   // v0.9.140：同上，自动抽取同样要立刻落盘
+          cfg.glossRows = GLOSS_ROWS;
+          cfg.glossKey  = GLOSS_ROWS.map(function(x){ return x.t+'\u0001'+x.r; }).join('\u0002');
+          log(t('autoTermsDone',added.length),'okc');
+          log(added.map(x=>'  · '+glossRowText(x)).join('\n'));
+        }
+        if(gl.synopsis){ cfg.synopsis=gl.synopsis; sys = systemPrompt(cfg); }
+      }catch(e){ log(t('autoTermsSkip',e.message),'err'); }
+    }
+
+    // v0.9.74：按「字符预算 + 条数上限」双约束分批；句组是原子单位不拆开，单句永不跨批
+    // （字符预算管输出量稳定，CUE_CAP 兜底编号数量，两者取先到者切批）
+    const batches=[];
+    let curB=[], curCues=0, curChars=0;
+    for(const g of groups){
+      const gc=g.cues.length;
+      const gChars=g.cues.reduce(function(n,c){ return n + String(c.text||'').length; }, 0);
+      if(curB.length && (curChars+gChars>CHAR_BUDGET || curCues+gc>CUE_CAP)){
+        batches.push(curB); curB=[]; curCues=0; curChars=0;
+      }
+      curB.push(g); curCues+=gc; curChars+=gChars;
+    }
+    if(curB.length) batches.push(curB);
+    // 翻译结果暂存：gno -> {type,text}；fillers：整条纯水词的 cue 编号集合
+    const res=new Map();
+    const fillerSet=new Set();
+    const totalB=batches.length;
+    /* v0.9.351：把真实总批数随请求带给服务端。服务端分配 D 档时要判断「这一集的
+       额度够不够跑完」，以前只能按字幕条数 ÷45 猜 —— 非中日韩字幕每批 60 条，
+       猜出来的批数比真实多三成，大任务因此被整集挡在 D 门外（10-21 00:43 的
+       1948 条波斯语：真实 33 批被估成 44 批，差 2 次就进不去）。 */
+    if(S.trMeta) S.trMeta.batches = totalB;
+    let ctx=[]; // v0.9.62：跨批上下文（前批末尾 ≤2 组的原文+已定译文，随批发给模型做衔接参考）
+    // v0.9.77 断点续传：同一文件 + 同语言对 + 同切批参数才认；批数对不上说明参数变了，旧快照作废
+    const snapFpStr=snapFp(cfg, CHAR_BUDGET, CUE_CAP);
+    /* v0.9.404：槽键 = 源文内容哈希 + 目标语言。
+       以前整页共用一个固定键，结果是「翻 A 到一半去翻 B，A 的进度被挤掉」；
+       分槽之后每部片（每种目标语言）各占一格，互不干扰。
+       ⚠️ 键里只放内容哈希与语言对，不放文件名与参数：
+         · 文件名改了（重命名/重新导出）不该丢进度，靠内容哈希认片；
+         · 参数（风格、行宽、术语表、歌词设置、切批）仍进上面的 snapFpStr 由 loadSnap 校验，
+           改了参数就不复用旧译文，但槽还在，改回来还能接着用。 */
+    SNAP_KEY = SnapStore.keyFor(srcFingerprint(S.srcItems), cfg.dst);
+    SNAP_META = { src:cfg.src, dst:cfg.dst, lines:S.srcItems.length };
+    SNAP_GEO = { tl:snapTimeline(S.srcItems), gs:groups.map(function(g){ return g.cues.length; }) };
+    let startBi=0;
+    const snap=loadSnap(snapFpStr);
+    if(snap && snap.totalB===totalB){
+      /* v0.9.167：快照分两种形态，走两条互不相干的路。
+         未跑完（无 fin）——原断点续传逻辑，一字未改；
+         整片跑完（fin=1）——新增：问用户要不要直接取回这份结果。 */
+      if(snap.fin){
+        /* 取回时 startBi=bi=totalB，下方批次循环零次执行，直接落到回填/渲染/导出。
+           与正常跑完完全同构：快照存的是「未经任何后处理的模型原始输出」，
+           而 renderRows / applyPost 在循环之后，所以不会出现二次折行、重复加空格。 */
+        const c2=await askReuse(snap.file||S.fileBase, S.srcItems.length, LBY(cfg.dst).zh, snap.ts);
+        if(c2==='reuse'){
+          applySnapInto(snap, res, fillerSet);
+          ctx=snap.ctx||[]; startBi=snap.bi;
+          PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];
+          S.reuse=1;   // 用于跳过 finish 上报——这次没调模型，不该当成一次任务计入 events.json
+          log(t('reuseLog'),'okc');
+        } else if(c2==='new'){
+          rmSnap();
+        } else {
+          return;   // cancel：不删快照也不翻译，回到翻译前状态（按钮与进度条由 finally 复原）
+        }
+      } else {
+        const choice=await askResume(snap.bi, totalB);
+        if(choice==='resume'){
+          applySnapInto(snap, res, fillerSet);
+          ctx=snap.ctx||[]; startBi=snap.bi;
+          PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];  // ETA 沿用上次节奏，不用重新攒样本
+          log(t('resumeLog', snap.bi, snap.bi+1),'okc');
+        } else {
+          rmSnap();
+        }
+      }
+    } else if(snap){ rmSnap(); }
+    if(useApi) log(t('resumeHint'));
+    for(let bi=startBi; bi<totalB; bi++){
+      /* v0.9.186：排队超时导致的停止不是用户点的，别写「已由用户停止」（会和弹窗自相矛盾） */
+      if(S.stop){ if(!S.paceOut) log(t('userStop'),'err'); break; }
+      const gBatch=batches[bi];
+      // v0.9.77：整批已有结果（断点恢复）→ 跳过不重发，只推进进度
+      if(gBatch.every(function(g){ return res.has(g.gno); })){ pgBatch(bi, totalB, true); continue; }
+      pgBatch(bi, totalB);
+      setPrText(t('batchProg', bi+1, totalB, gBatch[0].gno, gBatch[gBatch.length-1].gno));
+      /* v0.9.134：提示词按批定制——只把本批原文里真出现的术语带进 4.5。
+         无术语表时直接复用同一份 sys（与旧行为完全一致）。 */
+      const sysB = glossSysFor(gBatch, cfg, sys);
+      let ok=false, lastWhy='';
+      for(let attempt=0; attempt<maxTry && !ok; attempt++){
+        if(S.stop) break;
+        try{
+          lastCall=Date.now();
+          /* v0.9.400：重发带 rt=6。以前整批重发只落进 batches，后台根本看不出「重发了几次」；
+             现在单独进 retryBatch 桶，batches 只统计首批与补译请求。 */
+          let out;
+          if(attempt===0){
+            out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx,0);
+          }else{
+            /* v0.9.403：第二次机会改成拆半——把本批一分为二，各发一次。
+               整批重发之所以没效果，是因为请求体与上一次完全相同（v0.9.97 已就此把「跑偏」类
+               重发改成单组隔离）；真正还会整批失败的只剩网络 / 返空 / 截断，而这三类里
+               「批太大、输出太长被截」恰恰是缩小规模能直接缓解的。
+               两半串行发（不并发）：可停在半途（用户点停 / paceGiveOut），也不会同时压两个请求。
+               ctx 与 sysB 仍用整批那一份——术语表按半批重算会让两半的译名不一致，宁可多带几个词。 */
+            const mid=Math.ceil(gBatch.length/2);
+            const halves=[gBatch.slice(0,mid), gBatch.slice(mid)].filter(h=>h.length>0);
+            let acc=null, halfErr=null;
+            for(const h of halves){
+              if(S.stop) break;
+              try{
+                acc=mergeBatchOut(acc, await translateBatch(effBase,effKey,effModel,h,bi+1,totalB,sysB,null,ctx,6));
+              }catch(e2){
+                halfErr=e2;
+                /* 排队超时是真该停的信号：外层的 catch 会把它翻成 S.stop，但要等这轮拆半跑完。
+                   这里就地置位，第二半不再发——上游已经挤到排不进来，再补一个请求只会更挤。 */
+                if(e2 && e2.paceGiveUp){ S.paceOut=true; S.stop=true; break; }
+              }
+            }
+            if(!acc) throw halfErr || new Error('half retry failed');
+            if(halfErr){
+              /* 一成一败：成功那半先落库，再抛出去走下方逐组补救。
+                 落库后 pend=gBatch.filter(!res.has) 只会捞失败那半，不会把已翻好的组重发一遍。
+                 但「本来要走专用救援通道」的组必须先剔出来——它们各自的就地重译（drop 救援 /
+                 歌词隔离 / cue 重译）全写在接下来这段 try 里，这里已经 throw，一步都跑不到；
+                 若让它们落库，就会带着 drop、歌词缺词或结构错直接过关。剔出去交补救通道重翻，
+                 补救粒度是 ≤3 组一请求，比半批更小。 */
+              const skip=new Set(acc.badAnchor||[]);
+              (acc.cueBadGnos||[]).forEach(x=>skip.add(x.gno));
+              (acc.musicDropGnos||[]).forEach(gno=>skip.add(gno));
+              (acc.subDropGnos||[]).forEach(gno=>skip.add(gno));
+              Object.keys(acc.byGno).forEach(k=>{ if(!skip.has(Number(k))) res.set(Number(k), acc.byGno[k]); });
+              acc.fillers.forEach(no=>fillerSet.add(no));
+              throw halfErr;
+            }
+            out=acc;
+          }
+          /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
+             理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
+             模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +
+             单组盲重发 ×2 全部复现同样的混合输出」，即盲重发对跑偏零效果。真正修好跑偏的是下方
+             单组隔离通道（a=0 盲发一次、a=1 把跑偏译文喂回模型做纠错）。
+             成本：单批从最多 3 个整批请求降到 1 个整批 + 少量单组请求。
+             注意：网络错误 / 429 的重试在下方 catch 分支，与此处无关，保持原样。 */
+          if(out.badAnchor && out.badAnchor.length){
+            log(t('batchFail',bi+1,1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
+          }
+          // v0.9.47：音乐组 drop → 单组隔离重译一次；v0.9.82：勾选「去除水词」时模型 drop 与用户意图一致，直接跳过
+          // v0.9.85：合并重译——该批全部 drop 组打包成 1 次请求（此前每组 1 次，极端时 55 组=55 次往返）；
+          //          合并后仍 drop 的接受模型判断，按水词删除
+          // v0.9.90：实义组（subDropGnos）无条件进救援——用户勾「去除水词」想删的是 Um. 这类水词，
+          //          绝不会想删一整句实义对白；音乐组维持 v0.9.82 语义（勾选时跳过，歌词删留是用户明确取向）
+          const rescueGnos=[];
+          if(!dropFillers && out.musicDropGnos) rescueGnos.push(...out.musicDropGnos);
+          if(out.subDropGnos) rescueGnos.push(...out.subDropGnos);
+          if(rescueGnos.length){
+            const g1s=rescueGnos.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
+            const stillDrop=rescueGnos.slice();
+            if(g1s.length && !S.stop){
+              try{
+                const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sysB,null,ctx,1);
+                stillDrop.length=0;
+                for(const gno of rescueGnos){
+                  const m2=o2.byGno&&o2.byGno[gno];
+                  // 救回标准：非空组译文（音乐/旧格式）或 cue 对齐有文（cueTexts / cues），且该组未触发语言跑偏锚定
+                  const cueAny = m2 && ((m2.cueTexts && m2.cueTexts.size) || (Array.isArray(m2.cues) && m2.cues.some(c=>String((c&&c.text)||'').trim())));
+                  if(m2 && m2.type!=='drop' && (String(m2.text||'').trim() || cueAny) && !(o2.badAnchor||[]).includes(gno)){
+                    out.byGno[gno]=m2;
+                    o2.fillers.forEach(no=>fillerSet.add(no));
+                  } else stillDrop.push(gno);
+                }
+              }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+            }
+            const savedN=rescueGnos.length-stillDrop.length;
+            if(savedN>0) log(t('musicDropSaved',savedN),'okc');
+            if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
+          }
+          if(out.badAnchor && out.badAnchor.length){
+            // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
+            // v0.9.57：第 1 次仍盲重发（保留实证过的恢复通道）；第 2 次起把跑偏译文喂回模型做纠错重译
+            const remain=[];
+            /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次要喂第 1 次译文纠错） */
+            await poolMap(out.badAnchor, 3, async gno=>{
+              if(S.stop){ remain.push(gno); return; }
+              const g1=gBatch.find(x=>x.gno===gno);
+              let fixed=false;
+              if(g1){
+                /* v0.9.97：跑偏原文必须连 cue 对齐格式一起收——v0.9.66 起模型默认输出 cues
+                   （校验通过时 m.cues 被清空、只留 cueTexts，m.text 恒为空），此前 badTexts 取
+                   不到任何内容，于是 a=1 的纠错反馈永远为空，"第 2 次纠错重译"实际又是一次盲发，
+                   正解释了 v0.9.57 注释里「单组盲重发 ×2 全部复现同样输出」的现象。 */
+                /* v0.9.377：badTexts 带上 cue 编号——平铺协议里喂回模型的「跑偏译文」要能定位到条，
+                   否则模型只能看到一串无主译文，纠错反馈等于没给。 */
+                const badTexts=[];
+                (function(m){
+                  if(!m) return;
+                  const t=String(m.text||'').trim(); if(t) badTexts.push({no:null,text:t});
+                  if(m.cueTexts && m.cueTexts.size) m.cueTexts.forEach((v,no)=>{ const x=String(v||'').trim(); if(x) badTexts.push({no:no,text:x}); });
+                  else if(Array.isArray(m.cues)) m.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x) badTexts.push({no:(c&&c.no),text:x}); });
+                })(out.byGno[gno]);
+                /* v0.9.150：顺序反转——第 1 次就带纠错反馈（强的那次），失败才盲发兜底。
+                   此前 a=0 盲发、a=1 才带反馈，等于每组固定先烧一次几乎无效的请求：反馈素材
+                   badTexts 取自整批输出 out.byGno[gno]，本就不依赖 a=0 的产物，盲发纯属多余。
+                   实测（3 句组桩，四种模型行为）：能被反馈纠正时 7→4 次且修复率不变；
+                   只能靠「隔离」偶发恢复的情形（盲发有效、反馈无效）由第 2 次盲发兜住，不退化。
+                   两种成因并存见 v0.9.22 注释（隔离即恢复 5/5）与 v0.9.57 注释（盲发零效果）。 */
+                for(let a=0;a<2 && !fixed;a++){
+                  try{
+                    const fbArr=(a===0&&badTexts.length)?badTexts:null;
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,5);
+                    // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
+                    // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
+                    // v0.9.97：cue 对齐格式（cueTexts 或 cues 有文）同样算"已修复"，判据与上方 drop
+                    // 救援通道的 cueAny 对齐。此前只认 m2.text，而 cue 格式下 text 恒空 → 整条隔离
+                    // 救援对 v0.9.66 起的默认输出格式全程无效（实测 5/5 组落到「已按原样保留」）
+                    if(!o2.badAnchor || !o2.badAnchor.length){
+                      const m2=o2.byGno&&o2.byGno[gno];
+                      const cueAny2 = m2 && ((m2.cueTexts && m2.cueTexts.size)
+                        || (Array.isArray(m2.cues) && m2.cues.some(c=>String((c&&c.text)||'').trim())));
+                      if(m2 && (String(m2.text||'').trim() || cueAny2)){
+                        out.byGno[gno]=m2;
+                        o2.fillers.forEach(no=>fillerSet.add(no));
+                        fixed=true;
+                      }
+                    } else {
+                      const bm=(o2.byGno||{})[gno]||{};
+                      const pushBad=(n,t)=>{ const x=String(t||'').trim(); if(x && !badTexts.some(b=>b.text===x)) badTexts.push({no:(n==null?null:n),text:x}); };
+                      pushBad(null, bm.text);
+                      if(bm.cueTexts && bm.cueTexts.size) bm.cueTexts.forEach((v,no)=>pushBad(no, v));
+                      else if(Array.isArray(bm.cues)) bm.cues.forEach(c=>pushBad(c&&c.no, c&&c.text));
+                    }
+                  }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+                }
+              }
+              if(!fixed) remain.push(gno);
+            });
+            if(remain.length){
+              log(t('anchorKeep', remain.slice(0,5).join(',')+(remain.length>5?'…':''), LBY(cfg.dst).zh),'err');
+            } else {
+              log(t('anchorRefix', out.badAnchor.length),'okc');
+            }
+          }
+          /* v0.9.381：分配失衡软统计——每批校验通过后累加（跨条重排合法，只记「某条被掏空」的条数）。
+             不参与任何判定，接不接拦截等这批数据出来再说。 */
+          if(out.thinN){
+            S.thinN=(S.thinN||0)+out.thinN;
+            if(!S.thinSamples) S.thinSamples=[];
+            (out.thinSample||[]).forEach(x=>{ if(S.thinSamples.length<8) S.thinSamples.push(x); });
+          }
+          // v0.9.66：cue 对齐结构错组——单组隔离重发 ×2（第 2 次带结构错误反馈；实验实证一次可修复，
+          // hi 天城文 2 结构错 → 重试清零）。仍败则该组按旧格式回落：重发结果若无 cueTexts 但有 text
+          // 也能走旧回填路径；两者皆无 → missing（与批失败组同待遇，可见可后处理）。
+          if(out.cueBadGnos && out.cueBadGnos.length){
+            bumpCueErrs(out.cueBadGnos);   // v0.9.151：类型归因（只在此处计一次，单组重译的返回不再计）
+            /* v0.9.375：编号级样本 —— 计数分不出「串组」和「编号写错」，要靠这批编号定性 */
+            noteCueSample(gBatch, out.cueBadGnos, bi+1, out.byGno);
+            const remainCue=[];
+            /* v0.9.377：坏组不再「一组一请求」，改为切成 ≤3 个小批各发一次。
+               此前 N 个坏组最多 2N 次请求，而每次请求都要重发整份系统提示词（约 2.5k token）——
+               重试成本的大头从来不是字幕内容，是这份固定开销（实测重试占输入 token 的 35~43%）。
+               切 3 批后请求数从 2N 降到 ≤6；每小批仍远小于原批（十几条 vs 几十条），
+               v0.9.22/v0.9.66 实证的「隔离 + 缩小规模」修复机理没有丢。
+               份数上限取 3：坏组 ≤3 个时仍一组一批，保持最强的隔离度。 */
+            const badGs = out.cueBadGnos.map(cb=>gBatch.find(x=>x.gno===cb.gno)).filter(Boolean);
+            const badErrs = new Map(out.cueBadGnos.map(cb=>[cb.gno, cb.errs||[]]));
+            /* v0.9.72：并行化（并发3）——小批之间独立并行；批内 a<2 两次仍串行（第 2 次盲发兜底） */
+            await poolMap(splitBadChunks(badGs, 3), 3, async chunk=>{
+              if(S.stop){ chunk.forEach(g=>remainCue.push(g.gno)); return; }
+              const fixedSet=new Set();
+              for(let a=0;a<2;a++){
+                const todo=chunk.filter(g=>!fixedSet.has(g.gno));
+                if(!todo.length) break;
+                try{
+                  /* v0.9.150：第 1 次就带结构纠错反馈，失败再盲发兜底。
+                     打包后反馈 = 这一小批里所有坏组的错误清单（错误码自带编号，模型能定位） */
+                  const errs=[];
+                  todo.forEach(g=>{ (badErrs.get(g.gno)||[]).forEach(e=>errs.push(e)); });
+                  const fbCue=(a===0&&errs.length)?{cueErrs:errs}:null;
+                  const o2=await translateBatch(effBase,effKey,effModel,todo,bi+1,totalB,sysB,fbCue,ctx,3);
+                  for(const g of todo){
+                    const m2=o2.byGno && o2.byGno[g.gno];
+                    if(!m2 || (o2.badAnchor||[]).includes(g.gno)) continue;
+                    if(m2.cueTexts && m2.cueTexts.size){
+                      out.byGno[g.gno]=m2;
+                      o2.fillers.forEach(no=>fillerSet.add(no));
+                      fixedSet.add(g.gno);
+                    } else if(String(m2.text||'').trim()){
+                      out.byGno[g.gno]=m2; // 模型回落旧格式：有完整组译文也可用
+                      o2.fillers.forEach(no=>fillerSet.add(no));
+                      fixedSet.add(g.gno);
+                    }
+                  }
+                }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              }
+              chunk.forEach(g=>{ if(!fixedSet.has(g.gno)) remainCue.push(g.gno); });
+            });
+            /* v0.9.375：重试修复率 —— 只加两个整数。分母是「重试过的组数」而不是请求数
+               （一组最多发 2 次），用来回答「这一类结构错到底值不值得再问模型一遍」。 */
+            S.cueRetryN = (S.cueRetryN||0) + out.cueBadGnos.length;
+            S.cueRetryFix = (S.cueRetryFix||0) + (out.cueBadGnos.length - remainCue.length);
+            if(remainCue.length){
+              log(t('cueAlignFallback', remainCue.slice(0,5).join(',')+(remainCue.length>5?'…':'')),'err');
+            } else {
+              log(t('cueAlignRefix', out.cueBadGnos.length),'okc');
+            }
+          }
+          Object.keys(out.byGno).forEach(k=>res.set(Number(k), out.byGno[k]));
+          out.fillers.forEach(no=>fillerSet.add(no));
+          ok=true;
+          logSticky('b'+(bi+1)+'-0', t('batchDone',bi+1,totalB, attempt?t('retried',attempt):''),'okc');
+          logStickyEnd('b'+(bi+1)+'-0');
+        }catch(e){
+          logSticky('b'+(bi+1)+'-0', t('batchFail',bi+1,attempt+1,e.message),'err');
+          lastWhy=failWhyOf(e); /* v0.9.146：记下整批失败原因，供下方补救通道上报 */
+          if(S.stop) break;
+          /* v0.9.186：排队超时不再重试本批，也不再走下面的「逐组隔离补救」。
+             预算是批级的，批重试会把它重置（3 次 × 90 秒），逐组补救更是每组各来一轮——
+             实测一个 4 行的小任务能干等 150 秒以上还在排，而用户看到的只是「一直在转」。
+             上游此刻就是挤，重试只会让它更挤；已翻好的批留在本机断点里，稍后可续。 */
+          if(e && e.paceGiveUp){ S.paceOut=true; S.stop=true; break; }
+          if(cfg.mode==='builtin' && /HTTP (429|503)/.test(e.message)){
+            // 后端限流 / 未配置：按 code 本地化服务端消息（v0.9.33），停止整片翻译
+            log(srvErrTxt(e.message), 'err');
+            log(t('builtinOff'), 'err');
+            S.modelDead=true; S.stop=true; break;
+          } else if(cfg.mode==='builtin' && /HTTP 502/.test(e.message) && /Upstream HTTP 40[13]/.test(e.message)){
+            // 上游认证失败/额度不足（管理员 Key 问题）：重试无意义，直接停止
+            log(srvErrTxt(e.message), 'err');
+            S.modelDead=true; S.stop=true; break;
+          } else if(/429|rate/i.test(e.message) && attempt<maxTry-1){
+            log(t('rateWait'),'err');
+            await new Promise(r=>setTimeout(r,20000));
+          } else if(attempt===maxTry-1){
+            log(t('batchSkip'),'err');
+          } else {
+            await new Promise(r=>setTimeout(r,1500));
+          }
+        }
+      }
+      // v0.9.29：批次重试全败 → 拆成小组单独补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
+      // 同批其他句组本身无问题，隔离重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
+      if(!ok && !S.stop){
+        let consecFail=0, drifted=[];
+        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留）
+           v0.9.380：改用补救专属标记 _failWhy4 —— 全局那个会被并发的 cue 重译请求先一步吃掉。 */
+        _failWhy4 = lastWhy || null;
+        /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
+           此前会连同这些组一起补救，白白多烧请求（语义与上方 v0.9.77「整批已有结果则跳过」一致）。 */
+        const pend = gBatch.filter(g=>!res.has(g.gno));
+        /* v0.9.380：一组一请求 → ≤3 组一请求。此前一批 9 组就是 9 次请求，上游返空时整片能刷出
+           74 次补救，全部打在同一条不出货的链路上；而请求越小越容易成功，3 组一批正好兼顾。
+           （v0.9.377 已给 cue 重译做过同样的切批，这条补救通道当时没跟上。） */
+        const RC = 3;
+        for(let ci=0; ci<pend.length; ci+=RC){
+          if(S.stop) break;
+          const chunk = pend.slice(ci, ci+RC);
+          let got1=false;
+          // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
+          // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
+          let badTexts=[];
+          /* v0.9.381：RC=3（≤3 组一请求）是 380 改的，但退出条件仍是 `some` + `!got1`——
+             3 组里只要有 1 组成功就整块收工，另 2 组再也不重试，等于白送，且不报错、日志上看不出来。
+             改成与 5518 行分类重译同形的 todo 模式：每轮只重发本 chunk 里还没救回的组。
+             顺带接住「部分成功」：第 1 次跑偏的组单独留给第 2 次带反馈重译，已经成功的不再重发
+             （原来 `continue` 会把成功的一起丢掉，等于拿一遍重试换一遍重算）。 */
+          for(let a=0;a<2;a++){
+            const todo=chunk.filter(g=>!res.has(g.gno));
+            if(!todo.length) break;
+            try{
+              lastCall=Date.now();
+              const fbArr=(a>0&&badTexts.length)?badTexts:null;
+              /* v0.9.146：rt 由 2 改 4——这是「整批请求失败后的逐组补救」，不是语言跑偏。
+                 此前混用 rt=2，统计把网络/截断造成的补救全算进 retryAnchor，排查方向被带偏。 */
+              const o2=await translateBatch(effBase,effKey,effModel,todo,bi+1,totalB,sysB,fbArr,ctx,4);
+              const bad=(o2.badAnchor||[]).filter(gno=>todo.some(g=>g.gno===gno));
+              if(bad.length){
+                bad.forEach(gno=>{
+                  const bt=String((o2.byGno[gno]||{}).text||'').trim();
+                  if(bt && !badTexts.some(x=>x.text===bt)) badTexts.push({gno:gno,text:bt});
+                });
+                if(a>0) drifted.push(...bad);   // 第 1 次跑偏不记账：留给下一轮带反馈重译
+              }
+              Object.keys(o2.byGno).forEach(k=>{
+                const no=Number(k);
+                if(a===0 && bad.indexOf(no)>=0) return;  // 跑偏的不落地，下一轮重来
+                res.set(no, o2.byGno[k]);
+              });
+              o2.fillers.forEach(no=>fillerSet.add(no));
+              if(chunk.some(g=>res.has(g.gno))) got1=true;
+            }catch(e2){ /* 下一轮前统一退避 */ }
+            if(a===0 && chunk.some(g=>!res.has(g.gno))) await new Promise(r=>setTimeout(r,1200));
+          }
+          // v0.9.56 熔断：连续 3 批补救全败 → 判定模型无响应，立即停止整片翻译
+          //（否则整片每批都空转一轮，最坏几十分钟才轮到下一批重复同样的失败）
+          if(!got1){ if(++consecFail>=3){ S.modelDead=true; S.stop=true; break; } }
+          else consecFail=0;
+        }
+        const saved = gBatch.filter(g=>res.has(g.gno)).length;
+        if(drifted.length) log(t('anchorKeep', drifted.slice(0,5).join(',')+(drifted.length>5?'…':''), LBY(cfg.dst).zh),'err');
+        log(t('batchRescue',bi+1,saved,gBatch.length), saved===gBatch.length?'okc':'err');
+        // v0.9.56：首批即全军覆没，或连续 2 批零成功 → 模型不工作，停止并弹窗（小批次凑不满 3 连败走此兜底）
+        if(!S.stop && saved===0){
+          deadStreak++;
+          if(bi===0 || deadStreak>=2){ S.modelDead=true; S.stop=true; }
+        } else if(saved>0) deadStreak=0;
+      }
+      /* v0.9.383：补译止损。缺号补译成立的前提是「再问一次模型就能把编号补上」。
+         源语言 == 目标语言时这个前提系统性失效：模型认为原文无需翻译，编号永远补不齐，
+         于是每批都「补译 → 仍缺 → 判死 → 整批重发 → 再补译」无限空转，
+         而**每批都有部分组成功**，正是这一点让它绕开了全部既有熔断 ——
+         上面 5645 的 consecFail 与 5652 的 deadStreak 判的都是「整批零成功」，
+         这里 got1 / saved>0 恒为真，两个计数器一直被清零，熔断永远不触发。
+         线上实测（v0.9.381 埋点）：276 句的 en→en 任务 172 次补译尝试只救回 3 条（1.7%），
+         最后是用户手动停的；同期正常任务修复率 93%（30 试 28 中）。
+         到阈值就停：继续跑下去每批都会重复同样的失败，早停早告诉用户原因。 */
+      if(!S.stop && !S.gapAbort && (S.gapTryN||0) >= GAP_TRY_MIN
+         && (S.gapFixN||0) < (S.gapTryN||0)*GAP_EFF){
+        S.gapAbort=1;
+        log(t('gapAbort', S.gapTryN, S.gapFixN), 'err');
+        S.stop=true; break;
+      }
+      // v0.9.62：批末更新跨批上下文——取本批末尾最多 3 个有实义译文的句组（截到 300 字控 token）
+      // v0.9.74：2 → 3 组。字符预算切批后长句素材（120字/条）批数变多、衔接链条变长，
+      //   每批多带一句前文的代价极小，可缓解语气/称谓在长链条上缓慢漂移
+      // v0.9.66：cue 对齐组 text 为空 → 用 cues 文本按 cue 序拼接（跨批衔接参考不缺位）
+      ctx = gBatch.filter(g=>{
+        const m=res.get(g.gno);
+        return m && m.type!=='drop' && (String(m.text||'').trim() || (m.cueTexts && m.cueTexts.size));
+      })
+        .slice(-3)
+        .map(g=>{
+          const m=res.get(g.gno);
+          let txt=String(m.text||'').trim();
+          if(!txt && m.cueTexts && m.cueTexts.size){
+            txt=g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>String(m.cueTexts.get(c.no)||'').trim()).filter(Boolean).join(' ');
+          }
+          return { gno:g.gno, src:String(g.mFrames?g.mFrames.plainText:g.text).slice(0,300), text:txt.slice(0,300) };
+        });
+      // v0.9.77：本批落地即存盘——中断/关页后重开同一文件可从下一批续跑。
+      // 用户主动停止时不写：快照停在「上一个完成批 +1」，恢复时正好重跑被中断的那批
+      if(!S.stop) saveSnap(snapFpStr, res, fillerSet, ctx, bi+1, totalB, PG.durs, S.fileBase);
+    }
+    setProg(95,true); setPrText(t('postEnd')); // v0.9.59：批翻完只到 95%，run 动画保留到 pgFinish
+    log(t('postEnd'));
+
+    // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
+    // v0.9.116：fillers 始终生效——勾选时是对本地判定的补充；不勾选时删除属于「交给模型」的预期结果
+    /* v0.9.148：丢行归因——只计「本次新标记为 drop」的行，同一行不会被多个原因重复计数 */
+    S.rows.forEach(r=>{ if(fillerSet.has(r.no)){ if(r.flag!=='drop') S.dropAiFiller++; r.zh=null; r.flag='drop'; } });
+    // 勾选「去除水词」→ 本地判定的水词组直接清空（未送模型，模型无从干预）
+    groups.forEach(g=>{ if(!g.fillerLocal) return; g.cues.forEach(c=>{
+      const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropLocal++; r.zh=null; r.flag='drop'; }
+    }); });
+    const overCapGroups=[];   // 超容句组（v0.9.21：压缩重译候选）
+    let gMulti=0, mG=0, suspiciousDrop=0, missingCount=0;
+    for(const g of groups){
+      if(g.fillerLocal) continue;   // v0.9.116：本地定案已清空，无模型结果可回填
+      /* v0.9.130：跨多条的句组在此统一计数（口径与开头 groupInfo 完全一致 = !g.filler && g.cues.length>1）。
+         旧代码只在「合并 / 按时长切分」分支里 gMulti++，而模型返回 cue 逐条对齐时
+         （最优路径，实测 deepseek 全组走这条）在该分支前就 continue 了，
+         于是结尾日志「跨条句组 0 组」与开头「其中 30 组跨多条字幕」自相矛盾。 */
+      if(!g.filler && g.cues.length>1) gMulti++;
+      const active=g.cues.filter(c=>!fillerSet.has(c.no));
+      if(!active.length) continue;
+      // v0.9.78：歌词按用户设置本地处理——keep=原文原样落地；drop=整组移除（含纯符号标记行）
+      if(g.lyricLocal){
+        if(g.lyricLocal==='drop'){
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropLocal++; r.zh=null; r.flag='drop'; } });
+        }else{
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(c.text).trim(); if(r.flag!=='drop') r.flag=''; } });
+        }
+        continue;
+      }
+      // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型——译文=源文原样，符号永远不丢
+      if(g.pureMusic){
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(g.text).trim(); if(r.flag!=='drop') r.flag=''; } });
+        continue;
+      }
+      const m=res.get(g.gno);
+      // 批次失败 / 无结果：标记为 missing（待处理）——绝不当 drop，否则用户会把失败误判为水词清空
+      if(!m){
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
+        missingCount++;
+        continue;
+      }
+      // v0.9.67 防御网：豁免组（mFrames 等）或重试败组若带结构完整的 cues 输出 → 二次校验后采用，
+      // 不再整组 missing。mFrames 组 cue 输出无 [N] 编号标记 → 按序拼回 text 走符号复原路径。
+      if(!m.cueTexts && m.type!=='drop' && Array.isArray(m.cues) && m.cues.length){
+        try{
+          const v2=C.validateCueAlign(g.cues, m.cues, {maxW:(cfg.maxW||21), cpsLimit:C.cpsLimitOf(cfg.dst), fillerSet});
+          if(v2.ok && v2.texts.size){
+            if(g.mFrames){ m.text = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>String(v2.texts.get(c.no)||'').trim()).filter(Boolean).join(' '); }
+            else m.cueTexts = v2.texts;
+          }
+        }catch(e3){}
+      }
+      // v0.9.66：cue 对齐组——模型已按时长把译文分配到每条 cue，逐条直写（跳过合并/比例切分）。
+      // 折行与旧路径同款（wrapToWidth ≤2 行；speaker dash 结构原样）；盘古之白 zh 系同享；
+      // 行宽/CPS 软违规由 QC 报警 + 折行兜底（实验：1400+ cue 零硬违规）。
+      // v0.9.67：覆盖不全（个别 cue 无文）→ 不直写，拼接全组可用文本改走旧路径按比例重分配，
+      // 杜绝组内单条静默空缺（v0.9.66 实测：一夜限定组内 17/18 有文而 16 空缺导出占位符）。
+      if(m.cueTexts && m.cueTexts.size){
+        const holes = active.filter(c=>!String(m.cueTexts.get(c.no)||'').trim());
+        if(!holes.length){
+          active.forEach(c=>{
+            const r=S.rows.find(x=>x.no===c.no);
+            if(!r) return;
+            let ct=String(m.cueTexts.get(c.no)||'').trim();
+            if(/^zh/.test(String(cfg.dst||''))) ct=C.panguSpace(ct);
+            r.zh=C.isSpeakerText(ct)?ct:C.monoFit(ct,cfg.maxW,cfg.dst).join('\n');
+            if(r.flag!=='drop') r.flag='';
+          });
+          continue;
+        }
+        if(holes.length < active.length){
+          m.text = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>String(m.cueTexts.get(c.no)||'').trim()).filter(Boolean).join(' ');
+          m.cueTexts = null;   // 落到旧路径：按各条时长比例重切
+        }
+        // holes.length===active.length：全空 → 旧路径按 !text 走 missing
+      }
+      const textRaw = String(m.text||'').trim();
+      // 防御性丢弃判定：仅当模型显式 type='drop' 且 text 为空时才丢弃；只要给了译文就用译文
+      // v0.9.47：音乐组 drop 已在批次层经单组隔离重译确认（再 drop 即信模型），与其他水词同路径按 drop 落标
+      const explicitDrop = m.type==='drop' && !textRaw;
+      if(explicitDrop){
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropAiDrop++; r.zh=null; r.flag='drop'; } });
+        suspiciousDrop++;
+        continue;
+      }
+      // v0.9.45：音乐帧组——[N] 编号正文按源文段映射、符号按源文序列复原（模型从未见过 ♪）。
+      // 复原结果不过 normalizeMusic（相邻帧「♪ ♪」是正确结构，折叠会破坏）；复原失败回落旧路径。
+      let text = null;
+      if(g.mFrames) text = C.reassembleMusic(C.fixMixedChars(textRaw, cfg.dst), g.mFrames);
+      if(text == null){
+        // v0.9.45b：旧路径清洗残留分段编号——模型偶发把规则 5.5 的 [N] 编号带进无编号输入的输出，
+        // 不清会被时长切分切成两半（实测：行尾 [ 行首 3]）；源文本身含 [N] 时不清（可能是正文引用）
+        let rawOld = C.fixMixedChars(textRaw, cfg.dst);
+        if(!C.hasSegMarkers(g.text)) rawOld = C.stripSegMarkers(rawOld);
+        text = C.normalizeMusic(rawOld, g.text);
+      }
+      if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
+      // v0.9.64：盘古之白——中文目标的中西文边界补一个空格（「普通iPhone」→「普通 iPhone」），
+      // 模型输出时有时无，此处确定性归一；仅 zh 系目标（ja 等无此惯例不动）
+      if(/^zh/.test(String(cfg.dst||''))) text = C.panguSpace(text);
+      if(!text || C.musicLost(text, g.text)){
+        // v0.9.67 抢救：模型 cues 输出有部分可用文本（校验失败/重试未过）→ 拼接走比例切分，
+        // 好过整组 missing（v0.9.66 实测：13 条 dash cue 整组丢失导出「待翻译…」占位符）
+        let salv='';
+        if(Array.isArray(m.cues) && m.cues.length){
+          salv = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>{
+            const oc=m.cues.find(x=>x&&Number(x.no)===Number(c.no));
+            return oc?String(oc.text||'').trim():'';
+          }).filter(Boolean).join(' ');
+        }
+        if(salv && salv.length >= 2 && !C.musicLost(salv, g.text)){
+          text = salv;
+        } else {
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
+          missingCount++;
+          continue;
+        }
+      }
+      if(active.length>1){
+        // v0.9.130：gMulti 已在循环开头统一计数（含 cue 逐条对齐路径），此处不再自增
+        // v0.9.42：音乐组优先按歌词行对齐（♪ 边界逐 cue 回填，杜绝♪孤行/行中♪/词中硬切）
+        const mSegs = musicAlignedSegs(active, text, cfg);
+        if(mSegs){
+          active.forEach((c,i)=>{
+            const r=S.rows.find(x=>x.no===c.no);
+            if(r){ r.zh=mSegs[i]; if(r.flag!=='drop') r.flag=''; }
+          });
+          continue;
+        }
+        // 短句组（总时长 <=7s 且译文 <=2 行）直接合并为一条，译文天然完整、永不切散
+        if(C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); mG++; continue; }
+      }
+      const times=active.map(c=>({start:c.start, end:c.end}));
+      // B1 孤儿尾巴收并（v0.9.23）：末条 cue <700ms 且译文只剩尾巴 → 并回前条，消灭 0.5s 级闪现孤儿
+      const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
+      const pieces=col.pieces;
+      // 超容检测：分片折行 >2 行 = 译文总宽超过 cue数×2×maxW 物理容量，任何切分都放不下（v0.9.21 压缩重译）
+      // v0.9.25：双 speaker 对话豁免——压缩改写会破坏 dash 行结构，超宽由导出时的行级折行兜底
+      let over=false;
+      pieces.forEach(p=>{
+        const ps=String(p!=null?p:'').trim();
+        if(ps && !C.isSpeakerText(ps) && C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length>2) over=true;
+      });
+      // v0.9.45：音乐帧组不进压缩重译——改写会破坏 ♪ 复原结构；歌词天然短行，超容概率极低，
+      // 保不住容量也优先保符号正确（导出折行兜底）
+      if(over && !g.mFrames) overCapGroups.push({g, active, text});
+      active.forEach((c,i)=>{
+        const r=S.rows.find(x=>x.no===c.no);
+        if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
+      });
+      if(col.collapsed) applyTailCollapse(active);
+    }
+    // 异常 drop / missing 告警：超过 30% 时提示用户检查模型配置或重试（避免静默全军覆没）
+    const grpTotal = groups.length || 1;
+    if(suspiciousDrop > 0 && suspiciousDrop >= grpTotal * 0.3){
+      const pct = Math.round(suspiciousDrop / grpTotal * 100) + '%';
+      log(t('warnManyDrop', suspiciousDrop, grpTotal, pct), 'err');
+    }
+    /* v0.9.186：排队超时造成的缺失，原因已经写在弹窗里，别再让用户去检查配置——
+       他会真的去翻「翻译引擎」，而那里什么问题都没有。 */
+    if(missingCount > 0 && missingCount >= grpTotal * 0.3 && !S.paceOut){
+      const pct = Math.round(missingCount / grpTotal * 100) + '%';
+      log(t('warnManyMissing', missingCount, grpTotal, pct), 'err');
+    }
+
+    // 超容压缩重译（v0.9.21）：极少数句组译文总宽超过物理容量（cue数×2行×maxW），
+    // 任何切分都会产生 >2 行的 cue。交给模型压缩改写一轮；压缩后仍放不下或校验不过
+    // 则按原样保留（实测出现率 <0.2%，只影响该句组本身，不触碰其他任何译文行）。
+    if(overCapGroups.length && useApi && !S.stop){
+      setProg(97,true); setPrText(t('overCapStart', overCapGroups.length)); // v0.9.59：压缩重译阶段可见化
+      log(t('overCapStart', overCapGroups.length));
+      const items = overCapGroups.map(oc=>({ gno:oc.g.gno, src:oc.g.text, current:oc.text, cap:oc.active.length*2*cfg.maxW }));
+      let got=null;
+      for(let a=0; a<2 && !got && !S.stop; a++){
+        try{ got = await compressBatch(effBase,effKey,effModel,items,cfg.dst); }
+        catch(e){
+          log(t('overCapCallFail', a+1, e.message), 'err');
+          if(a===0) await new Promise(r=>setTimeout(r,2000));
+        }
+      }
+      if(got){
+        let fixed=0;
+        overCapGroups.forEach(oc=>{
+          const nt=got[oc.g.gno];
+          // v0.9.37：压缩改写后的译文同样归一化音乐符号（压缩可能把首尾 ♪ 压掉）
+          const txt=nt ? C.normalizeMusic(String(nt.text||'').trim(), oc.g.text) : '';
+          const cap=oc.active.length*2*cfg.maxW;
+          /* v0.9.388：这里原本还有一道 C.anchorOk 语言锚定——语言检测已在 387 整套摘掉，
+             译文语言交给用户自查。留着它等于在压缩通道里复活了半个已被移除的判定：
+             压缩成果仅因为「语言不符」被丢弃，用户拿到的仍是原来那句超长译文，
+             一次请求白烧。压缩要守的是长度与容量，这两道闸本来就在。 */
+          if(txt && C.textWidth(C.stripSoundTags(txt))<=cap && fitsCapacity(txt,oc.active,cfg)){
+            backfillGroup(oc.active, txt, cfg);
+            fixed++;
+          }
+        });
+        log(t('overCapDone', fixed, overCapGroups.length), fixed ? 'okc' : 'err');
+      }else{
+        log(t('overCapFail'), 'err');
+      }
+    }
+    S.dropN = S.rows.filter(r=>r.flag==='drop').length;
+    /* v0.9.86：静默清空遥测（纯统计，不改任何行为）——统计被删行里「源文仍有实义」的行数。
+       判定：有效字符 ≥6（排除 Um./Yeah./Mm-hmm 这类真水词）且非纯哼唱（Oh-oh 之类）。
+       用途：判断要不要把合并救援通道从「有 ♪ 标记」放宽到「源文有实义」，先攒数据再定。 */
+    S.subDrop = S.rows.filter(r=>r.flag==='drop' && C.effChars(String(r.en||''))>=6 && !C.isPureHumming(String(r.en||''))).length;
+    S.mergeN = gMulti;
+    S.mergedN = mG;
+    log(t('mergeInfo', gMulti, mG, gMulti-mG));
+
+    setProg(99,true); // v0.9.59：进入渲染/折行阶段
+    /* v0.9.270：译完只把上次改过的**时间轴与原文**套回来，不碰译文——
+       译文刚刚由模型产出，永远是最新的；快照是翻译「之前」落的，里面那份 zh 多半还是空的，
+       拿它盖回来就是把刚翻好的译文抹掉（编辑区不显示 + 导出为空）。
+       重跑翻译会覆盖上一次的手工译改，这是翻译本身的语义，入口日志里已明说一句。 */
+    { const ne=restoreEdits(true); if(ne) log(t('edRestored',ne),'okc'); }
+    renderRows();        // 先渲染译文，避免后处理误读旧 DOM
+    applyPost();         // 清提示词 + 折行（超阈值自动分行）
+    finalRenumberAndStats();
+    /* v0.9.130：allDone 的第二个占位是「合并了多少条」（各语言字典措辞均为 merged / 并入），
+       必须是真正的合并数 mG；S.mergeN 现在存的是「跨多条的句组」总数（给顶部指标徽章用），
+       二者不是一回事——多数跨条句组走的是逐条对齐或时长切分，并没有真的被并成一条。 */
+    /* v0.9.186：排队超时打断的这一轮没跑完，别报「全部完成」——会跟弹窗自相矛盾 */
+    if(!S.paceOut) log(t('allDone',S.dropN,S.mergedN,S.wrapN),'okc');
+    try{ glossVerify(); }catch(e){}   // v0.9.141：术语表核对，失败不影响已完成的结果
+    try{ updateSplitWarn(); }catch(e){}   // v0.9.191：跑完立刻告诉用户有没有字幕被切分
+    /* v0.9.167：从上次结果「取回」的这一轮没有调用模型，不是一次翻译任务。
+       若照旧上报 finish，events.json 会多出一条「行数齐全、批次与 token 全为 0」的记录，
+       看起来就是一次正常任务，会污染所有基于 batches / tkIn 的分析口径。
+       ⚠️ 这里只做「跳过」，没有新增 restore 事件类型——那需要改 server.js 的 ev 白名单（server.js:1106），
+       会把一个纯前端改动升级成动服务的改动（三副本同步 + node --check + 重启）。量化留到以后单独做。 */
+    if(!S.reuse) reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
+    // v0.9.77：只有整片跑完才作废断点。用户主动停止 / 模型熔断（S.stop）时保留，下次可续跑
+    /* v0.9.167：「作废」改为「标记完成」——跑完的快照留在本机（24 小时），
+       下次同一文件 + 同一套参数可以直接把它取回来，不必重译。详见 markSnapDone。 */
+    if(!S.stop) markSnapDone();
+    pgFinish();
+  }catch(e){
+    log(t('errOccur',e.message),'err');
+    reportEvent('fail', e && (e.message||e));   // v0.9.80：异常原因上报，后台可直接看到失败原因
+    try{ showErrModal(t('errModalFatal'), t('errOccur', String(e.message||e))); }catch(_){}
+  }finally{
+    S.translating=false;
+    $('btnGo').disabled=false;
+    $('btnGo').textContent=btnText;
+    if(!PG.ok){ setProg(0,false); setPrText(''); }
+    /* v0.9.348：不管跑完、失败还是用户点停止，都立刻把 D 槽占着的模型档让出来。
+       用户 10-20 定案：任务完没完咱们自己清楚，别等 3 分钟闲置过期 ——
+       小任务 1 分钟就跑完，白占一档，后面的人只能被挤去 C/B/A。
+       keepalive：用户关标签页/立刻离开时，这一发仍能发出去。 */
+    try{
+      if(S.taskId) fetch('/api/model-done',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({taskId:S.taskId}),keepalive:true}).catch(function(){});
+    }catch(e){}
+    /* v0.9.186：排队超时 → 弹窗告知「上游繁忙，稍后再试」。
+       与 modelDead 分开：那边是模型不响应（建议换 API），这边是额度挤（建议等一会儿再来），
+       处理建议完全不同，不能共用一套文案。 */
+    if(S.paceOut){
+      S.paceOut=false;
+      log(t('busyTitle'),'err');
+      try{ showErrModal(t('busyTitle'), t('busyBody')); }catch(_){}
+    }
+    // v0.9.56：模型无响应熔断 → 弹窗告知（稍后再试 / 打开引擎设置换自定义模型）
+    if(S.modelDead){
+      S.modelDead=false; S.gapAbort=0; S.missN=0;
+      log(t('errModalTitle'),'err');
+      try{ showErrModal(t('errModalTitle'), t('errModalBody')); }catch(_){}
+    }
+    /* v0.9.383：补译止损 —— 与 modelDead 分开，两件事的处理建议完全不同：
+       那边是模型压根不响应（建议换 API / 稍后再试），这边是模型有响应、
+       但它认为原文无需翻译（最可能就是源语言 == 目标语言，建议去检查语言设置）。
+       共用一套文案会把人往错误的方向带。 */
+    else if(S.gapAbort){
+      S.gapAbort=0; S.missN=0;
+      log(t('gapAbortTitle'),'err');
+      try{ showErrModal(t('gapAbortTitle'), t('gapAbortBody')); }catch(_){}
+    }
+    /* v0.9.385：绝大多数正常收尾的情况——模型全程正常、任务也跑完了，
+       只是零星的几条始终没拿到译文（模型漏输出、补译也没问回来）。
+       此前这些条目虽然内部打了 missing 标记，界面上却和「还没轮到翻译」长得一模一样，
+       用户只觉得"有几行空着"，不知道它们是翻失败了还是没翻。
+       现在：日志给一行、弹窗告诉用户去哪儿看、表格里这几条自己变色。 */
+    else if(S.missN){
+      const mn=S.missN; S.missN=0;
+      log(t('missLog', mn));
+      try{ showErrModal(t('missTitle'), t('missBody', mn)); }catch(_){}
+    }
+  }
+}
+
+function finalRenumberAndStats(){
+  S.rows.forEach((r,i)=>{ r.id=i; r.no=i+1; });
+}
+
+// 停止按钮 = 同一个按钮
+$('btnGo').addEventListener('click', ()=>{
+  if(S.translating){
+    /* v0.9.126：此前这里静默 return。上一轮还在等一个迟迟不回的请求时（自定义平台
+       最坏情况：每批 300 秒 × 3 次重试 = 15 分钟），此期间任何点击都石沉大海，
+       用户侧现象就是「点了没反应、连日志都没有」，且完全无从判断原因。现在明确告知。 */
+    try{ log(t('alreadyRunning'),'err'); }catch(e){}
+    S.stop=true; return;
+  }
+  runTranslate();
+});
+$('filter').addEventListener('change', renderRows);
+
+/* v0.9.87：全局错误显形——未捕获异常与未处理的 Promise 拒绝写进页面日志区。
+   此前这类错误只进浏览器控制台（用户根本不会打开），界面上的表现是「点了没反应」，
+   站长也无法远程定位。现在至少日志区能看到 [Error]/[Unhandled] 前缀的红字。 */
+window.addEventListener('error', function(e){ try{ log('[Error] '+String((e&&e.message)||''),'err'); }catch(_){} });
+window.addEventListener('unhandledrejection', function(e){ try{ var r=e&&e.reason; log('[Unhandled] '+(r&&r.message?r.message:String(r||'')),'err'); }catch(_){} });
+
+/* v0.9.351：刷新 / 关标签页时 finally 不会执行，model-done 发不出去，D 档的认领只能
+   等 3 分钟闲置过期 —— 这期间同一个人重新点一次翻译，新任务会被挤去 B，等旧认领一过期
+   又跳回 D，后台看起来就是 D→B→D→B 来回抖（10-21 00:43 的 SpongeBob 任务实例）。
+   pagehide 是页面消失前最后一个还能发请求的时机，用 sendBeacon 补一发；
+   服务端另有「同人重开直接接手」兜底，两条一起才压得住。 */
+window.addEventListener('pagehide', function(){
+  if(!S.taskId || !S.translating) return;
+  try{
+    var body = JSON.stringify({taskId:S.taskId, why:'pagehide'});
+    if(navigator.sendBeacon && typeof Blob==='function'){
+      navigator.sendBeacon('/api/model-done', new Blob([body],{type:'application/json'}));
+    }
+  }catch(_){}
+});
+
+/* ---------------- 导入 ---------------- */
+/* v0.9.144：整片文本指纹，用来判断「换了一部新片」还是「重新载入同一部片」。
+   只要内容一致就不算换片——否则用户重传一次修正版，刚写好的术语表会被误清。
+   ⚠️ 函数名不能叫 srcFingerprint：5821 行已有一个同名函数（接收 items 数组，供断点快照 snapFp 使用），
+   函数声明提升会让后者覆盖前者，直接毁掉续跑/断点机制。 */
+/* v0.9.168：术语库 =「留到下一部片继续用」的那一份，独立 key 存。
+   与 srtTool.terms 是两回事，别混：terms 是当前片正在用的表，跟着片子走、换片就清（v0.9.144）；
+   术语库跟着人走，只在换片那一刻回填进 terms。单槽设计——新的保存整体覆盖旧的。
+   多槽（按名字存多个库）要做清理策略、容量控制和选择 UI，复杂度与收益不成比例，先不做。 */
+const GLOSS_LIB_KEY='srt_gloss_lib_v1', GLOSS_LIB_MAX=20000;
+/* v0.9.170：已经确认过继续的「库语言 > 目标语言」组合（内存里记，不落盘）。
+   没有它的话，换片时选了「仍要载入」、点开始翻译又被拦一次——同一个问题连着问两回，很烦。
+   ⚠️ 只在用户点了「继续」之后才记：点取消说明他还没决定，下次该问还得问，
+      否则第二次点开始翻译就会静默放行，等于把「取消」变成了「第二次默认同意」。 */
+let GLOSS_LANG_ASKED='';
+/* v0.9.170：语言对不上的统一守卫。返回 true = 继续，false = 用户取消（调用方什么都不做）。
+   两条路共用：①换片回填 ②开翻前。runMode 的差别只有一条——
+   开翻时术语表是空的就没必要拦（空表不影响译文），而换片回填时表刚被清空，必须照样拦。 */
+async function glossLangGuard(curLang, runMode){
+  const lib=glossLibLoad(); if(!lib) return true;
+  curLang=String(curLang||'');
+  if(!lib.lang || !curLang || lib.lang===curLang) return true;
+  if(runMode){
+    const ta=$('terms');
+    if(!String((ta&&ta.value)||'').trim()) return true;
+  }
+  const key=lib.lang+'>'+curLang;
+  if(GLOSS_LANG_ASKED===key) return true;
+  const choice=await askGlossLang(LBY(lib.lang).zh, LBY(curLang).zh, runMode);
+  if(choice!=='go') return false;
+  GLOSS_LANG_ASKED=key;
+  return true;
+}
+function glossLibLoad(){
+  try{
+    const s=localStorage.getItem(GLOSS_LIB_KEY); if(!s) return null;
+    const o=JSON.parse(s);
+    if(!o || typeof o.text!=='string' || !o.text.trim()) return null;
+    return { text:String(o.text), lang:String(o.lang||''), ts:Number(o.ts)||0 };
+  }catch(e){ return null; }
+}
+function glossLibWrite(text){
+  try{
+    localStorage.setItem(GLOSS_LIB_KEY, JSON.stringify({
+      text:String(text||''), lang:String(($('dstLang')||{}).value||''), ts:Date.now()
+    }));
+    return true;
+  }catch(e){ return false; }
+}
+function glossLibDrop(){ try{ localStorage.removeItem(GLOSS_LIB_KEY); }catch(e){} }
+function glossLibCount(lib){ try{ return glossParse((lib&&lib.text)||'').rows.length; }catch(e){ return 0; } }
+function glossLibUI(){
+  const el=$('glossLibHint'); if(!el) return;
+  const lib=glossLibLoad();
+  if(!lib){ el.textContent=''; return; }
+  el.textContent=t('glossLibHint', glossLibCount(lib), LBY(lib.lang).zh);
+}
+function glossLibSaveNow(){
+  const ta=$('terms'); const v=String((ta&&ta.value)||'');
+  if(!v.trim()){ log(t('glossSaveEmpty'),'err'); return; }
+  /* 与 srtTool.terms 同口径：超过 2 万字不落盘。历史上这台机器的 localStorage 被存满过，
+     术语表又是纯文本、占地方最狠的一类。 */
+  if(v.length>GLOSS_LIB_MAX){ log(t('glossSaveTooBig', v.length, GLOSS_LIB_MAX),'err'); return; }
+  if(!glossLibWrite(v)){ log(t('glossSaveEmpty'),'err'); return; }
+  glossLibUI();
+  log(t('glossSaved', glossLibCount(glossLibLoad()), LBY(String(($('dstLang')||{}).value||'')).zh),'okc');
+}
+/* 清空 = 文本框 + 术语库一起清。只清文本框是不够的：库还在的话，下一部片又会被自动回填，
+   用户看到「我明明清空了怎么又回来了」——这比不清更让人困惑。
+   因为同时删掉了保存的东西，所以必须确认，不能点了就生效。 */
+async function glossLibClearNow(){
+  const cur=String((($('terms')||{}).value)||'');
+  const lib=glossLibLoad();
+  if(!cur.trim() && !lib){ log(t('glossClearNone')); return; }
+  const choice=await askGlossClear(glossParse(cur).rows.length, lib?glossLibCount(lib):0);
+  if(choice!=='yes') return;
+  $('terms').value='';
+  glossLibDrop();
+  glossRefresh(); glossCountUI(); glossLibUI(); save();
+  log(t('glossCleared'),'okc');
+}
+/* 术语库回填的唯一入口。语言不同一定要拦一下：术语表里写的是「译成什么」，
+   给中文存的表拿去翻日语，那些译法本身就是错的（专名保留类除外）。
+   这里只提示、不自动丢弃——因为 SpaceX 这类「保留原文」的条目跨语言照样通用，
+   硬拦会逼用户每次重存一遍。
+   ⚠️ v0.9.171：判据从「换片时」改成「术语框为空时」。此前只挂在 setSrc 的换片分支里，
+   而换片要求上一部片的指纹存在（S.srcFp），于是首次传片 / 清过浏览数据 / 换了机器
+   这三种情况下保存的术语永远载不进来——按钮下的小字还一直显示「已保存 N 条」，
+   用户看得见库、却看不见内容。现在页面打开时、任意一次传片后都补一次。
+   ⚠️ 框里已有内容一律不动：那是当前这部片正在用的表，覆盖它比不回填更糟。 */
+async function glossLibRestore(opt){
+  const o=opt||{};
+  const ta=$('terms'); if(!ta) return;
+  if(String(ta.value||'').trim()) return;
+  const lib=glossLibLoad(); if(!lib) return;
+  const curLang=String(($('dstLang')||{}).value||'');
+  if(o.silent){
+    /* 页面刚打开就弹窗太打扰：语言对不上时不载入，只写一行日志说清原因。
+       用户改回一致的语言后，下一次传片仍会正常载入并照旧弹窗确认。 */
+    if(lib.lang && curLang && lib.lang!==curLang){ log(t('glossLibSkip', LBY(lib.lang).zh, LBY(curLang).zh),'warn'); return; }
+  }else{
+    /* v0.9.170：语言检查改用统一的 guard（取消 = 什么都不载入，与开翻那次共用「只问一次」） */
+    if(!(await glossLangGuard(curLang, false))) return;
+  }
+  ta.value=lib.text;
+  glossRefresh(); glossCountUI(); glossLibUI(); save();
+  log(t('glossLibLoaded', glossLibCount(lib)),'okc');
+}
+/* 两个弹窗都沿用 askReuse 的样式与 resolve 约定：点遮罩 = 取消，绝不等同于「确认执行」。 */
+function askGlossClear(nCur, nLib){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.id='glossClearModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('glossClearTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=t('glossClearBody', nCur, nLib);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('reuseCancel'),false,'no');
+    mk(t('glossClearGo'),true,'yes');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('no'); } });
+    document.body.appendChild(ov);
+  });
+}
+function askGlossLang(savedLang, curLang, runMode){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.id='glossLangModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('glossLibTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=runMode ? t('glossLangRunBody', savedLang, curLang) : t('glossLibBody', savedLang, curLang);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('reuseCancel'),false,'cancel');
+    mk(runMode ? t('glossLangRunGo') : t('glossLibGo'),true,'go');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('cancel'); } });
+    document.body.appendChild(ov);
+  });
+}
+function srcTextFp(text){
+  const s=String(text||'');
+  if(!s) return '';
+  let h=2166136261;
+  for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+  return h.toString(36)+'-'+s.length;
+}
+function setSrc(text, fileName){
+  /* v0.9.184：导入新字幕就是新任务，上一部的「完成 · 用时 · 消耗」还挂在进度条上会误导人 */
+  try{ setProg(0,false); setPrText(''); }catch(e){}
+  const inFmt=C.detectFormat(text);   // 按内容识别：srt / vtt / ass / sbv
+  const {items, issues}= inFmt==='vtt' ? C.parseVtt(text) : inFmt==='ass' ? C.parseAss(text) : inFmt==='sbv' ? C.parseSbv(text) : C.parseSrt(text);
+  /* v0.9.144：换片清空整张术语表（AI 抽的 + 手写的都清）。
+     旧版只清 AI 抽的、保留手写，但「哪条是 AI 抽的」记在内存集合里、没落盘——
+     刷新一次就全忘了，换片后整张旧表照单全留，在新片里命中 0，改哪条都不生效。
+     用户的心智模型是「一部片一张表」，所以换片就该是干净起点。
+     重新载入同一部片（指纹相同）不触发，避免误删刚写好的表。 */
+  const fp=srcTextFp(text);
+  const isNewFilm = !!(S.srcFp && fp && fp!==S.srcFp);
+  let clearedN=0;
+  if(isNewFilm){
+    try{
+      const ta=$('terms');
+      const cur=String((ta&&ta.value)||'');
+      if(cur.trim()){
+        clearedN=glossParse(cur).rows.length;
+        ta.value='';
+        glossRefresh(); glossCountUI(); save();
+      }
+    }catch(e){ clearedN=0; }
+    /* 清表之后不在分支内回填了：v0.9.171 把它挪到本函数末尾统一做（见下），
+       这样首次传片同样能载入保存的术语，而不只是「换了一部片」这一种情况。 */
+  }
+  S.srcFp=fp;
+  /* v0.9.168 + v0.9.171：清完（或首次导入）后把术语库补回来——不补的话，v0.9.144 这条
+     清表逻辑会把用户特意保存的术语一起清掉，「上传新字幕后直接用之前保存的术语」不成立。
+     异步（语言不匹配时要弹窗问一句），这里不 await：导入不能被一个弹窗卡住。
+     ⚠️ 框里已有内容时函数会自行跳过——那是当前这部片在用的表，覆盖它比不补更糟。 */
+  try{ const p=glossLibRestore(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+  S.srcItems=items;
+  /* v0.9.270：指纹在导入这一刻固定。之后改原文不会让它漂移，同一份字幕的手工编辑
+     才能在刷新后认回来；改时间轴更不该动指纹（srcFingerprint 只按原文算）。 */
+  try{ S.srcFp0=srcFingerprint(items); }catch(e){ S.srcFp0=''; }
+  // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
+  S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
+  S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
+  S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清，样本不跨文件混
+  if(fileName){
+    S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
+  }
+  /* v0.9.270：同一份字幕上次改过的行，导入后立刻认回来（此时译文还没翻，恢复的是时间轴与原文）。
+     ⚠️ 必须排在 S.fileBase 赋值之后——文件名是编辑指纹的一部分，
+     放在前面会拿上一次（或空）的文件名去比对，永远认不回来。 */
+  { const ne=restoreEdits(); if(ne) log(t('edRestored',ne),'okc'); }
+  const w=issues.length;
+  $('parseInfo').innerHTML= w
+    ? '<span style="color:var(--warn)">'+t('parseWarn',items.length,w)+'</span><br>'+issues.slice(0,6).map(i=>'#'+i.at+' '+issTxt(i)).join('<br>')+(issues.length>6?'<br>…':'')
+    : t('parseOk',items.length);
+  renderRows();
+  /* v0.9.237：导入的 VTT 带 STYLE 块 / cue settings → 回填样式面板（导入即继承，不用再设一遍）。
+     ⚠️ 不自动改「导出格式」：导入 VTT 但想导出 SRT 是完全合理的，替用户改选择才是越界。
+     ⚠️ 只填读到的字段（applyVttStyle 内部保证），读不到的保持现值，不做「智能还原」。 */
+  if(inFmt==='vtt'){
+    try{
+      const vp=C.parseVttStyle(text);
+      const vn=applyVttStyle(vp);
+      if(vn>0){ save(); log(t('vttStyleImported',vn),'okc'); }
+      if(vp.notes && vp.notes.indexOf('lineNumber')>=0) log(t('vttLineNumNote'),'warn');
+    }catch(e){}
+  }
+  log(t('imported',fileName||t('paste'),items.length),'okc');
+  if(clearedN>0) log(t('glossClearedAll',clearedN),'okc');
+  document.getElementById('reportBox').style.display='none';
+}
+
+$('btnFile').addEventListener('click', ()=>$('file').click());
+$('file').addEventListener('change', ()=>{
+  const f=$('file').files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>setSrc(String(rd.result||''), f.name);
+  rd.readAsText(f,'utf-8');
+  $('file').value='';
+});
+$('btnParse').addEventListener('click', ()=>{
+  const txt=$('paste').value.trim();
+  if(!txt){ log(t('pasteEmpty'),'err'); return; }
+  setSrc(txt,'');
+});
+$('btnDemo').addEventListener('click', ()=>{ $('paste').value=DEMO; setSrc(DEMO,t('demoFile')); });
+/* v0.9.404：本机记录。打开前先清一遍过期的——过期槽只有在这里才会被真正删掉，
+   不清理的话索引会一直带着它们，面板上出现「点了没反应」的条目。 */
+$('btnSnap').addEventListener('click', ()=>{ try{ SnapStore.gc(); }catch(e){} openSnapPanel(); });
+
+const DEMO=`1
+00:00:00,200 --> 00:00:00,600
+Brigitte
+
+2
+00:00:00,600 --> 00:00:01,366
+Mennerbrigitte
+
+3
+00:00:01,366 --> 00:00:02,000
+Mennerbrigitte
+
+4
+00:00:02,000 --> 00:00:02,700
+yeah
+
+5
+00:00:02,700 --> 00:00:05,266
+Mennerthis is 180,000 square feet
+
+6
+00:00:05,333 --> 00:00:06,133
+down
+
+7
+00:00:07,533 --> 00:00:08,800
+this is our manufacturing floor
+
+8
+00:00:08,866 --> 00:00:11,133
+we will have multiple manufacturing lines for our prism and portal product
+
+9
+00:00:13,266 --> 00:00:14,100
+so for both of those
+
+10
+00:00:14,100 --> 00:00:16,000
+that's gonna be hundreds of antennas in production
+
+11
+00:00:16,133 --> 00:00:19,133
+space systems were the major focus for a long time and ground segment was kind of the afterthought
+
+12
+00:00:29,866 --> 00:00:32,900
+so you've raised over $136 million from Founders Fund
+
+13
+00:00:33,733 --> 00:00:35,700
+1:00 37 Ventures Alpine
+
+14
+00:00:50,366 --> 00:00:53,500
+Roger Menlner thanks for having us at the new HQ
+
+15
+00:00:53,700 --> 00:00:56,666
+your old tenants left you a lot of nice little gifts
+
+16
+00:01:07,000 --> 00:01:10,900
+amazing NASA astronaut statue
+
+17
+00:01:11,566 --> 00:01:14,166
+this building came with a lot of fun little treasures
+
+18
+00:01:26,366 --> 00:01:28,600
+you recently had a hundred million dollar announcement back in January February
+`;
+
+/* ---------------- 导出 ---------------- */
+/* v0.9.178：源语言=自动检测时，给双语导出的分词器猜一个方言。
+   它只决定「源文行允许在哪些位置断开」——ja 会额外启用日语活用形禁则（不许切在 買っ|て、やっ|た），
+   ko/其它同理。判不出就返回 ''（分词器回退 zh，与 v0.9.177 及更早行为完全一致）。
+   ⚠️ 只按字符分布猜，不做语言识别、不写进提示词、不改变任何切分算法；采样上限 400 字符控制开销。 */
+function srcLocaleForExport(){
+  const v = ($('srcLang') || {}).value;
+  if (v !== 'auto') return v || '';
+  const rows = (typeof S !== 'undefined' && S.rows) || [];
+  let s = '';
+  for (let i = 0; i < rows.length && s.length < 400; i++) {
+    const t = String(rows[i] && rows[i].en || '');
+    if (t) s += (s ? ' ' : '') + t;
+  }
+  if (!s) return '';
+  let kana = 0, hang = 0;
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if (c >= 0x3040 && c <= 0x30FF) kana++;        // 平假名 + 片假名
+    else if ((c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF)) hang++; // 谚文音节 + 字母
+  }
+  if (kana >= 2) return 'ja';   // ≥2 个假名才判日语，避免中文里的单个「の」误判
+  if (hang >= 2) return 'ko';
+  return '';                    // 中文 / 西文：中文分词器本就合适，西文靠空格断点不受影响
+}
+// 按导出格式生成条目：mono=仅译文（原逻辑）；bi-*=双语（源文/译文叠放，严格 1+1，长 cue 自动切时间轴）
+function buildExportItems(){
+  collectZh();
+  collectEn();   /* v0.9.270：原文也能改了，导出前同样要把 DOM 里的原文读回 */
+  const fmt=expFmtOf();
+  if(fmt==='mono'){
+    // v0.9.23：单语导出走 buildMonoParts 四层规则（R0 尊重已有折行 / R1 微超宽单行 / R2 常态折行 /
+    // R3 超容量切分），替代此前 filter+map 直透 S.rows 的零处理路径（超宽单行、>2 行、merged 尾行时间丢失）
+    const out = C.buildMonoParts(S.rows, {
+      maxW: +$('maxW').value || 21,
+      dstLocale: $('dstLang').value
+    });
+    // v0.9.191：结果已经算出来了，顺手把切分提示刷成最新——覆盖下载/复制/预览所有导出路径，零额外成本
+    try { paintSplitWarn(out && out.splitInfo, fmt); } catch (e) {}
+    return out;
+  }
+  const biOut = C.buildBilingual(S.rows, {
+    maxW: +$('maxW').value || 21,
+    biMaxW: +$('biMaxW').value || 32,
+    srcLocale: srcLocaleForExport(),   // v0.9.178：auto 时按字符分布猜 ja/ko，猜不到仍回退 zh
+    dstLocale: $('dstLang').value,
+    order: fmt==='bi-dst' ? 'dst-first' : 'src-first'
+  });
+  // v0.9.192：双语同样会按宽度瓜分时间轴（此前完全静默），提示里改说「调双语行宽」
+  try { paintSplitWarn(biOut && biOut.splitInfo, fmt); } catch (e) {}
+  return biOut;
+}
+function expStyle(){ return ($('expStyle')||{}).value||'mono|srt'; }
+function expFmtOf(){ return expStyle().split('|')[0]||'mono'; }
+// ass-stack（底部双行）归一化为 ass：导出通道、文件扩展名与 ass 完全一致，堆叠与否由 assStacked() 单独判断
+function expFileFmt(){ const ff=expStyle().split('|')[1]||'srt'; return ff==='ass-stack'?'ass':ff; }
+function assStacked(){ return (expStyle().split('|')[1]||'')==='ass-stack'; }
+// 穷举全部导出组合（v0.9.16）：3 内容格式 × 文件格式穷举（单语 4 种、双语 5 种含 ASS 分屏/双行）= 14 种，一个下拉框列全。
+// ASS 双语有两种布局：分屏（Top 金黄小字在屏幕顶 + Bottom 白色主阅读位）与底部双行（两行都锚在底部，影院惯例）。
+function buildStyleOptions(){
+  const sel=$('expStyle'); if(!sel) return;
+  const cur=sel.value||'mono|srt';
+  const fileOpts=(bi)=>[
+    ['srt','SRT (.srt)'],
+    ['vtt','WebVTT (.vtt)'],
+    ['sbv','SBV · YouTube (.sbv)'],
+    ['ass', bi ? 'ASS · '+t('assSplit')+' (.ass)' : 'ASS (.ass)'],
+    ...(bi ? [['ass-stack','ASS · '+t('assStack')+' (.ass)']] : []),
+    ['txt','TXT (.txt)']
+  ];
+  const groups=[['mono',t('fmtMono'),false],['bi-src',t('fmtBiSrc'),true],['bi-dst',t('fmtBiDst'),true]];
+  sel.innerHTML='';
+  for(const g of groups){
+    const og=document.createElement('optgroup'); og.label=g[1];
+    for(const fo of fileOpts(g[2])){
+      const o=document.createElement('option'); o.value=g[0]+'|'+fo[0]; o.textContent=fo[1]; og.appendChild(o);
+    }
+    sel.appendChild(og);
+  }
+  sel.value=cur;
+  if(sel.value!==cur) sel.value='mono|srt'; // 防御：值不在选项里回默认
+}
+buildStyleOptions();
+/* v0.9.258：导出格式按钮面板 ---------------------------------------------------
+   ⚠️ 这里**不新增状态**：所有读写仍然只走 <select id="expStyle">（存档、expFmtOf()、
+      expFileFmt()、buildExport() 全只认它）。按钮是它的可视层 —— 点一下改它的值并派发
+      change，于是预览、ASS/VTT 显隐、折行设置、存档全部照旧生效，联动逻辑零改动。
+   ⚠️ 单语没有「ASS · 双行」（双行是双语才有的布局），该按钮在单语下整块收起；
+      不收起的话点下去会被静默降级成分屏 ASS —— 那就是个假按钮。 */
+const FMT_KINDS = [['mono','fmtMono'], ['bi-src','fmtBiSrc'], ['bi-dst','fmtBiDst']];
+const FMT_FILES = ['srt', 'vtt', 'sbv', 'ass', 'ass-stack', 'txt'];
+const FMT_FILE_LABEL = { srt:'SRT', vtt:'VTT', sbv:'SBV', ass:'ASS', 'ass-stack':'ASS', txt:'TXT' };
+/* v0.9.260：小注词条 —— ASS 两颗复用 assSplit/assStack（「上下双屏 / 底部双行」，
+   与隐藏下拉同一个概念同一个词条，不会出现两套叫法）；SRT/VTT/SBV/TXT 各配一句用途。 */
+const FMT_FILE_SUB = { srt:'fmtSubSrt', vtt:'fmtSubVtt', sbv:'fmtSubSbv',
+  ass:'assSplit', 'ass-stack':'assStack', txt:'fmtSubTxt' };
+function renderFmtPanel(){
+  const kr=$('fmtRowKind'), fr=$('fmtRowFile');
+  if(!kr || !fr || !$('expStyle')) return;
+  kr.innerHTML=''; fr.innerHTML='';
+  FMT_KINDS.forEach(function(k){
+    const b=document.createElement('button');
+    b.type='button'; b.className='fmt-btn';
+    b.setAttribute('data-kind', k[0]); b.setAttribute('data-i18n', k[1]);
+    b.textContent=t(k[1]);
+    b.addEventListener('click', function(){ setFmt(k[0], null); });
+    kr.appendChild(b);
+  });
+  FMT_FILES.forEach(function(f){
+    const b=document.createElement('button');
+    b.type='button'; b.className='fmt-btn'; b.setAttribute('data-file', f);
+    /* 两行式：主名（语言无关，静态）+ 小注（挂 data-i18n，applyI18n 只改 .sub 的文本，结构不动） */
+    const sub=FMT_FILE_SUB[f];
+    b.innerHTML='<span class="nm">'+FMT_FILE_LABEL[f]+'</span>'+
+      '<span class="sub" data-i18n="'+sub+'">'+esc(t(sub))+'</span>';
+    b.addEventListener('click', function(){ setFmt(null, f); });
+    fr.appendChild(b);
+  });
+  syncFmtPanel();
+}
+function setFmt(kind, file){
+  const cur=expStyle().split('|');
+  const k=kind||cur[0]||'mono';
+  let f=file||cur[1]||'srt';
+  if(k==='mono' && f==='ass-stack') f='ass';   /* 单语没有双行，降级成分屏 ASS */
+  let v=k+'|'+f;
+  const sel=$('expStyle');
+  let hit=false;
+  for(let i=0;i<sel.options.length;i++){ if(sel.options[i].value===v){ hit=true; break; } }
+  if(!hit) v=k+'|srt';
+  if(sel.value===v){ syncFmtPanel(); return; }
+  sel.value=v;
+  sel.dispatchEvent(new Event('change'));   /* ← 既有联动链就是靠这一下发动的 */
+  syncFmtPanel();
+}
+function syncFmtPanel(){
+  const v=expStyle().split('|'), k=v[0], f=v[1];
+  const kr=$('fmtRowKind'), fr=$('fmtRowFile');
+  if(!kr || !fr) return;
+  kr.querySelectorAll('.fmt-btn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-kind')===k);
+  });
+  fr.querySelectorAll('.fmt-btn').forEach(function(b){
+    const bf=b.getAttribute('data-file');
+    const off=(k==='mono' && bf==='ass-stack');
+    b.hidden=off;
+    b.classList.toggle('on', !off && bf===f);
+  });
+}
+renderFmtPanel();
+function buildExport(){
+  const ff=expFileFmt();
+  /* v0.9.236：VTT 带样式导出。不传 style 时 core 的输出与旧版逐字节一致。 */
+  if(ff==='vtt') return C.formatVtt(buildExportItems(), { style: vttStyle(), srcLine: vttSrcLine() });
+  if(ff==='txt') return C.formatTxt(buildExportItems());
+  if(ff==='sbv') return C.formatSbv(buildExportItems());
+  if(ff==='ass') return C.formatAss(buildAssEvents(), {title:S.fileBase||'translated', assStyle:assStyleOf()}); /* v0.9.100：外观设置 */
+  return C.formatSrt(buildExportItems());
+}
+// ASS 事件（v0.9.35：字号跟角色走，位置跟模式走）——译文恒为主阅读样式（白 56pt：Bottom/TopMain），
+// 原文恒为副样式（金黄 50pt：Top/Sub），不再因「译文在上」把主字号让给原文：
+//   单语 → 全部 Bottom（白 56pt 底部）；
+//   分屏 bi-src（原文在上）→ 原文 Top（金黄）+ 译文 Bottom（白）；
+//   分屏 bi-dst（译文在上）→ 译文 TopMain（白 56pt）+ 原文 Sub（金黄落底）；
+//   底部双行（ass-stack）→ 位置完全跟随 order（v0.9.36 定稿方案 B，所见即所得）：
+//     bi-src → 原文 Sub 在上、译文 Bottom 贴底（影院惯例摆法）；
+//     bi-dst → 译文 Bottom（白 56pt 整块经 MarginV 抬到上方）+ 原文 Sub 贴底。
+//     在上块 的 MarginV 按下方块实际行数动态抬高：42 + 行数×行高 + 8（56pt 行高 66 / 50pt 行高 59），
+//     保证贴合不重叠；字号始终译大原小，与位置无关。
+/* v0.9.100：ASS 外观设置——#RRGGBB → ASS 的 &H00BBGGRR（ASS 为 BGR 序） */
+function hexToAss(h){
+  var m=/^#?([0-9a-f]{6})$/i.exec(String(h||'').trim());
+  if(!m) return '';
+  return '&H00'+(m[1].slice(4,6)+m[1].slice(2,4)+m[1].slice(0,2)).toUpperCase();
+}
+/* v0.9.101：颜色由预设 radio 改为自由输入 #RRGGBB；空值/非法值一律回落默认色，绝不写出坏样式 */
+function assColorVal(id,dflt){
+  var el=$(id), v=el?String(el.value||'').trim():'';
+  return /^#?[0-9a-f]{6}$/i.test(v)?v:(dflt||'');
+}
+/* 预览方块：合法显示实色，非法（含空）显示虚线空框——让「输错了」一眼可见 */
+function syncColorSw(id){
+  var el=$(id), sw=$(id+'Sw'); if(!el||!sw) return;
+  var v=String(el.value||'').trim(), ok=/^#?[0-9a-f]{6}$/i.test(v);
+  sw.style.background = ok ? ('#'+v.replace('#','').toUpperCase()) : 'transparent';
+  sw.style.borderStyle = ok ? 'solid' : 'dashed';
+}
+/* v0.9.217：字体下拉。选常见中文字体——ASS 的 Fontname 在**播放端机器**上解析，
+   对方没装就会自动回退（这是 ASS 固有行为，不是 bug），故提示里要说明。
+   ⚠️ 不给「其它/自定义」输入框：Fontname 里的逗号会截断解析（已在 core 剥掉），
+   而字体名列表外的需求（压片方指定字体）本来就该由压制时统一替换，给了下拉反而添乱。 */
+const ASS_FONTS = ['PingFang SC','Microsoft YaHei','SimHei','SimSun','Source Han Sans SC','Source Han Serif SC','Noto Sans CJK SC','Noto Serif CJK SC','Arial','Times New Roman'];
+function fillAssFonts(){
+  ASS_FONTS.forEach(function(f){
+    [['assDstFont',f],['assSrcFont',f]].forEach(function(pair){
+      var el=$(pair[0]); if(!el || el.dataset.filled==='1') return;
+      var o=document.createElement('option'); o.value=f; o.textContent=f;
+      el.appendChild(o);
+    });
+  });
+  var d=$('assDstFont'), s=$('assSrcFont');
+  if(d && !d.value) d.value='PingFang SC';
+  if(s && !s.value) s.value='PingFang SC';
+  if(d) d.dataset.filled='1';
+  if(s) s.dataset.filled='1';
+}
+/* v0.9.217：描边色与主色色值校验方式不同（格式一样，但失败的后果不同），
+   故独立绑定。alpha 滑杆同时刷新旁边的百分比数字。 */
+function bindAssNew(){
+  ['assDstOutlineColor','assSrcOutlineColor'].forEach(function(id){
+    var el=$(id); if(!el || el.dataset.bound==='1') return;
+    el.addEventListener('input', function(){ syncColorSw(id); });
+    el.addEventListener('change', function(){ normColor(id); save(); });
+    el.dataset.bound='1';
+  });
+  [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut']].forEach(function(pair){
+    var r=$(pair[0]), o=$(pair[1]); if(!r || !o || r.dataset.bound==='1') return;
+    var upd=function(){ o.textContent=r.value+'%'; };
+    r.addEventListener('input', upd);
+    r.addEventListener('change', function(){ upd(); save(); });
+    r.dataset.bound='1';
+    upd();
+  });
+  /* v0.9.220：描边粗细也要落盘 */
+  ['assDstOutline','assSrcOutline'].forEach(function(id){
+    var el=$(id); if(!el || el.dataset.bound==='1') return;
+    el.addEventListener('change', function(){ save(); });
+    el.dataset.bound='1';
+  });
+}
+/* 失焦/change 时把 #aabbcc 规范成 #AABBCC，方便用户核对（不影响导出，hexToAss 本身大小写无关） */
+function normColor(id){
+  var el=$(id); if(!el) return;
+  var v=String(el.value||'').trim();
+  if(/^#?[0-9a-f]{6}$/i.test(v)) el.value='#'+v.replace('#','').toUpperCase();
+  syncColorSw(id);
+}
+/* v0.9.102：两个离底距离 + 「用户是否手动固定过」（true = 不再随模式/字号联动） */
+function assMVs(){
+  var d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
+  return {
+    /* 允许 0（贴底），故不能写 `+x || 42`——0 会被误判为未填 */
+    dst: (isFinite(d) && d>=0) ? d : 42,
+    src: (isFinite(s) && s>=0) ? s : 42,
+    dstFix: !!UI.assDstMVSet, srcFix: !!UI.assSrcMVSet
+  };
+}
+/* 画面上方的块也用「离底距离」表达：an8 的 MarginV 是距顶边 = 1080 − 离底 − 块高。
+   ⚠️ 注意「离底距离」这个值天生只对应某一行数：多行时块更高，距顶自然更小（可能为负）。
+   历史：v0.9.130 曾用 max(ASS_TOP_SAFE=42,…) 把负值兜回 42（更早是 max(1,…)），
+   v0.9.233 连同常量一起删掉——与双语合成工具 v0.9.230 同口径：用户填什么就是什么，
+   填错导致顶部块贴上边/出画，由用户自己看到并改，代码不许偷偷夹。 */
+function assTopMV(bottomDist, nLines, lineH){
+  return Math.round(1080 - bottomDist - (nLines||1)*lineH);
+}
+function assStyleOf(){
+  var m=assMVs();
+  /* 样式表的 MarginV 只在「该行没被 Dialogue 的 mv 覆盖」时生效，也就是贴底那一行。
+     所以 Bottom/Sub 谁贴底就给谁对应的离底值，另一块恒留 42（v0.9.35 默认值）——
+     这样未手动调整时输出与 v0.9.101 逐字节一致；上方行的真实位置由 mv 逐条指定。 */
+  var bottomMV=42, subMV=42;
+  var fmt=expFmtOf();
+  if(fmt==='mono') bottomMV=m.dst;                 // 单语：只有译文，恒贴底
+  else if(fmt==='bi-dst') subMV=m.src;             // 译文在上 → 原文（Sub）贴底
+  else bottomMV=m.dst;                             // 原文在上 → 译文（Bottom）贴底
+  /* v0.9.217：描边 / 字体 / 不透明度各自译文原文一套。空值一律回落默认（不传 → srt-core 沿用 v0.9.35 写死值） */
+  const alphaOf = id => { const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&n>=10&&n<=100) ? n : 100; };
+  return {
+    dstSize: +($('assDstSize')||{}).value || 56,
+    srcSize: +($('assSrcSize')||{}).value || 50,
+    dstColor: hexToAss(assColorVal('assDstColor','#FFFFFF')) || '&H00FFFFFF',
+    srcColor: hexToAss(assColorVal('assSrcColor','#FFD700')) || '&H0000D7FF',
+    dstOutline: parseFloat(($('assDstOutline')||{}).value),
+    srcOutline: parseFloat(($('assSrcOutline')||{}).value),
+    dstOutlineColor: hexToAss(assColorVal('assDstOutlineColor','#000000')) || '',
+    srcOutlineColor: hexToAss(assColorVal('assSrcOutlineColor','#000000')) || '',
+    dstFont: (($('assDstFont')||{}).value) || '',
+    srcFont: (($('assSrcFont')||{}).value) || '',
+    dstAlpha: alphaOf('assDstAlpha'),
+    srcAlpha: alphaOf('assSrcAlpha'),
+    /* Top / TopMain 是顶部对齐，MarginV 语义为「距顶边」，恒用 42 兜底（真实位置由 mv 覆盖） */
+    marginV: 42,
+    dstMV: bottomMV, srcMV: subMV
+  };
+}
+/* 行高必须由实际字号推导（旧版写死 56→66 / 50→59），否则改大字号后双行会重叠 */
+function assLH(){ var s=assStyleOf(), m=assMVs(); return { dst:C.assLineHeight(s.dstSize), src:C.assLineHeight(s.srcSize), dstMV:m.dst, srcMV:m.src, dstFix:m.dstFix, srcFix:m.srcFix }; }
+function buildAssEvents(){
+  const fmt=expFmtOf();
+  if(fmt==='mono'){
+    return buildExportItems().map(it=>({start:it.start,end:it.end,lines:[{style:'Bottom',text:it.text}]}));
+  }
+  const srcV=$('srcLang').value;   // 下面 stackMV 还要用（ASS 双语堆叠的边距换算），别删
+  const dstV=$('dstLang').value;
+  const dstFirst = fmt==='bi-dst';
+  const parts=C.buildBilingualParts(S.rows,{
+    maxW: +$('maxW').value || 21,
+    biMaxW: +$('biMaxW').value || 32,
+    srcLocale: srcLocaleForExport(),   // v0.9.178：同上
+    dstLocale: $('dstLang').value
+  });
+  const stacked=assStacked();
+  return parts.map(p=>{
+    const dstText=p.dstLines.join('\n');
+    const srcText=p.srcLines.join('\n');
+    if(stacked){
+      const lines=[];
+      /* v0.9.100：抬高量改用实际字号推导的行高与底距（旧版写死 42 / 59 / 66）。
+         v0.9.102：贴底那块用「它自己的离底距离」（样式 MarginV），上方块默认 = 贴底块 + 其高度 + 8；
+         用户手动改过上方块距离后（*Fix）改用用户给的值。 */
+      const L=assLH(), S=assStyleOf();
+      const nLines=(s)=>s?s.split('\n').length:0;
+      /* v0.9.110：抬高量改为「下方块墨迹顶 + 12px」（旧逻辑按行框堆叠，两行墨迹之间空 ~36px）。
+         下方块多行时按实际行数累加行高（第 1 行在最上，其墨迹顶最高）。 */
+      const stackMV=(bottomMV,bottomSize,bottomLang,n,topSize,topLang)=>
+        (typeof C.assStackMV==='function')
+          ? C.assStackMV({bottomMV:bottomMV,bottomSize:bottomSize,bottomLang:bottomLang,
+                          bottomLines:n,topSize:topSize,topLang:topLang})
+          : (bottomMV + n*C.assLineHeight(bottomSize) + 8);   // 旧 core 缓存兜底
+      if(dstFirst){
+        // 译文在上：原文 Sub（副字号）贴底（srcMV），译文 Bottom（主字号）抬到其上方
+        const nSrc=nLines(srcText);
+        if(srcText) lines.push({style:'Sub',text:srcText});
+        if(dstText) lines.push({style:'Bottom',text:dstText,
+          mv: L.dstFix ? L.dstMV : (nSrc? stackMV(L.srcMV,S.srcSize,srcV,nSrc,S.dstSize,dstV) : L.srcMV)});
+      }else{
+        // 原文在上：译文 Bottom（主字号）贴底（dstMV），原文 Sub（副字号）紧贴其上方
+        const nDst=nLines(dstText);
+        if(srcText) lines.push({style:'Sub',text:srcText,
+          mv: L.srcFix ? L.srcMV : (nDst? stackMV(L.dstMV,S.dstSize,dstV,nDst,S.srcSize,srcV) : L.dstMV)});
+        if(dstText) lines.push({style:'Bottom',text:dstText});
+      }
+      return {start:p.start,end:p.end,lines};
+    }
+    const lines=[];
+    /* v0.9.102：分屏模式两块也各按「离底距离」表达。位于画面上方的那块（TopMain / Top）是 an8
+       顶部对齐，需换算成距顶：1080 − 离底 − 块高。未手动改过则不覆盖 mv（沿用旧行为）。 */
+    const L=assLH();
+    const nLines=(s)=>s?s.split('\n').length:0;
+    if(dstText) lines.push({style: dstFirst?'TopMain':'Bottom', text:dstText,
+      mv: (dstFirst && L.dstFix) ? assTopMV(L.dstMV, nLines(dstText), L.dst) : undefined});
+    if(srcText) lines.push({style: dstFirst?'Sub':'Top', text:srcText,
+      mv: (!dstFirst && L.srcFix) ? assTopMV(L.srcMV, nLines(srcText), L.src) : undefined});
+    return {start:p.start,end:p.end,lines};
+  });
+}
+function runReport(){
+  const ff=expFileFmt();
+  let issues, count, items;
+  if(ff==='srt'){
+    const r=C.parseSrt(buildExport());
+    items=r.items; issues=r.issues; count=items.length;
+  }else{
+    items=buildExportItems();
+    issues=C.validateItems(items); count=items.length;
+  }
+  // v0.9.42 CPS 检测：只读 QC（时间轴来自源文件，超标多为源节奏快），结构问题排前面不被冲掉
+  const rs=C.readingSpeedIssues(items, $('dstLang').value);
+  const cpsN=rs.filter(i=>i.type==='cps').length, durN=rs.length-cpsN;
+  issues=issues.concat(rs);
+  const box=$('reportBox'); box.style.display=issues.length?'block':'none';
+  if(issues.length){
+    let html='<div class="issue">'+issues.slice(0,20).map(i=>'#'+i.at+' '+issTxt(i)).join('<br>')+'</div>';
+    if(issues.length>20) html+='<div class="issue">…</div>';
+    if(cpsN||durN) html+='<div class="issue">'+t('cpsSummary',cpsN,durN)+'</div>';
+    $('report').innerHTML=html;
+  }else{
+    $('report').innerHTML=t('verifyOk',count);
+  }
+}
+$('btnDownload').addEventListener('click', ()=>{
+  if(!S.rows.length){ log(t('noExport'),'err'); return; }
+  runReport();
+  /* v0.9.190：文件名输入框已删——直接按「源文件名 + 目标语言 + 样式」现算，不再读 DOM */
+  const name=(S.fileBase?autoOutNameStr():('translated.'+expFileFmt()));
+  const blob=new Blob([buildExport()],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
+  /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致） */
+  reportEvent('download', '', expFileFmt());   // 下载成功上报（仅云端模式有效）
+  log(t('exported',name,buildExportItems().length),'okc');
+});
+$('btnCopy').addEventListener('click', async ()=>{
+  if(!S.rows.length){ log(t('noCopy'),'err'); return; }
+  runReport();
+  const txt=buildExport();
+  let copied=false;
+  try{ await navigator.clipboard.writeText(txt); copied=true; log(t('copied'),'okc'); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); copied=document.execCommand('copy'); ta.remove();
+    if(copied){ log(t('copiedCompat'),'okc'); }
+    /* v0.9.299：execCommand 也可能回 false（剪贴板权限被拒等）—— 之前不看返回值，
+       双失败时照样报「已复制」并计一次 copy，统计虚高还骗用户。现在失败就走 err 文案。 */
+    else{ log(t('copyFail'),'err'); }
+  }
+  /* v0.9.298：复制也算「拿到结果」—— 与下载同口径上报。
+     背景（10-13 分析）：后台只有 download 计数，走复制拿结果的用户在账本里是「完成未下载」，
+     下载率被系统性低估；补 copy 事件补上这块盲区。
+     v0.9.299：只在真复制成功时上报（见上 copied 标记）。 */
+  if(copied) reportEvent('copy', '', expFileFmt());
+});
+
+/* v0.9.258：去特效字幕处理 —— 把这份译文带到特效页继续调样式。
+   ⚠️ 双语一律用「原文在上」(bi-src) 生成：特效页拆分双语时按「第 1 行 = 原文、第 2 行 = 译文」
+      认列（merge-core 的 splitBilingual → two-line 分支），传「译文在上」会把两列拆反。
+   ⚠️ 生成时临时改一下 select 再改回来 —— buildExport() 只认 expStyle()，不这样拿不到
+      想要的布局；改回后**不派发 change**，免得白重绘预览、白写一次存档。 */
+const FX_KEY='srt_fx_in';
+/* ⚠️ 组装过程单独成函数：点下去就跳页了，没有它就没法在页面里回头验证「到底带了什么走」。 */
+function fxHasZh(){ return S.rows.length > 0 && S.rows.some(function(r){ return r && r.zh; }); }
+function buildFxPayload(){
+  if(!fxHasZh()) return null;
+  const bi=expFmtOf()!=='mono';
+  const sel=$('expStyle'), keep=sel.value;
+  sel.value = bi ? 'bi-src|srt' : 'mono|srt';
+  let text='';
+  try{ text=buildExport(); }catch(e){ text=''; }
+  sel.value=keep;   /* 改回来但**不派发 change** —— 免得白重绘预览、白写一次存档 */
+  if(!text || !text.trim()) return null;
+  return { mode: bi?'bi':'mono', text:text, name:(S.fileBase||'translated')+'.srt' };
+}
+/* v0.9.278：改成新标签页打开（用户定案：工作台这边不丢，两边对着调）。
+   ⚠️ 跨标签页 sessionStorage 取不取得到，各浏览器实现不一致（有的复制一份、有的不给），
+      所以 localStorage 落一份、sessionStorage 照旧落一份，特效页两处都读、读完都删。
+   ⚠️ 顺带记时间戳：万一新标签页被弹窗拦下，localStorage 里会躺着一份没人取的旧字幕 ——
+      不设过期，用户下周打开特效页会被一份陈年字幕灌进去（FX_TTL 与特效页的判据要一致）。 */
+const FX_TTL = 120000;
+/* 跟着界面语言走：日语界面点过去也该是日语的特效页。
+   原来写死 /merge.html，英/日界面会被掉回中文页。 */
+function fxHref(){
+  let l='zh-CN';
+  try{ l = UI.lang || 'zh-CN'; }catch(e){}   /* UI 还没初始化时别炸 */
+  return (l==='zh-CN' ? '/' : '/'+l+'/') + 'merge.html?from=translate';
+}
+/* 置灰态（用户定案）：没有译文时整卡变灰、说明行换成「先翻译」，
+   点了只在本页日志里提醒，不再换页 —— 旧版是点了才报红字，用户不知道自己哪步没做。 */
+function syncFxCard(){
+  const el=$('btnFxGoto');
+  if(!el) return;
+  let ok=false;
+  try{ ok = fxHasZh(); }catch(e){ ok=false; }   /* 早于 S 初始化被调到时别炸 */
+  el.classList.toggle('dis', !ok);
+  if(ok){ el.removeAttribute('aria-disabled'); el.href=fxHref(); }
+  else { el.setAttribute('aria-disabled','true'); }
+  const sub=$('fxGotoSub');
+  if(sub) sub.textContent = ok ? t('fxGotoSub') : t('fxNoZh');
+}
+$('btnFxGoto').addEventListener('click', function(e){
+  if(!fxHasZh()){ e.preventDefault(); log(t('fxNoZh'),'err'); return; }
+  const p=buildFxPayload();
+  if(!p){ e.preventDefault(); log(t('fxFail'),'err'); return; }
+  const raw=JSON.stringify({ mode:p.mode, text:p.text, name:p.name, at:Date.now() });
+  let wrote=false;
+  try{ localStorage.setItem(FX_KEY, raw); wrote=true; }catch(e){}
+  try{ sessionStorage.setItem(FX_KEY, raw); wrote=true; }catch(e){}
+  if(!wrote){ e.preventDefault(); log(t('fxFail'),'err'); return; }   /* 容量超限 / 隐私模式禁写 */
+  this.href=fxHref();   /* 剩下的交给默认行为：target=_blank 开新标签页 */
+});
+syncFxCard();   /* 首屏先定一次态（没译文 = 置灰） */
+
+/* ---------------- 本地记忆 ---------------- */
+let sv={};
+try{ sv=JSON.parse(localStorage.getItem('srtTool')||'{}'); }catch(e){ sv={}; }
+if(sv.mode==='free') sv.mode='builtin';           // 旧版「免费模型」→「默认模型」
+if(sv.mode && !['builtin','api','demo'].includes(sv.mode)) sv.mode='builtin';
+/* v0.9.133：折行宽度改为「按目标语言记账」——{语言: 手调值}，槽里存的必然是用户手动改过的。
+   旧设计（v0.9.41 起）只有一个全局 maxW，并靠「值是否落在 [18,24,20,16,13,21] 里」推断用户有没有手调过：
+   这些值是历代默认值与联动推荐值，于是真手调了 20/21/13/16 的用户，下次加载会被判成"系统填的"
+   → 不回填 + 判定为未手调 → 被语言联动改回推荐值（手调值凭空消失）。
+   根因是数据模型没区分「谁写的值」，只能猜；改成分语言记账后无需再猜。 */
+const MW_SYS_VALS=[18,24,20,16,13,21];   // 仅供迁移旧数据：这些值无法区分是系统填的还是用户手调的
+const mwMemo=(function(){
+  try{
+    const m=sv.maxWByLang;
+    if(m && typeof m==='object' && !Array.isArray(m)){
+      const out={};
+      Object.keys(m).forEach(function(k){ const v=+m[k]; if(v>=8&&v<=48) out[k]=v; });
+      if(Object.keys(out).length) return out;
+    }
+  }catch(e){}
+  return {};
+})();
+/* 迁移：旧记录只有一个全局 maxW。属 MW_SYS_VALS 的无法确认是否被手调过 → 不认（保持联动推荐）；
+   其余认定为「用户在当时那个目标语言下调的」，记入该语言槽。 */
+(function(){
+  if(Object.keys(mwMemo).length) return;
+  const legacy=+sv.maxW;
+  if(!legacy || MW_SYS_VALS.includes(legacy)) return;
+  const lang=String(sv.dstLang||'').trim();
+  if(lang) mwMemo[lang]=legacy;
+})();
+function save(){
+  const style=(document.querySelector('input[name=style]:checked')||{}).value||'elegant';
+  const o = {
+    base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
+    extra:($('extra')||{}).value||'',   /* v0.9.124：附加请求参数原样记忆（保存时不校验，仅测试连接时提示） */
+    /* v0.9.232：温度（与后台 cfg.temperature 对齐）+ 是否经本站转发 */
+    temp:($('temp')||{}).value||'', viaSrv:(($('viaSrv')||{}).checked)?'1':'0',
+    provider:(document.getElementById('provider')||{}).value||'',
+    /* v0.9.134：术语表内容按用户所见保存，但设 2 万字上限——
+       术语表跟着片子走，存下一张几千条的表既没意义又占 localStorage（历史上这台机器存满过）。 */
+    terms:(String(($('terms')||{}).value||'').length>20000 ? '' : ($('terms')||{}).value),
+    srcFp:S.srcFp||'',   // v0.9.144：换片判据要跨会话有效，否则刷新一次就忘了上一部片是啥
+    mode:$('mode').value,
+    srcLang:$('srcLang').value, style:style,
+    styleCustom:$('styleCustom').value.trim(),
+    pnMode:(document.querySelector('input[name=pnMode]:checked')||{}).value||'trans',
+    pnModeSet:(UI.pnModeSet||sv.pnModeSet==='1')?'1':'0',
+    autoTerms: sv.autoTerms || '0',
+    autoTermsSet:(UI.autoTermsSet||sv.autoTermsSet==='1')?'1':'0',
+    expStyle:expStyle(),
+    /* v0.9.236：VTT 样式（新键；老存档没有 → 保持 HTML 默认值）。
+       与 ASS 那套完全独立：两套单位不同（百分比 vs 像素），不能共用字段也不能互相换算。 */
+    vttLine:($('vttLine')||{}).value, vttLineAlign:($('vttLineAlign')||{}).value,
+    vttPos:($('vttPos')||{}).value, vttWidth:($('vttWidth')||{}).value, vttAlign:($('vttAlign')||{}).value,
+    vttSize:($('vttSize')||{}).value, vttColor:($('vttColor')||{}).value, vttFont:($('vttFont')||{}).value,
+    vttLH:($('vttLH')||{}).value,
+    vttBold:(($('vttBold')||{}).checked?'1':'0'), vttItalic:(($('vttItalic')||{}).checked?'1':'0'),
+    vttSrcSizeMode:($('vttSrcSizeMode')||{}).value, vttSrcColorMode:($('vttSrcColorMode')||{}).value,
+    vttSrcColor:($('vttSrcColor')||{}).value, vttSrcSize:($('vttSrcSize')||{}).value,
+    vttBgOn:(($('vttBgOn')||{}).checked?'1':'0'), vttBgColor:($('vttBgColor')||{}).value, vttBgAlpha:($('vttBgAlpha')||{}).value,
+    vttShadowOn:(($('vttShadowOn')||{}).checked?'1':'0'), vttShadowW:($('vttShadowW')||{}).value,
+    vttShadowColor:($('vttShadowColor')||{}).value,
+    /* v0.9.100：ASS 外观（新键；老用户 localStorage 无这些字段 → 恢复时用 HTML 默认值） */
+    assSizeSet:(UI.assSizeTouched?'1':'0'), assCtxV:'1',
+    assDstColor:($('assDstColor')||{}).value, assSrcColor:($('assSrcColor')||{}).value,
+    assDstMV:$('assDstMV').value, assSrcMV:$('assSrcMV').value,
+    /* v0.9.220：v0.9.217 新增的描边/字体/不透明度也要落盘（当时漏了，刷新即丢）。
+       这些字段没有自动联动、默认值固定，不像字号需要 touched 标记防「误判锁定」，直接无条件存。 */
+    assDstOutline:$('assDstOutline').value, assSrcOutline:$('assSrcOutline').value,
+    assDstOutlineColor:($('assDstOutlineColor')||{}).value, assSrcOutlineColor:($('assSrcOutlineColor')||{}).value,
+    assDstFont:($('assDstFont')||{}).value, assSrcFont:($('assSrcFont')||{}).value,
+    assDstAlpha:($('assDstAlpha')||{}).value, assSrcAlpha:($('assSrcAlpha')||{}).value,
+    assDstMVSet:(UI.assDstMVSet||sv.assDstMVSet==='1')?'1':'0',
+    assSrcMVSet:(UI.assSrcMVSet||sv.assSrcMVSet==='1')?'1':'0'
+  };
+  /* v0.9.105：ASS 字号「联动推荐值」不落盘——否则下次加载会被误判为用户自定义而永久锁死
+     （同 v0.9.53 对 maxW 的处理）。只有明确标记为自定义时才写入。 */
+  if(UI.assSizeTouched){ o.assDstSize=$('assDstSize').value; o.assSrcSize=$('assSrcSize').value; }
+  /* v0.9.133：折行宽度按语言落盘（各语言独立记忆），不再用「值猜有没有手调过」。
+     同时镜像一份到旧字段 maxW —— 仅当前语言有记忆时才写，这样回滚到旧版时行为与原先一致。 */
+  if(Object.keys(mwMemo).length) o.maxWByLang=mwMemo;
+  try{ const _cw=mwMemo[$('dstLang').value]; if(_cw!==undefined) o.maxW=String(_cw); }catch(e){}
+  /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
+     否则第二次访问起浏览器语言自动检测会被 localStorage 里的旧值永久覆盖 */
+  if (UI.langManual)      { o.uiLang = UI.lang;   o.langManual = 1; }
+  else if (sv.langManual) { o.uiLang = sv.uiLang; o.langManual = 1; }
+  /* 目标语言同理：手动选过才记忆，没选过则跟随界面语言 */
+  if (UI.dstManual)       { o.dstLang = $('dstLang').value; o.dstManual = 1; }
+  else if (sv.dstManual && sv.dstLang) { o.dstLang = sv.dstLang; o.dstManual = 1; } /* 继承旧记忆，防加载期 save() 洗掉 */
+  localStorage.setItem('srtTool',JSON.stringify(o));
+}
+if(sv.base) $('base').value=sv.base;
+if(sv.model) $('model').value=sv.model;
+if(sv.key) $('apikey').value=sv.key;
+if(sv.extra) $('extra').value=sv.extra;   /* v0.9.124：附加请求参数（自定义引擎透传，可能为嵌套对象如 response_format） */
+/* v0.9.232：温度与转发开关（旧存档没有这两个键 → 保持 HTML 默认值 0.2 / 未勾选） */
+if(sv.temp) $('temp').value=sv.temp;
+if(sv.viaSrv==='1') $('viaSrv').checked=true;
+/* v0.9.134：旧的逗号分隔列表 → 现在的每行一条。旧值里不含换行但含逗号，据此判断；
+   不含逗号的旧值（如单个 "SpaceX"）在新语法下等价于「保留原文」，原样保留即可。 */
+if(sv.terms){
+  const _v=String(sv.terms);
+  $('terms').value = (_v.indexOf('\n')<0 && /[,，]/.test(_v))
+    ? _v.split(/[,，]/).map(function(x){return x.trim();}).filter(Boolean).join('\n')
+    : _v;
+}
+if(sv.srcFp) S.srcFp=String(sv.srcFp);   // v0.9.144：恢复上一部片的指纹，刷新后换片仍能识别
+if(sv.mode) $('mode').value=sv.mode;
+/* v0.9.133：折行宽度不再在这里回填——统一交给下方 IIFE 的 syncMaxW()：
+   按当前目标语言取「该语言的手调记忆」，没有就用该语言的推荐值。 */
+/* 导出样式记忆 + 旧版双选择器迁移：expFmt+expFileFmt → expStyle */
+if(sv.expStyle && /^[a-z-]+\|(srt|vtt|ass|ass-stack|txt)$/.test(sv.expStyle)) $('expStyle').value=sv.expStyle;
+/* v0.9.100：ASS 外观恢复 */
+/* v0.9.110：只认显式标记 assSizeSet，不再靠「猜数值」判定是否手动设过。
+   旧判定用黑名单 [56,50] 反推，有两个实伤：
+     ① 用户手动设成 50（或 56）会被当成默认值丢弃，下次打开被推荐值悄悄覆盖；
+     ② 只改了原文字号（译文仍是 56）同样被判为「没设过」，自定义的原文字号丢失。
+   v0.9.100 起就写 assSizeSet 标记；没有标记的存档 = 从未手动设过（v0.9.100 之前没有字号 UI），
+   一律走推荐值。这也符合「推荐值仅供参考、用户自定义优先」的语义。 */
+/* v0.9.110：旧存档（无 assCtxV 标记）里那三个「改过一次就永久锁死」的标记一律作废，
+   升级后重新跟随推荐值。保留它们等于把「跨布局沿用 → 字幕掉到画面底部」这个 bug 固化下来，
+   且用户再也无法回到自动联动（离底距离此前没有清空复位通道）。 */
+var assLegacy = (sv.assSizeSet==='1' || sv.assDstMVSet==='1' || sv.assSrcMVSet==='1') && sv.assCtxV!=='1';
+UI.assSizeTouched = (!assLegacy && sv.assSizeSet==='1');
+if(UI.assSizeTouched){
+  if(sv.assDstSize) $('assDstSize').value=sv.assDstSize;
+  if(sv.assSrcSize) $('assSrcSize').value=sv.assSrcSize;
+}
+if(sv.assDstColor!=null && sv.assDstColor!=='') $('assDstColor').value=sv.assDstColor;
+if(sv.assSrcColor!=null && sv.assSrcColor!=='') $('assSrcColor').value=sv.assSrcColor;
+/* v0.9.220：描边/不透明度恢复（字体在下方 fillAssFonts 之后回填——select 的 value 得先有 option 才设得进去） */
+if(sv.assDstOutline!=null && sv.assDstOutline!=='') $('assDstOutline').value=sv.assDstOutline;
+if(sv.assSrcOutline!=null && sv.assSrcOutline!=='') $('assSrcOutline').value=sv.assSrcOutline;
+if(sv.assDstOutlineColor!=null && sv.assDstOutlineColor!=='') $('assDstOutlineColor').value=sv.assDstOutlineColor;
+if(sv.assSrcOutlineColor!=null && sv.assSrcOutlineColor!=='') $('assSrcOutlineColor').value=sv.assSrcOutlineColor;
+if(sv.assDstAlpha!=null && sv.assDstAlpha!=='') $('assDstAlpha').value=sv.assDstAlpha;
+if(sv.assSrcAlpha!=null && sv.assSrcAlpha!=='') $('assSrcAlpha').value=sv.assSrcAlpha;
+if(sv.assDstMV!=null && sv.assDstMV!=='') $('assDstMV').value=sv.assDstMV;
+if(sv.assSrcMV!=null && sv.assSrcMV!=='') $('assSrcMV').value=sv.assSrcMV;
+UI.assDstMVSet = (!assLegacy && sv.assDstMVSet==='1'); UI.assSrcMVSet = (!assLegacy && sv.assSrcMVSet==='1');
+/* 旧版双选择器迁移（v0.9.102：原为上一行的 else 分支，离底距离拆成两个字段后改为独立判断，
+   条件补上 !sv.expStyle，避免覆盖上面已恢复的新格式记忆） */
+if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt) && ['srt','vtt','ass','txt','sbv'].includes(sv.expFileFmt)) $('expStyle').value=sv.expFmt+'|'+sv.expFileFmt;
+
+/* 语言选择填充 */
+(function(){
+  const src=$('srcLang'), dst=$('dstLang');
+  const ao=document.createElement('option'); ao.value='auto'; ao.textContent='自动检测'; src.appendChild(ao);
+  LANGS.forEach(l=>{
+    const o1=document.createElement('option'); o1.value=l.v; o1.textContent=l.zh; src.appendChild(o1);
+    const o2=document.createElement('option'); o2.value=l.v; o2.textContent=l.zh; dst.appendChild(o2);
+  });
+  const okSrc = (v)=> v==='auto' || LANGS.some(l=>l.v===v);
+  const okDst = (v)=> LANGS.some(l=>l.v===v);
+  /* v0.9.177：默认改为「自动检测」（原为 en）。源语言未手动选过时不再谎报为英语，
+     交给模型从正文识别；用户手动选过（localStorage 有 sv.srcLang）仍沿用手动值。 */
+  src.value = okSrc(sv.srcLang) ? sv.srcLang : 'auto';
+  /* 默认目标语言跟随界面语言（URL 路径 > 手动记忆 > 浏览器检测）；用户手动改过目标语言则优先手动值 */
+  const uiDefault = pathUiLang() || (sv.langManual && UI_LANGS.some(x=>x[0]===sv.uiLang) ? sv.uiLang : detectUiLang());
+  dst.value = (sv.dstManual && okDst(sv.dstLang)) ? sv.dstLang : (okDst(uiDefault) ? uiDefault : 'zh-CN');
+})();
+
+/* v0.9.42 语言感知行宽推荐：切换目标语言时，若用户没手动改过行宽，联动到该语言推荐值
+   （Netflix TTSG：中文 16 / 日文 13 / 韩文 16 全角字每行；拉丁语系保持 20 ≈ 40 半角字符）。
+   用户手动改过（input 事件）或 localStorage 里存过自定义值 → 永远尊重用户，不再联动。 */
+(function(){
+  /* Netflix TTSG（Timed Text Style Guide）每语言行宽，换算为本工具口径（全角=1 字、半角 2 字符=1 字）：
+     拉丁/西里尔/天城文/阿拉伯等半角书写系统 42 CPL → 21 字（官方各语言 guide：英/德/西/葡/意/荷/土/俄/印地 42、
+     阿拉伯 Netflix Originals 42）；中文 16 全角、日文 13 全角、韩文 16 全角。
+     未列语言按 21。用户手动改过（input 或 localStorage 自定义值）永远优先。 */
+  const MAXW_BY_LANG={
+    'zh-CN':16, 'zh-TW':16, 'ja':13, 'ko':16,
+    'en':21, 'fr':21, 'de':21, 'es':21, 'pt':21, 'it':21, 'ru':21,
+    'ar':21, 'th':21, 'vi':21, 'id':21, 'hi':21, 'tr':21, 'pl':21,
+    'nl':21, 'ms':21, 'fil':21, 'fa':21,
+    // v0.9.110 新增：均按 Netflix TTSG 的 42 CPL 折算为 21 全角（与既有 hi/id/tr/pl/nl/ms/fil/fa 同口径）,
+    'sv':21, 'da':21, 'fi':21, 'nb':21, 'cs':21, 'sk':21, 'hu':21, 'ro':21, 'ca':21, 'hr':21, 'el':21, 'uk':21, 'sr':21,
+    'bg':21, 'he':21, 'ur':21, 'bn':21, 'ta':21, 'te':21, 'mr':21, 'ne':21, 'si':21, 'my':21, 'km':21, 'lo':21, 'sw':21,
+    // v0.9.112 新增：非 CJK 一律 21 全角（Netflix TTSG 42 CPL 口径）
+    'gu':21, 'kn':21, 'ml':21, 'pa':21, 'or':21, 'as':21, 'kk':21, 'uz':21, 'mn':21, 'az':21, 'is':21, 'et':21, 'lv':21, 'lt':21, 'sl':21, 'sq':21, 'mk':21, 'eu':21, 'gl':21, 'am':21, 'ha':21, 'yo':21, 'zu':21, 'so':21, 'ps':21, 'ku':21, 'af':21,
+    // v0.9.338 新增：非 CJK 一律 21（Netflix TTSG 42 CPL 口径）；粤语 yue 用汉字，跟 zh-TW 一样 16 全角
+    'yue':16, 'be':21, 'tg':21, 'ky':21, 'tk':21, 'bs':21, 'mt':21, 'cy':21, 'ga':21, 'hy':21, 'ka':21, 'ti':21, 'bo':21, 'ug':21, 'sd':21, 'yi':21, 'jv':21, 'su':21, 'ceb':21, 'mg':21, 'ig':21, 'xh':21, 'sn':21, 'ny':21, 'mi':21
+  };
+  // v0.9.133：不再推断「用户有没有手调过」——改由 mwMemo 按语言记账（见「本地记忆」段）
+  const mw=$('maxW');
+  /* 改值 → 立刻记入「当前语言」的槽并落盘。旧版只在按钮/失焦时 save()，
+     于是手调值常常还没写入就刷新，回过头被联动覆盖；这里即时持久化是修复的关键一环。 */
+  mw.addEventListener('input', ()=>{
+    if(mw.value==='') return;
+    const v=+mw.value;
+    if(!(v>=8&&v<=48)) return;            // 越界不记账（HTML min/max 之外的手输值）
+    mwMemo[$('dstLang').value]=v;
+    save();
+  });
+  /* 清空后失焦 → 只清除「当前语言」的记忆，立即填回该语言的推荐值。
+     其它语言的记忆不受影响；之所以用 blur 而非 input：改值时往往先清空再输入，清空瞬间清除会吞掉输入。 */
+  mw.addEventListener('blur', ()=>{
+    if(mw.value!=='') return;
+    delete mwMemo[$('dstLang').value];
+    syncMaxW();   // 可见地恢复成该语言的推荐值
+    save();
+  });
+  /* v0.9.189：改完折行阈值 → 立刻按新阈值重排表格（跳过手工编辑过的行，见 reflowRows）。
+     用 change 而非 input：number 框逐字输入时 input 会先触发中间值（如 "1"），越界重排没意义还抖动；
+     change 在失焦 / 回车 / 点步进箭头时触发，正是「这个值定下来了」的时刻。
+     程序赋值 mw.value（syncMaxW 切语言联动）不触发 change，所以切语言不会误重排。 */
+  mw.addEventListener('change', ()=>{
+    const v=+mw.value;
+    if(!(v>=8&&v<=48)) return;
+    S.maxW=v;
+    reflowRows();
+  });
+  // v0.9.54：number 输入框聚焦时鼠标滚轮会静默改值（并触发 input 锁定联动），阻止之；
+  // 未聚焦时 hover 滚轮正常滚动页面（Chrome 默认此时不改值，preventDefault 会卡住页面滚动）
+  mw.addEventListener('wheel', (e)=>{ if(document.activeElement===mw) e.preventDefault(); }, {passive:false});
+  /* 切目标语言 → 该语言有手调记忆就用它，没有才用推荐值。
+     因此「跟着语言变」与「在该语言下改过就记住」两者不再互相排斥。 */
+  const syncMaxW=()=>{
+    const lang=$('dstLang').value;
+    const v=(mwMemo[lang]!==undefined)?mwMemo[lang]:(MAXW_BY_LANG[lang]||21);
+    if(+mw.value!==v) mw.value=v;
+  };
+  $('dstLang').addEventListener('change', syncMaxW);
+  syncMaxW();
+})();
+
+/* v0.9.110：ASS 字号 / 离底距离的「上下文感知联动」。
+   旧设计用三个全局布尔（assSizeTouched / assDstMVSet / assSrcMVSet）表示「用户改过」，
+   一旦置位就永久锁定，切语言、切布局都不再变。实测两个实害：
+     ① 离底距离跨布局沿用：双行推荐 83、分屏推荐 972、单语 42 是三个不同坐标系，
+        在双行下调的 120 被带到分屏，字幕会掉到画面底部（而它本该在顶部 972 附近）；
+     ② 离底距离缺「清空复位」通道（字号和行宽都有），清空后值空而标记仍在 →
+        导出回落 42 且永不联动，用户想「恢复自动」的操作反而把自己锁死，并持久化到下次访问。
+   新机制区分两类切换：
+     · 布局上下文（单语/双语 × 分屏/双行 × 谁在上）变化 → 旧值必然失效，自动套新推荐值，给一次「撤销」；
+     · 语言 / 行宽变化 → 同一坐标系内的微调，保留用户值，绝不静默覆盖。
+   v0.9.111 修正该提示行的表达：原「推荐 76 pt · English · 你的 70 [应用]」被实测读成三种意思
+     （「你的 70」像已失效的旧值 / 「应用」没有宾语 / 看不出是否处于自定义态）→
+     提示行只留「推荐 76 pt · English」，推荐数字本身可点即填入，状态说明交给底部 assSizeHint。 */
+var ASS_UNDO = {};                       // field -> 重置前的用户值（供撤销）
+function assLayoutCtx(){ try{ return expFmtOf() + (assStacked() ? '|stack' : '|split'); }catch(e){ return '?'; } }
+function assLangCtx(){ return (($('dstLang')||{}).value||'') + '>' + (($('srcLang')||{}).value||'') + '@' + (+($('maxW')||{}).value||21); }
+var ASS_CTX = { layout:'', lang:'' };
+function assCtxReason(){
+  var l = assLayoutCtx(), g = assLangCtx(), r = 'same';
+  /* ASS_CTX 在页面初始化末尾就已赋值（见 ASS_CTX.layout = ... 那行），这里不再做懒初始化——
+     懒初始化会把用户的「第一次真实切换」误判成初始化而吞掉（实测：首次切布局不生效）。 */
+  if(!ASS_CTX.layout){ ASS_CTX.layout = l; ASS_CTX.lang = g; }
+  if(l !== ASS_CTX.layout) r = 'layout'; else if(g !== ASS_CTX.lang) r = 'lang';
+  ASS_CTX.layout = l; ASS_CTX.lang = g;
+  return r;
+}
+function renderAssHint(el, text, act){
+  if(!el) return;
+  el.textContent = '';
+  if(text === '' || text == null) return;
+  var sp = document.createElement('span'); sp.textContent = text; el.appendChild(sp);
+  if(!act) return;
+  var b = document.createElement('span');
+  b.className = 'ass-hint-act';
+  b.textContent = t(act.kind === 'apply' ? 'assApply' : 'assUndo');
+  b.setAttribute('data-ass-act', act.kind + ':' + act.field);
+  el.appendChild(b);
+}
+/* v0.9.111：推荐值提示行——只说「推荐 X」，X 本身可点（点一下填入输入框）。
+   旧版在同一行里还塞了「你的 70」和一个「应用」按钮，实测三种误会：
+     ①「你的 70」被读成已失效的旧值，其实它是当前生效值（输入框里就写着 70，属于重复信息）；
+     ②「应用」没有宾语，用户不确定是应用推荐值还是应用自己的输入；
+     ③ 看不出当前是「自动跟随」还是「我已自定义」——这一档状态改由字号模块底部的 assSizeHint 说明。 */
+function renderRecHint(el, before, num, after, field){
+  if(!el) return;
+  el.textContent = '';
+  if(before) el.appendChild(document.createTextNode(before));
+  var s = document.createElement('span');
+  s.className = 'ass-hint-num';
+  s.textContent = String(num);
+  s.setAttribute('data-ass-act', 'apply:' + field);
+  el.appendChild(s);
+  if(after) el.appendChild(document.createTextNode(after));
+}
+var ASS_F = {};                          // 四个可联动字段的注册表（字号模块与离底距离模块各自填充）
+function assFieldApply(field){
+  var f = ASS_F[field]; if(!f) return;
+  ASS_UNDO[field] = f.el.value;
+  f.el.value = f.rec(); f.setT(false);
+  try{ f.after(); }catch(e){}
+  try{ save(); }catch(e){}
+}
+function assFieldUndo(field){
+  (field === 'all' ? ['dsz','ssz','dmv','smv'] : [field]).forEach(function(k){
+    var f = ASS_F[k]; if(!f || ASS_UNDO[k] == null) return;
+    f.el.value = ASS_UNDO[k]; f.setT(true); ASS_UNDO[k] = null;
+    try{ f.after(); }catch(e){}
+  });
+  try{ save(); }catch(e){}
+}
+/* 布局切换：把所有字段拉回新布局的推荐值（自定义过的记住旧值供撤销） */
+function assLayoutReset(){
+  ['dsz','ssz','dmv','smv'].forEach(function(k){
+    var f = ASS_F[k]; if(!f) return;
+    ASS_UNDO[k] = f.isT() ? f.el.value : null;
+    f.el.value = f.rec(); f.setT(false);
+  });
+}
+function assResetNote(show){
+  var el = $('assResetNote'); if(!el) return;
+  var any = ['dsz','ssz','dmv','smv'].some(function(k){ return ASS_UNDO[k] != null; });
+  renderAssHint(el, (show && any) ? t('assAutoReset') : '', (show && any) ? {kind:'undo', field:'all'} : null);
+}
+/* 上下文变化的统一入口：reason 只消费一次，再分发给两个模块，避免重复触发 */
+function assCtxSync(){
+  var r = assCtxReason();
+  if(r === 'layout'){
+    assLayoutReset();
+    try{ window.assSizeRender && window.assSizeRender(); }catch(e){}
+    try{ syncAssMVBox(); }catch(e){}
+    assResetNote(true);
+  }else if(r === 'lang'){
+    try{ window.assSizeRender && window.assSizeRender(); }catch(e){}
+    try{ syncAssMVBox(); }catch(e){}
+  }
+  try{ save(); }catch(e){}
+}
+(function(){
+  var box = $('assStyleBox'); if(!box) return;
+  box.addEventListener('click', function(e){
+    var el = e.target && e.target.closest ? e.target.closest('[data-ass-act]') : null;
+    if(!el) return;
+    var p = String(el.getAttribute('data-ass-act') || '').split(':');
+    if(p[0] === 'apply') assFieldApply(p[1]);
+    else if(p[0] === 'undo'){ assFieldUndo(p[1]); assResetNote(false); }
+  });
+})();
+
+/* v0.9.105：ASS 字号按「书写系统的实际字形高度」联动推荐——同一个 pt 下，汉字几乎撑满 em 框，
+   拉丁小写只有一半高，给所有语言同一个数值等于让非中文矮掉四成。
+   机制沿用 maxW（v0.9.53/54）：未手动改过则跟随语言，改过即锁定，清空输入框恢复联动。
+   行宽 maxW 变大时推荐值按 1800/maxW 自动封顶（否则一行会顶出画面被折行）。 */
+(function(){
+  const dsz=$('assDstSize'), ssz=$('assSrcSize'), hint=$('assSizeHint');
+  const dhint=$('assDstSizeHint'), shint=$('assSrcSizeHint');
+  if(!dsz||!ssz||typeof C==='undefined'||typeof C.recAssSize!=='function') return;
+  let touched = !!UI.assSizeTouched;
+  UI.assSizeTouched = touched;
+  const langName=function(v){ var l=LANGS.filter(function(x){return x.v===v;})[0]; return l?l.zh:''; };
+  /* v0.9.111：推荐值常驻显示；语言切换只提示不覆盖（点提示行里的推荐数字才会填入），
+     布局切换由 assLayoutReset 统一处理（见文件上方 v0.9.110 说明）。 */
+  const recOf=function(){ return C.recAssSize($('dstLang').value, $('srcLang').value, {maxW:+$('maxW').value||21}); };
+  const apply=function(reason){
+    const rec=recOf();
+    if(reason==='layout' && touched){ touched=false; UI.assSizeTouched=false; }
+    if(!touched){ dsz.value=rec.dstSize; ssz.value=rec.srcSize; }
+    const dn=langName($('dstLang').value);
+    const sn=$('srcLang').value==='auto' ? t('autoDetect') : langName($('srcLang').value);
+    const mono=(typeof expFmtOf==='function') ? (expFmtOf()==='mono') : false;
+    /* v0.9.111：提示行只留「推荐 X pt · 语言」，X 可点即填入。不再显示「你的 70」（输入框里已有）、
+       不再给「应用」按钮（无宾语、易被理解成应用自己的输入）。是否处于自定义态由底部 assSizeHint 说明。 */
+    renderRecHint(dhint, t('assSizeRec'), rec.dstSize, ' pt' + (dn?(' · '+dn):''), 'dsz');
+    if(mono) renderAssHint(shint, '');
+    else renderRecHint(shint, t('assSizeRec'), rec.srcSize, ' pt' + (sn?(' · '+sn):''), 'ssz');
+    if(hint) hint.textContent=touched?t('assSizeLocked'):t('assSizeFollow');
+  };
+  window.assSizeRender = function(){ apply(''); };
+  window.syncAssSizeHint = window.assSizeRender;  // 界面语言切换时由 applyI18n 重绘
+  [dsz,ssz].forEach(function(el){
+    el.addEventListener('input',function(){
+      if(el.value==='') return;
+      touched=true; UI.assSizeTouched=true; apply('');
+      try{ assResetNote(false); }catch(e){}
+      try{ if(typeof syncAssMVBox==='function') syncAssMVBox(); }catch(e){}   // 离底默认值依赖字号
+    });
+    el.addEventListener('blur',function(){
+      if(el.value!=='') return;
+      touched=false; UI.assSizeTouched=false; apply(''); save();
+    });
+  });
+  apply('');
+  ASS_F.dsz={el:dsz,hint:dhint,rec:function(){return recOf().dstSize;},isT:function(){return touched;},
+             setT:function(v){touched=v;UI.assSizeTouched=v;},after:function(){apply('');}};
+  ASS_F.ssz={el:ssz,hint:shint,rec:function(){return recOf().srcSize;},isT:function(){return touched;},
+             setT:function(v){touched=v;UI.assSizeTouched=v;},after:function(){apply('');}};
+  /* 语言 / 行宽 / 布局变化统一由 assCtxSync 判定：布局变→重置并可撤销，语言变→只提示 */
+  $('dstLang').addEventListener('change', assCtxSync);
+  $('srcLang').addEventListener('change', assCtxSync);
+  $('maxW').addEventListener('input', assCtxSync);
+})();
+
+/* v0.9.99 行宽换算提示：行宽单位是「全角宽」而非字数——中日韩 1 单位=1 字，
+   拉丁/西里尔/天城文/阿拉伯/泰文等半角书写系统 1 单位≈2 字符（泰文 32 ≈ 64 字符）。
+   界面直接显示当前目标语言下的换算，避免用户把「32」误读成 32 个字。 */
+function approxCharsFromWidth(v, lang){
+  const n = +v;
+  if (!n) return 0;
+  const fullWidth = (lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja' || lang === 'ko');
+  return fullWidth ? n : n * 2;
+}
+function updateWidthHints(){
+  const dl = $('dstLang');
+  const lang = (dl && dl.value) || 'zh-CN';
+  const set = (inpId, hintId) => {
+    const inp = $(inpId), hint = $(hintId);
+    if (!inp || !hint) return;
+    const v = +inp.value;
+    hint.textContent = v ? (v + ' \u2248 ' + approxCharsFromWidth(v, lang) + ' ' + (t('wUnit') || '')) : '';
+  };
+  set('maxW', 'maxWHint');
+  set('biMaxW', 'biMaxWHint');
+}
+(function(){
+  ['maxW','biMaxW'].forEach(function(id){
+    const el = $(id);
+    if (el) el.addEventListener('input', updateWidthHints);
+  });
+  const dl = $('dstLang');
+  if (dl) dl.addEventListener('change', updateWidthHints);
+  updateWidthHints();
+})();
+
+/* v0.9.191：把 R3 切分摆到明面上。装不下时 buildMonoParts 会把一条字幕切成多条、时间轴按宽度占比瓜分，
+   用户从头到尾看不见。这里实时算一遍，告诉他「有几条被切、阈值调到多少就不切」。
+   ⚠️ 刻意不替他放宽行宽——放宽等于绕过他自己设的阈值，决定权该留给用户。
+   v0.9.192：双语同样会切（按宽度瓜分），此前完全没提示。两种模式说的阈值不同——
+   单语调「折行阈值」、双语调「双语行宽」，所以文案是两条（splitWarn / splitWarnBi）。 */
+function paintSplitWarn(si, fmt){
+  const el = $('splitWarnHint');
+  if (!el) return;
+  if (!si || !si.srcs) { el.hidden = true; return; }
+  el.hidden = false;
+  const bi = fmt && fmt !== 'mono';
+  el.textContent = bi ? t('splitWarnBi', si.srcs, si.items, si.need)
+                      : t('splitWarn', si.srcs, si.items, si.need);
+}
+/* v0.9.202：行宽设置跟着「导出字幕样式」走 —— 单语只给「单语行宽」，双语只给「双语行宽」。
+   此前两个永远并排，各有一半时间是改了不生效的假控件（单语下 biMaxW 完全不参与折行，
+   双语下 maxW 只管「- A / - B」双说话人行），用户无从判断该调哪个。
+   ⚠️ 只做显隐：两个 id 与它们的取值、语言联动、切分提示全部原样保留 ——
+   双语下对白行仍按 maxW 折，所以那个值必须留着，不能因为看不见就丢。 */
+function syncWrapField(){
+  try {
+    const mono = (typeof expFmtOf === 'function') ? (expFmtOf() === 'mono') : true;
+    const a = $('wcellMaxW'), b = $('wcellBiMaxW');
+    /* v0.9.316：显隐要连标签一起切（否则换模式后标签与输入框对不上号）；
+       v0.9.317：标签与输入框同一排，显隐语义不变 */
+    const la = $('wlblMaxW'), lb = $('wlblBiMaxW');
+    if (a) a.hidden = !mono;
+    if (b) b.hidden = mono;
+    if (la) la.hidden = !mono;
+    if (lb) lb.hidden = mono;
+    /* v0.9.317：标题行删掉后，「无须重新翻译」那句与行宽释义合并进行宽标签的 ⓘ。
+       两个 ⓘ 各自固定取一组词条（单语 wrapTip+lblMaxW / 双语 wrapTipBi+lblBiMaxW），
+       不随模式切 —— 每次都重设两个，切语言由包装版 applyI18n 调到这里刷新。
+       ⚠️ 不能挂 data-tip-i18n：applyTipI18n 只认单键，会把合并文案冲回半截。
+       浮层不支持换行（white-space:normal 只折不断），合并只能是句子拼接。 */
+    var tip = $('wrapTipEl'), tipB = $('wrapTipBiEl');
+    if (tip) tip.setAttribute('data-tip', t('wrapTip') + ' ' + t('lblMaxW'));
+    if (tipB) tipB.setAttribute('data-tip', t('wrapTipBi') + ' ' + t('lblBiMaxW'));
+  } catch (e) {}
+}
+
+function updateSplitWarn(){
+  const el = $('splitWarnHint');
+  if (!el) return;
+  try {
+    if (!S.rows || !S.rows.length) { el.hidden = true; return; }
+    // 直接走导出通道：单语/双语各算各的，阈值语义（maxW vs biMaxW）与真实导出完全一致
+    const out = buildExportItems();
+    paintSplitWarn(out && out.splitInfo, expFmtOf());
+  } catch (e) { el.hidden = true; }
+}
+(function(){
+  // v0.9.192：biMaxW 也监听——双语行宽才是双语切分的开关，改它不刷新提示等于提示是死的
+  const mw = $('maxW'), bw = $('biMaxW'), es = $('expStyle'), dl = $('dstLang');
+  if (mw) mw.addEventListener('change', updateSplitWarn);
+  if (bw) bw.addEventListener('change', updateSplitWarn);
+  if (es) es.addEventListener('change', updateSplitWarn);
+  if (dl) dl.addEventListener('change', updateSplitWarn);
+})();
+
+/* 风格单选联动 */
+function styleUI(){
+  const cur=(document.querySelector('input[name=style]:checked')||{}).value||'elegant';
+  $('styleCustom').style.display = cur==='custom' ? 'block' : 'none';
+  $('styleHint').textContent =
+    cur==='custom' ? t('hintCustom')
+    : (cur==='plain' ? t('hintPlain') : t('hintElegant'));
+}
+(function(){
+  const sel=(['plain','custom','formal','dubbed'].includes(sv.style))?sv.style:'elegant';
+  const el=document.querySelector('input[name=style][value="'+sel+'"]');
+  if(el) el.checked=true;
+  styleUI();
+})();
+document.querySelectorAll('input[name=style]').forEach(r=>r.addEventListener('change',()=>{ styleUI(); save(); }));
+$('styleCustom').addEventListener('change',save);
+
+/* ============ v0.9.134：专名策略 + 统一术语表 ============
+   旧结构是「一个 keepTerms 复选框 + 一个逗号分隔输入框」，有三个问题：
+     ① keepTerms 一关就把输入框 disabled，用户彻底失去对专名的控制；
+     ② 提示文案说「术语表不生效」，但 cfg.glossary 的注入压根不看 keepTerms；
+     ③ 最严重：keepTerms 关闭时，输入框里的词被拼成「用户提供的术语也要翻译」——与标签语义相反。
+   现在拆成两个互不排斥的维度：策略（这次到底保不保留）+ 术语表（认哪些词、译成什么）。
+   术语表统一走规则 4.5，而 4.5 明文优先于规则 4，所以「保留原文」能盖过「全部译出」的全局设置。 */
+function glossCountUI(){
+  const el=$('glossHint'); if(!el) return;
+  const n=GLOSS_ROWS.length;
+  if(!n){ el.textContent=''; return; }
+  let s = t('glossHit', n, glossFileHits(), GLOSS_BAD);
+  /* v0.9.140：光说「命中 7/10」没用——用户不知道自己刚改的那条是不是在剩下 3 条里。
+     这里把未命中的条目名直接列出来。这是「改了没用」最要紧的一环：
+     术语表按批过滤，未命中的条目根本不会进提示词，界面原先却一字不提，
+     用户只会事后发现译名不统一，且完全想不到原因。 */
+  const miss=glossMissRows();
+  if(miss.length){
+    const names=miss.slice(0,5).map(function(r){ return glossForms(r).join('|'); }).join('、');
+    s += '；' + t('glossMiss', miss.length, names + (miss.length>5 ? '…' : ''));
+  }
+  el.textContent = s;
+  /* v0.9.141：有未命中就变警告色。v0.9.140 加的这行提示是灰色小字，用户压根不看，
+     于是「改了译名没用」依旧是个没有提示的哑谜——这里让它在有问题时自己跳出来。 */
+  if(miss.length) el.classList.add('alert'); else el.classList.remove('alert');
+}
+// 全片源文里命中了多少条——没有这个反馈，用户无法判断自己的表到底生效没有
+function glossFileHits(){
+  const src=glossSrcAll();
+  if(!src) return 0;
+  return glossFilter(GLOSS_ROWS, src).length;
+}
+function glossSrcAll(){
+  return (S.srcItems||[]).map(function(x){ return String(x.text||''); }).join('\n');
+}
+// v0.9.140：AI 给的注释常自带括号，写回前统一剥掉（输出时只加一层）
+function glossNormNote(n){
+  return String(n||'').trim().replace(/^[（(]+/,'').replace(/[）)]+$/,'').trim();
+}
+/* v0.9.140：把抽取结果摊成要写入的条目数组——主条目 + 片中出现过的拼写变体。
+   变体每条最多 2 个，与主条目共用同一译法；同名（含用户已有、本批已加）一律跳过。
+   返回 {rows, aiKeys}：aiKeys 供换字幕时精确清除「上一部片抽出来的那些」。 */
+function glossAIEntries(gl, have){
+  const added=[], seen={};
+  (have||[]).forEach(function(x){ glossForms(x).forEach(function(f){ seen[f.toLowerCase()]=1; }); });
+  (gl.terms||[]).forEach(function(x){
+    if(!x || !x.t) return;
+    const main=String(x.t).trim(); if(!main) return;
+    if(seen[main.toLowerCase()]) return;
+    /* v0.9.141：变体并进同一条的 alts，不再各占一行。
+       各占一行时用户改主条目的译法，变体行仍是旧译法——片里凡用变体拼写的句子
+       全都走旧译法，用户只会看到「改了没用」。并成一条后改一次全部跟随。 */
+    const alts=[];
+    (x.variants||[]).forEach(function(v){
+      const vt=String(v||'').trim(); if(!vt) return;
+      const lk=vt.toLowerCase();
+      if(lk===main.toLowerCase() || seen[lk]) return;
+      seen[lk]=1; alts.push(vt);
+    });
+    seen[main.toLowerCase()]=1;
+    // note 在这里再归一一次：抽取结果可能来自任何通道（含直接喂 JSON 的上传），
+    // 只靠 extractGlossary 内部那道不够，写回前统一剥首尾括号才稳
+    const row = { t:main, r:x.r, note:glossNormNote(x.note) };
+    if(alts.length) row.alts = alts.slice(0,2);
+    added.push(row);
+  });
+  return added;
+}
+/* v0.9.141：翻译完成后的最后一道兜底核对——成片译文里到底用上没有指定译法。
+   「命中过滤 / 提示词注入 / 模型服从」任何一环掉链子，用户看到的都是同一句话：
+   「改了译名没用」，且完全没有线索判断是哪一环。这里把结果直接摆出来：
+   本片命中、且译法不等于原文的条目，若整片译文里压根没出现过这个译法，就点名报出来。 */
+function glossVerify(){
+  const rows=S.rows||[];
+  if(!GLOSS_ROWS.length || !rows.length) return;
+  const out=rows.map(function(r){ return String(r.zh||''); }).join('\n');
+  if(!out.trim()) return;
+  const src=glossSrcAll(); if(!src) return;
+  const miss=[];
+  GLOSS_ROWS.forEach(function(g){
+    if(!g.r || g.r===g.t) return;        // 保留原文的条目本就该以原文出现，不核对
+    if(!glossHit(g, src)) return;        // 本片没出现的条目不算（界面那行已经点名过）
+    if(out.indexOf(g.r)>=0) return;
+    miss.push(glossForms(g).join('|')+' → '+g.r);
+  });
+  if(!miss.length){ log(t('glossVerifyOk'),'okc'); return; }
+  log(t('glossVerifyMiss', miss.length, miss.slice(0,5).join('；') + (miss.length>5 ? '…' : '')),'err');
+}
+// 本片一条都没命中的条目：改这些等于白改，必须显式告诉用户
+function glossMissRows(){
+  const src=glossSrcAll();
+  if(!src) return [];
+  return GLOSS_ROWS.filter(function(r){ return !glossHit(r, src); });
+}
+function termsUI(){
+  const keep=(document.querySelector('input[name=pnMode]:checked')||{}).value==='keep';
+  $('termsHint').textContent = keep ? t('termsHintOn') : t('termsHintOff');
+  /* v0.9.138：keepTerms 下 extractGlossary 会强制专名 r=t（v0.9.42 的有意设计，
+     为避免与规则 4 打架）。结果是抽出来的表全是「原文 → 原文」，用户会觉得术语表没用。
+     这里把设计后果讲清楚，让用户知道要指定译法得自己改或换策略。 */
+  const note=$('glossAiHint');
+  if(note) note.textContent = keep ? t('autoTermsKeepNote') : '';
+  glossRefresh();
+  glossCountUI();
+}
+/* v0.9.134：默认值从「保留原文」改为「全部译出」——旧默认值会把 Elon Musk、SpaceX
+   这类词原样留在中文字幕里，对中文用户几乎从不是想要的行为。
+   一次性迁移：没有 pnModeSet 标记的存档一律切到 trans（与 v0.9.96 迁移 autoTerms 同一套做法），
+   没有标记意味着用户从未主动选过这个策略。手动选过之后写标记，迁移不再干预。 */
+if (sv.pnModeSet !== '1') sv.pnMode = 'trans';
+(function(){
+  const mode = (sv.pnMode==='keep') ? 'keep' : 'trans';
+  const el=document.querySelector('input[name=pnMode][value="'+mode+'"]');
+  if(el) el.checked=true;
+})();
+if (sv.autoTermsSet !== '1') sv.autoTerms = '0';
+termsUI();
+glossLibUI();   // v0.9.168：术语库状态要在打开页面时就看得见，否则用户不知道自己存过
+document.querySelectorAll('input[name=pnMode]').forEach(r=>r.addEventListener('change',()=>{
+  UI.pnModeSet=true; termsUI(); save();
+}));
+$('terms').addEventListener('input', ()=>{ glossRefresh(); glossCountUI(); });
+$('terms').addEventListener('change', ()=>{ termsUI(); save(); });
+/* v0.9.139：术语表抽取从「勾选 + 点开始翻译」改为显式按钮。
+   旧流程的毛病：抽取发生在点开始翻译之后，抽完紧接着就翻译，用户根本来不及看抽到了什么、
+   更来不及改——所谓「可以在文本框里自定义」只是理论上的能力，改了也得等下一次翻译才生效。
+   现在点一次抽一次，结果直接追加进下面的文本框，改完再点开始翻译，这条路径才真正走得通。
+   与翻译时的自动抽取共用同一套写入逻辑：同名条目以用户已有的为准，AI 只补缺，绝不覆盖。 */
+let GLOSS_AI_BUSY=false;
+async function glossAIRun(){
+  const btn=$('btnGlossAI'), hint=$('glossAiHint');
+  if(GLOSS_AI_BUSY || S.translating) return;
+  if(!(S.srcItems && S.srcItems.length)){
+    if(hint) hint.textContent=t('glossAiNeedFile');
+    log(t('glossAiNeedFile'),'err'); return;
+  }
+  const cfg=getCfg();
+  const apiReady=(cfg.mode==='api' && cfg.base && cfg.key && cfg.model);
+  const builtinReady=(cfg.mode==='builtin' && BUILTIN_INFO.configured);
+  if(!apiReady && !builtinReady){ log(cfg.mode==='builtin' ? t('builtinOff') : t('degradeDemo'),'err'); return; }
+  GLOSS_AI_BUSY=true;
+  btn.disabled=true; btn.textContent=t('glossAiRun');
+  if(hint) hint.textContent=t('glossAiRun');
+  try{
+    const base =cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
+    const key  =cfg.mode==='builtin' ? '' : cfg.key;
+    const model=cfg.mode==='builtin' ? '' : cfg.model;
+    const gl=await extractGlossary(base,key,model,cfg,sampleSrcText(S.srcItems,20000));
+    const have=glossParse(($('terms')||{}).value||'').rows;
+    const added=glossAIEntries(gl, have);
+    if(added.length){
+      $('terms').value=have.concat(added).map(glossRowText).join('\n');
+      glossRefresh(); glossCountUI();
+      save();   // v0.9.140：抽完立刻落盘——此前只在用户失焦时 save，刷新页面整表丢失
+      log(t('glossAiDone',added.length),'okc');
+      log(added.map(x=>'  · '+glossRowText(x)).join('\n'));
+      if(hint) hint.textContent=t('glossAiDone',added.length);
+    }else{
+      log(t('glossAiNone'));
+      if(hint) hint.textContent=t('glossAiNone');
+    }
+  }catch(e){
+    log(t('autoTermsSkip',e.message),'err');
+    if(hint) hint.textContent=t('autoTermsSkip',e.message);
+  }finally{
+    GLOSS_AI_BUSY=false; btn.disabled=false; btn.textContent=t('btnGlossAI');
+  }
+}
+$('btnGlossSave').addEventListener('click', ()=>{ glossLibSaveNow(); });
+$('btnGlossClear').addEventListener('click', ()=>{ glossLibClearNow(); });
+$('btnGlossAI').addEventListener('click', ()=>{ glossAIRun(); });
+/* v0.9.137：上传拆成「追加 / 替换」。追加 = 并入现有内容（同名以新文件为准，故先旧后新）；
+   替换 = 清空后只写文件里的条目。两者共用同一个 file input，用 GLOSS_FILE_MODE 记本次模式。 */
+let GLOSS_FILE_MODE='append';
+$('btnGlossAppend').addEventListener('click', ()=>{ GLOSS_FILE_MODE='append'; try{ $('glossFile').click(); }catch(e){} });
+$('btnGlossReplace').addEventListener('click', ()=>{ GLOSS_FILE_MODE='replace'; try{ $('glossFile').click(); }catch(e){} });
+/* CSV 模板：BOM 不能省——没有它 Excel 打开中文就是乱码；CRLF 对 Excel 更友好 */
+function glossTplCsv(){
+  /* 只给两列：source,target 已经能覆盖「保留原文」和「指定译法」两种用法，
+     第三列备注是可选能力，放进模板反而让人以为必填。 */
+  return ['source,target','SpaceX,SpaceX','Burger King,汉堡王'].join('\r\n');
+}
+$('btnGlossTpl').addEventListener('click', ()=>{
+  try{
+    const blob=new Blob(['\uFEFF'+glossTplCsv()],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='glossary-template.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  }catch(e){ log(t('errOccur', e.message||String(e)),'err'); }
+});
+$('glossFile').addEventListener('change', async ev=>{
+  const f=(ev.target.files||[])[0];
+  try{ ev.target.value=''; }catch(e){}
+  if(!f) return;
+  try{
+    const txt=await f.text();
+    const p=glossParse(txt);
+    /* 复用「导入字幕」那两条既有文案，避免为上传功能新造 27×2 个词条 */
+    if(!p.rows.length){ log(t('imported', f.name, 0),'err'); return; }
+    const cur = GLOSS_FILE_MODE==='replace' ? [] : glossParse($('terms').value).rows;
+    $('terms').value = cur.concat(p.rows).map(glossRowText).join('\n');
+    termsUI(); save();
+    log(t('imported', f.name, p.rows.length),'okc');
+  }catch(e){ log(t('errOccur', e.message||String(e)),'err'); }
+});
+
+/* 语言/格式切换联动：列头 + 导出文件名（v0.9.190：文件名已无输入框，导出时现算，无需刷新占位符/联动覆盖） */
+function outNameParts(){ /* v0.9.33：文件名按界面语言生成——zh 界面沿用中文语言名+字幕；其余界面用英文语言名+本地化后缀 */
+  const fmt=expFmtOf();
+  const zhUI=UI.lang==='zh-CN'||UI.lang==='zh-TW';
+  const langName=zhUI ? LBY($('dstLang').value).file : LBY($('dstLang').value).en;
+  const suf=zhUI ? (fmt==='mono'?'字幕':'双语字幕') : (fmt==='mono'?'_'+t('fnSub'):'_'+t('fnBi'));
+  return {langName, suf};
+}
+function autoOutNameStr(){
+  const p=outNameParts();
+  return S.fileBase+'_'+p.langName+p.suf+'.'+expFileFmt();
+}
+/* v0.9.258：本页不再提供 ASS / VTT 外观面板（用户拍板：精细样式统一去特效页处理）。
+   ⚠️ 面板只是**不显示**，DOM 一个字节没动 —— 里面的字号/颜色/离底/描边/字体输入框
+      仍是 assStyleOf() / vttStyle() 的取值来源，删掉导出 ASS/VTT 就没有样式参数了；
+      而且 test-core 有 6 条断言盯着这些元素存在。隐藏是最低风险的移除方式。
+   ⚠️ 想恢复本页面板：把 ADV_EXPORT 改成 true 即可，其余逻辑原样都在。 */
+const ADV_EXPORT = false;
+/* v0.9.100：ASS 外观设置仅在导出格式为 ASS 时可见——对 SRT/VTT/TXT 无效，避免误导 */
+function syncAssStyleBox(){
+  var b=$('assStyleBox');
+  if(!ADV_EXPORT){ if(b) b.style.display='none'; return; }
+  if(b) b.style.display=(expFileFmt()==='ass')?'':'none';
+  /* v0.9.110：单语导出没有原文行 —— 原文字号与原文离底距离整行隐藏，
+     否则用户会对着一组「配了也不生效」的输入框调半天，还会被计入锁定状态。 */
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  /* v0.9.195：字号/颜色/离底三组统一走这同一份清单。此前按 id 逐个硬写两个变量，
+     颜色那两格没 id 就自动漏掉了（单语时照样显示原文颜色，而单语 ASS 根本没原文行，
+     改了播放器里纹丝不动）。清单化之后再加组也不会漏。 */
+  /* v0.9.217：新增描边 / 字体 / 不透明度三组，同样分译文原文两列（用户要求分列）。
+     清单化后单语只需这份数组驱动，加组不会漏 id（v0.9.195 的教训：颜色那组当时漏了 id 变成假控件）。 */
+  var tri=[['assSrcSizeRow','assDstSizeRow'],['assSrcColorRow','assDstColorRow'],['assSrcMVRow','assDstMVRow'],
+           ['assSrcOutlineRow','assDstOutlineRow'],['assSrcFontRow','assDstFontRow'],['assSrcAlphaRow','assDstAlphaRow']];
+  tri.forEach(function(p){
+    var s=$(p[0]), d=$(p[1]);
+    if(s) s.style.display = mono ? 'none' : '';
+    if(d && d.classList) d.classList.toggle('span2', !!mono);
+  });
+  /* v0.9.199：列头「译文 | 原文」也跟着收起。只剩一列时不需要说明哪列是哪列，
+     而且列头一旦留下「原文」两个字、下面却没有任何原文字段，反而更让人困惑。 */
+  var hd=$('assHead'); if(hd) hd.style.display = mono ? 'none' : '';
+}
+/* ---------- v0.9.236：WebVTT 样式 ----------
+   VTT 的样式和 ASS 不是一套东西，别互相换算：
+     ASS = 像素（离底 MarginV）+ 完整排版；VTT = 百分比（line/position/size）+ CSS 白名单属性。
+   ⚠️ 收集函数只做「取值」，不做修正：空就是空、负数就是负数、超过 100 就是超过 100，
+      原样交给 core 写进文件（v0.9.234/235 定的「用户填什么就是什么」在这里同样适用）。 */
+function vttStyle(){
+  var g=function(id){ var e=$(id); return e?String(e.value==null?'':e.value).trim():''; };
+  var ck=function(id){ var e=$(id); return !!(e&&e.checked); };
+  /* 单语导出没有原文行（vttSrcBox 整块隐藏），此时「区分原文」必须按关闭处理：
+     否则 STYLE 块里会留下一条永远匹配不到元素的 ::cue(.src) 规则（纯噪音）。 */
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  return {
+    line:g('vttLine'), lineAlign:g('vttLineAlign'),
+    position:g('vttPos'), width:g('vttWidth'), align:g('vttAlign'),
+    size:g('vttSize'), color:g('vttColor'), font:g('vttFont'), lineHeight:g('vttLH'),
+    bold:ck('vttBold'), italic:ck('vttItalic'),
+    /* v0.9.241：原文行的字号、颜色各自能「沿用」（select 的 '' = 沿用，'set' = 单独设）。
+       单语导出没有原文行（vttSrcBox 整块隐藏），此时两项一律按「沿用」处理：
+       否则 STYLE 块里会留下一条永远匹配不到元素的 ::cue(.src) 规则（纯噪音）。
+       「区分原文」那个总闸已删除 —— 全部沿用就等于「不区分」，不用再有一层开关一刀切。 */
+    srcColorInh: mono || (g('vttSrcColorMode') === ''), srcSizeInh: mono || (g('vttSrcSizeMode') === ''),
+    srcColor:g('vttSrcColor'), srcSize:g('vttSrcSize'),
+    bgOn:ck('vttBgOn'), bgColor:g('vttBgColor'), bgAlpha:g('vttBgAlpha'),
+    shadowOn:ck('vttShadowOn'), shadowW:g('vttShadowW'), shadowColor:g('vttShadowColor')
+  };
+}
+/* 原文行是文本里的第几行（0 基）：mono 没有原文行 → -1；bi-src 原文在前 → 0；bi-dst 原文在后 → 1 */
+function vttSrcLine(){
+  var f=(typeof expFmtOf==='function')?expFmtOf():'mono';
+  return f==='bi-src' ? 0 : (f==='bi-dst' ? 1 : -1);
+}
+const VTT_FONTS = [['sans','vttFontSans'],['serif','vttFontSerif'],['mono','vttFontMono'],
+  ['PingFang SC',''],['Microsoft YaHei',''],['SimHei',''],['SimSun',''],['Noto Sans CJK SC',''],['Arial',''],['Times New Roman','']];
+function fillVttFonts(){
+  var el=$('vttFont'); if(!el || el.dataset.filled==='1') return;
+  VTT_FONTS.forEach(function(p){
+    var o=document.createElement('option'); o.value=p[0];
+    if(p[1]) o.setAttribute('data-i18n', p[1]);
+    o.textContent=p[1]?t(p[1]):p[0];
+    el.appendChild(o);
+  });
+  el.value='sans'; el.dataset.filled='1';
+}
+/* v0.9.241：原文行字号、颜色选「沿用」时把值控件变暗 —— 值本身保留（切回「单独设」即恢复），
+   只是看得见这一项此刻不生效。不做「沿用就把输入框清空」那种事：用户填过的东西不许被抹掉。 */
+function syncVttSrcInh(){
+  [['vttSrcSizeMode','vttSrcSize',null],['vttSrcColorMode','vttSrcColor','vttSrcColorSw']].forEach(function(p){
+    var m=$(p[0]), v=$(p[1]); if(!m || !v) return;
+    var inh = (m.value === '');
+    v.classList.toggle('inh', inh);
+    var sw = p[2] ? $(p[2]) : null; if(sw) sw.classList.toggle('inh', inh);
+  });
+}
+/* 显隐：只有导出 WebVTT 时才有意义；单语时没有原文行 → 原文那一组整块收起 */
+function syncVttStyleBox(){
+  var b=$('vttStyleBox');
+  /* ⚠️ 提前 return 顺带解决另一件事：vttNatSync()（原生对照预览，canvas + 视频循环）
+     在本函数末尾被调用，面板都藏了还让它转就是白烧 CPU。 */
+  if(!ADV_EXPORT){ if(b) b.style.display='none'; return; }
+  if(b) b.style.display=(expFileFmt()==='vtt')?'':'none';
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  var sb=$('vttSrcBox'), fx=$('vttFxTip');
+  if(sb) sb.style.display=mono?'none':'';
+  if(fx) fx.style.display=mono?'none':'';
+  ['vttColor','vttSrcColor','vttBgColor','vttShadowColor'].forEach(function(id){ try{ syncColorSw(id); }catch(e){} });
+  try{ syncVttSrcInh(); }catch(e){}
+  try{ vttNatSync(); }catch(e){}
+}
+/* ---------- v0.9.237：样式回读 / 方案 / 原生对照预览 ---------- */
+
+/* 回填导入的 VTT 里读到的样式。只填**读到的**字段，没读到的保持面板现值 ——
+   不是「先清空再填」，那样会把用户自己刚调好的设置冲掉。
+   字体可能是下拉里没有的第三方族名 → 临时补一个 option；静默回默认等于把用户的字体丢了。 */
+function applyVttStyle(p){
+  if(!p || !p.found) return 0;
+  var s=p.style||{}, n=0;
+  var put=function(id,v){
+    var e=$(id); if(!e || v==null || v==='') return;
+    if(e.type==='checkbox'){ e.checked=!!v; n++; return; }
+    if(e.tagName==='SELECT'){
+      var hit=false;
+      for(var i=0;i<e.options.length;i++){ if(e.options[i].value===v){ hit=true; break; } }
+      if(!hit){ var o=document.createElement('option'); o.value=v; o.textContent=v; e.appendChild(o); }
+      e.value=v; n++; return;
+    }
+    e.value=v; n++;
+  };
+  put('vttLine',s.line); put('vttLineAlign',s.lineAlign);
+  put('vttPos',s.position); put('vttWidth',s.width); put('vttAlign',s.align);
+  put('vttSize',s.size); put('vttColor',s.color); put('vttFont',s.font); put('vttLH',s.lineHeight);
+  if(s.bold!=null) put('vttBold',s.bold);
+  if(s.italic!=null) put('vttItalic',s.italic);
+  /* v0.9.241：字号、颜色也有「沿用」了 —— 文件里的 ::cue(.src) 写了哪项，那项才是「单独设」。
+     ⚠️ 不能走 put()：它把空串当成「没读到」直接跳过，而 '' = 沿用 正是本版新增的合法值。
+     （整块 ::cue(.src) 都不存在时 parseVttStyle 不给这两个字段，面板现值原样保留。） */
+  var putMode=function(id,inh){ var e=$(id); if(!e) return; e.value = inh ? '' : 'set'; n++; };
+  if(s.srcColorInh!=null) putMode('vttSrcColorMode', !!s.srcColorInh);
+  if(s.srcSizeInh!=null) putMode('vttSrcSizeMode', !!s.srcSizeInh);
+  put('vttSrcColor',s.srcColor); put('vttSrcSize',s.srcSize);
+  put('vttBgOn',s.bgOn); put('vttBgColor',s.bgColor); put('vttBgAlpha',s.bgAlpha);
+  put('vttShadowOn',s.shadowOn); put('vttShadowW',s.shadowW); put('vttShadowColor',s.shadowColor);
+  try{ syncVttStyleBox(); }catch(e){}
+  return n;
+}
+
+/* 样式方案（localStorage）。与双语页的 ASS 方案同一套心智：方案 = 面板**全字段**。
+   少了任何一个，套上去就不是当初那套样式 —— 所以 vttSchemeFields 走的是字段白名单全量。 */
+const VTT_SCHEME_KEY='srt_vtt_style_v1';
+const VTT_SCHEME_IDS=['vttLine','vttLineAlign','vttPos','vttWidth','vttAlign','vttSize','vttColor','vttFont','vttLH',
+  'vttBold','vttItalic','vttSrcSizeMode','vttSrcColorMode','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
+  'vttShadowOn','vttShadowW','vttShadowColor'];
+function vttSchemeFields(){
+  var o={__v:1};
+  VTT_SCHEME_IDS.forEach(function(id){ var e=$(id); if(!e) return; o[id]=(e.type==='checkbox')?!!e.checked:e.value; });
+  return o;
+}
+function vttSchemeLoad(){ try{ return JSON.parse(localStorage.getItem(VTT_SCHEME_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function vttSchemeStore(o){ try{ localStorage.setItem(VTT_SCHEME_KEY,JSON.stringify(o)); }catch(e){} }
+function renderVttSchemeList(){
+  var sel=$('vttSchemeList'); if(!sel) return;
+  var all=vttSchemeLoad(), names=Object.keys(all).sort(function(a,b){ return a.localeCompare(b,'zh'); });
+  var keep=sel.value; sel.innerHTML='';
+  if(!names.length){
+    var o=document.createElement('option'); o.value=''; o.textContent=t('vttSchemeNone');
+    sel.appendChild(o); sel.disabled=true;
+  }else{
+    names.forEach(function(n){ var op=document.createElement('option'); op.value=n; op.textContent=n; sel.appendChild(op); });
+    sel.disabled=false;
+    if(keep && names.indexOf(keep)>=0) sel.value=keep;
+  }
+}
+function vttSchemePickName(){
+  var sel=$('vttSchemeList');
+  if(!sel || !sel.value){ log(t('vttSchemePick'),'err'); return null; }
+  return sel.value;
+}
+function vttSchemeDoSave(){
+  var name=String(window.prompt(t('vttSchemeAskName'))||'').trim();
+  if(!name) return;
+  var all=vttSchemeLoad(); all[name]=vttSchemeFields(); vttSchemeStore(all);
+  renderVttSchemeList();
+  var sel=$('vttSchemeList');
+  if(sel){ for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===name){ sel.value=name; break; } } }
+  log(t('vttSchemeSaved',name),'okc');
+}
+function vttSchemeDoApply(){
+  var name=vttSchemePickName(); if(!name) return;
+  var s=vttSchemeLoad()[name];
+  if(!s){ log(t('vttSchemePick'),'err'); return; }
+  VTT_SCHEME_IDS.forEach(function(id){
+    if(!(id in s)) return;
+    var e=$(id); if(!e) return;
+    if(e.type==='checkbox') e.checked=!!s[id]; else e.value=s[id];
+  });
+  try{ syncVttStyleBox(); }catch(e){}
+  try{ syncExpPreview(); }catch(e){}
+  try{ save(); }catch(e){}
+  log(t('vttSchemeApplied',name),'okc');
+}
+function vttSchemeDoDel(){
+  var name=vttSchemePickName(); if(!name) return;
+  if(!window.confirm(t('vttSchemeDelAsk',name))) return;
+  var all=vttSchemeLoad(); delete all[name]; vttSchemeStore(all);
+  renderVttSchemeList();
+  log(t('vttSchemeDeleted',name),'okc');
+}
+
+/* 原生对照预览：把 buildExport() 的**真实产物**喂给浏览器自己的 <track> 去渲染。
+   ⚠️ 产物原样：不改时间轴、不改样式 —— 看到的差异就是真差异（不是我们"修"过的样子）。
+   ⚠️ 时间轴由 canvas.captureStream() 提供：没有媒体源，<video> 没有 timeline，轨道根本不会被渲染。
+   ⚠️ MediaStream 的 duration 是 Infinity 且不可 seek → 每次换样式都重建流（时间轴归零），
+      否则用户改完样式时视频已播到几十秒、第一条 cue 早过去了，预览会一直是空白。 */
+var VTT_NAT={ ready:false, stream:null, url:null, track:null, hold:0, deb:0, seq:0, draw:0 };
+function vttNatDrawFrame(){
+  try{
+    var cv=$('vttNatCv'); if(!cv) return;
+    var ctx=cv.getContext('2d'), w=cv.width, h=cv.height, t=(Date.now()/1000)%6;
+    ctx.fillStyle='#15171c'; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#1b1f26'; ctx.fillRect(0,h-56,w,56);           // 地面
+    ctx.fillStyle='#2a3140'; ctx.fillRect(0,0,w,26);              // 顶栏
+    var x=(t/6)*(w+80)-40;
+    ctx.fillStyle='#39414e'; ctx.fillRect(x, h-96, 52, 40);       // 移动的方块
+  }catch(e){}
+}
+function vttNatBoot(){
+  var cv=$('vttNatCv'); if(!cv) return false;
+  if(!cv.captureStream) return false;                              // 不支持就干脆不做，别给假画面
+  VTT_NAT.ready=true;
+  return true;
+}
+/* ⚠️ 换内容时**整只 video 换掉**：不是只换 track，更不是在旧 track 上换 src。
+   实测只换 track（先 mode='disabled' 再 removeChild 也一样）时，Chrome 会把上一轮字幕的渲染
+   留在合成层里，新一轮字幕叠上去就是「新旧双影」——画面里彩色像素 9086（两层）vs 5649（一层）。
+   MediaStream 源 + 复用 video 才会这样；重建元素才干净。 */
+function vttNatBuild(url){
+  var cv=$('vttNatCv'); if(!cv || !cv.captureStream) return null;
+  var old=$('vttNatVid'); if(!old || !old.parentNode) return null;
+  vttNatEnsureDraw();
+  var nv=document.createElement('video');
+  nv.id='vttNatVid'; nv.muted=true; nv.playsInline=true; nv.setAttribute('playsinline','');
+  old.parentNode.replaceChild(nv, old);
+  try{
+    if(VTT_NAT.stream){ VTT_NAT.stream.getTracks().forEach(function(tk){ try{ tk.stop(); }catch(e){} }); }
+    VTT_NAT.stream=cv.captureStream(8);
+    nv.srcObject=VTT_NAT.stream;
+  }catch(e){}
+  var tr=null;
+  if(url){
+    try{
+      tr=document.createElement('track');
+      tr.kind='subtitles'; tr.srclang='zh'; tr.label='preview'; tr.default=true;
+      nv.appendChild(tr);
+      tr.src=url;
+    }catch(e){ tr=null; }
+  }
+  VTT_NAT.track=tr;
+  return nv;
+}
+/* 停播放 + 停绘制：切到别的格式后没必要继续按 8fps 重画（用户看不见） */
+function vttNatPause(){
+  clearTimeout(VTT_NAT.hold);
+  if(VTT_NAT.draw){ clearInterval(VTT_NAT.draw); VTT_NAT.draw=0; }
+  var v=$('vttNatVid'); if(v){ try{ v.pause(); }catch(e){} }
+}
+/* 绘制循环（幂等）：captureStream 只在 canvas 被绘制时才出帧，静止画面会让时间轴停住 */
+function vttNatEnsureDraw(){
+  if(VTT_NAT.draw) return;
+  vttNatDrawFrame();
+  VTT_NAT.draw=setInterval(vttNatDrawFrame, 125);
+}
+function vttNatRestart(){
+  var v=vttNatBuild(VTT_NAT.url); if(!v) return;
+  try{
+    var pr=v.play();
+    if(pr && pr.then) pr.then(function(){ VTT_NAT.lastPlay='ok'; }, function(e){ VTT_NAT.lastPlay='err:'+((e&&e.name)||e); });
+    else VTT_NAT.lastPlay='nopromise';
+  }catch(e){ VTT_NAT.lastPlay='sync:'+e.message; }
+}
+/* 循环播放。⚠️ **不能播完就停**：Chrome 对 MediaStream 源在暂停时不渲染字幕层，
+   一定格就只剩一块空画面（试过，用户什么都看不到）。所以改成「播到末条 cue 之后再重来一轮」，
+   字幕周期性地出现 —— 用户随时瞄一眼都能看到真样式。
+   ⚠️ 循环长度按 cue 实际时间算，不写死：VTTCue 的时间属性是 startTime / endTime，
+      写成 start / end 会拿到 undefined（NaN 会让 setTimeout 立即触发）。 */
+function vttNatPlayHold(){
+  var v=$('vttNatVid'); if(!v) return;
+  vttNatEnsureDraw();
+  var span=4000;
+  try{
+    var tt=v.textTracks && v.textTracks[0];
+    if(tt && tt.cues && tt.cues.length){
+      var last=tt.cues[tt.cues.length-1], s0=+last.startTime, e0=+last.endTime;
+      if(isFinite(s0) && isFinite(e0)) span=Math.max(0, Math.round(e0 - s0)) + Math.round(s0);
+    }
+  }catch(e){}
+  vttNatRestart();
+  clearTimeout(VTT_NAT.hold);
+  VTT_NAT.hold=setTimeout(vttNatPlayHold, Math.max(2000, span + 900));
+}
+/* 原生预览与自绘预览**同一份文本、同一份样式**，只是换个渲染器 ——
+   两边内容不同的"对照"是没有意义的。文本取自导出预览里那两个示例行（自绘预览读的也是它们），
+   所以这里不碰 S.rows：用户还没翻译时照样能看样式，两个预览也永远对得上。 */
+function vttNatText(){
+  var box=document.querySelector('.exp-preview');
+  var dstEl=box?box.querySelector('.ep-dst'):null, srcEl=box?box.querySelector('.ep-src'):null;
+  var dst=dstEl?String(dstEl.textContent||'').trim():'', src=srcEl?String(srcEl.textContent||'').trim():'';
+  var fmt=expFmtOf(), mono=(fmt==='mono');
+  var text = mono ? dst : (fmt==='bi-src' ? (src+'\n'+dst) : (dst+'\n'+src));
+  if(!text) text='♪ 爱在空中飘荡 ♪';
+  return C.formatVtt([{no:1,start:800,end:4800,text:text}], {style:vttStyle(), srcLine:vttSrcLine()});
+}
+function vttNatSync(){
+  if(typeof expFileFmt==='function' && expFileFmt()!=='vtt'){ vttNatPause(); return; }
+  clearTimeout(VTT_NAT.deb);
+  VTT_NAT.deb=setTimeout(vttNatSyncNow, 160);                      // 拖动数字框时别每个键都重建 Blob
+}
+function vttNatSyncNow(){
+  if(typeof expFileFmt==='function' && expFileFmt()!=='vtt'){ vttNatPause(); return; }
+  if(!vttNatBoot()) return;
+  var tok=++VTT_NAT.seq;
+  try{
+    if(VTT_NAT.url) URL.revokeObjectURL(VTT_NAT.url);
+    VTT_NAT.url=URL.createObjectURL(new Blob([vttNatText()], {type:'text/vtt'}));
+    if(!vttNatBuild(VTT_NAT.url)) return;
+    var tr=VTT_NAT.track;
+    if(tr){
+      tr.addEventListener('load', function(){ if(tok===VTT_NAT.seq) vttNatShow(tr); }, {once:true});
+      /* 同一 Blob 命中缓存时不一定再触发 load → 兜底一次，避免预览永远停在旧内容 */
+      setTimeout(function(){ if(tok===VTT_NAT.seq && tr.mode!=='showing') vttNatShow(tr); }, 800);
+    }
+  }catch(e){}
+}
+function vttNatShow(tr){
+  try{ tr.mode='showing'; }catch(e){}
+  vttNatPlayHold();
+}
+(function(){
+  var a=$('vttSchemeApply'), s=$('vttSchemeSave'), d=$('vttSchemeDel'), rp=$('vttNatReplay');
+  if(a) a.addEventListener('click', function(){ try{ vttSchemeDoApply(); }catch(e){} });
+  if(s) s.addEventListener('click', function(){ try{ vttSchemeDoSave(); }catch(e){} });
+  if(d) d.addEventListener('click', function(){ try{ vttSchemeDoDel(); }catch(e){} });
+  if(rp) rp.addEventListener('click', function(){ if(expFileFmt()==='vtt' && vttNatBoot()) vttNatSyncNow(); });   // 重播 = 用当前样式从头再放一遍
+  try{ renderVttSchemeList(); }catch(e){}
+})();
+/* VTT 预览：所有数值都按「百分比 → 预览框百分比」直译，字号按播放器默认基准（≈画面高 5%）× f 缩放。
+   与导出的关系是「同一个样式对象的两种渲染」——core 写进文件，这里画到 DOM，
+   两边读同一份 vttStyle()，不做第二套计算。 */
+function syncVttPreview(box, pvH, f){
+  var layer=box.querySelector('.ep-vtt'); if(!layer) return;
+  var cue=layer.querySelector('.ep-vtt-cue'), d=layer.querySelector('.ep-vtt-dst'), s=layer.querySelector('.ep-vtt-src');
+  if(!cue||!d||!s) return;
+  var st=vttStyle(), mono=(expFmtOf()==='mono'), srcFirst=(expFmtOf()==='bi-src');
+  var dstEl=box.querySelector('.ep-dst'), srcEl=box.querySelector('.ep-src');
+  d.textContent = dstEl ? dstEl.textContent : '';
+  s.textContent = srcEl ? srcEl.textContent : '';
+  d.style.display='';
+  s.style.display = mono ? 'none' : '';
+  /* 行序与导出一致：bi-src 原文在前，bi-dst 译文在前 */
+  if(srcFirst){ if(cue.firstChild!==s) cue.insertBefore(s, cue.firstChild); }
+  else { if(cue.lastChild!==s) cue.appendChild(s); }
+  var num=function(v,dflt){ var n=parseFloat(v); return (v!=='' && isFinite(n))?n:dflt; };
+  var col=function(v,dflt){ return /^#[0-9a-fA-F]{6}$/i.test(String(v||'').trim())?String(v).trim():dflt; };
+  /* 位置：line 的三种锚定（贴底 / 贴顶 / 居中）与 cue settings 的 line:xx%,end|start|center 一一对应 */
+  var ln=num(st.line,0), la=st.lineAlign||'end';
+  if(la==='start'){ cue.style.bottom='auto'; cue.style.top=ln+'%'; cue.style.transform=''; }
+  else if(la==='center'){ cue.style.bottom='auto'; cue.style.top=ln+'%'; cue.style.transform='translateY(-50%)'; }
+  else { cue.style.top='auto'; cue.style.transform=''; cue.style.bottom=(100-ln)+'%'; }
+  var pos=num(st.position,0), w=num(st.width,100), al=st.align||'center';
+  cue.style.width=w+'%';
+  cue.style.left=(al==='start'?pos:(al==='end'?(pos-w):(pos-w/2)))+'%';
+  /* 字号：100% = 播放器默认 cue 字号（≈画面高的 5%），预览再乘等比系数 f。
+     与 ASS 那条路径同源：成片 1080 高时 100% ≈ 54px，预览里就是 54×f。 */
+  var base=pvH*0.05;
+  d.style.fontSize=(base*(num(st.size,100)/100)).toFixed(2)+'px';
+  s.style.fontSize=(base*(num(st.srcSize,100)/100)).toFixed(2)+'px';
+  d.style.color=col(st.color,'#FFFFFF');
+  s.style.color=col(st.srcColor,'#FFD700');
+  if(st.srcDiff===false) s.style.color=d.style.color;
+  var fam=(typeof C!=='undefined' && C.vttFontStack)?C.vttFontStack(st.font):'';
+  cue.style.fontFamily=fam||'inherit';
+  cue.style.fontWeight=st.bold?'700':'400';
+  cue.style.fontStyle=st.italic?'italic':'normal';
+  cue.style.lineHeight=String(num(st.lineHeight,1.4));
+  /* 底衬：background 在 ::cue 里是逐条生效的（规范特意保留），画在 cue 盒上正好对应 */
+  if(st.bgOn!==false){
+    var a=num(st.bgAlpha,55), m=/^#([0-9a-fA-F]{6})$/.exec(col(st.bgColor,'#000000'));
+    var r=m?parseInt(m[1].slice(0,2),16):0, g=m?parseInt(m[1].slice(2,4),16):0, b=m?parseInt(m[1].slice(4,6),16):0;
+    cue.style.backgroundColor='rgba('+r+','+g+','+b+','+(a/100)+')';
+  }else cue.style.backgroundColor='transparent';
+  /* 描边：VTT 没有真描边，core 用 text-shadow 八向模拟 → 预览必须用同一串值（f 等比缩放） */
+  var sh=(typeof C!=='undefined' && C.vttShadowCss)?C.vttShadowCss(st):'';
+  if(sh){
+    var sw=num(st.shadowW,2), sc=col(st.shadowColor,'#000000');
+    cue.style.textShadow=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]]
+      .map(function(p){ return (p[0]*sw*f).toFixed(2)+'px '+(p[1]*sw*f).toFixed(2)+'px 0 '+sc; }).join(', ');
+  }else cue.style.textShadow='none';
+}
+/* v0.9.196：导出预览跟随「导出字幕样式」。此前 .exp-preview 里两行是写死的双语排布，
+   选 mono / bi-src / 换文件格式都不动——预览等于没用。
+   规则（与 srt-core.js 的 ASS 生成、以及 SRT/VTT 双行导出保持一致）：
+     mono                → 只留译文一行、垂直居中
+     bi-src              → 原文在上、译文在下
+     bi-dst              → 译文在上、原文在下
+     ASS 分屏（非 stack）→ 两块一上一下分开（原文贴顶 / 译文贴底）
+     ASS 双行 + SRT/VTT  → 两块相邻贴底
+   选 ASS 时颜色与字号再跟着上面的设置走（非 ASS 不跟：播放器用的不是这套样式，跟着反而误导）。
+   ⚠️ 字号按 pt 等比缩进预览框（56pt→12px / 50pt→10.5px 基准），并夹在 8~22px —— 不夹会被 200pt 撑破。 */
+function syncExpPreview(){
+  var box=document.querySelector('.exp-preview'); if(!box) return;
+  var dst=box.querySelector('.ep-dst'), src=box.querySelector('.ep-src');
+  if(!dst||!src) return;
+  var fmt=expFmtOf(), mono=(fmt==='mono'), srcFirst=(fmt==='bi-src');
+  var isAss=(expFileFmt()==='ass'), stacked=assStacked();
+  /* 分屏只在 ASS 且非双行时有意义：SRT/VTT 与 ASS 双行都是两块相邻贴底 */
+  var split = isAss && !stacked && !mono;
+  box.classList.toggle('pv-mono', mono);
+  /* ⚠️ bi-src 是「原文在上」（见 i18n fmtBiSrc），所以 srcFirst 时贴顶的是 ep-src，
+     对应 pv-split（.ep-src{top}）；bi-dst 才轮到译文贴顶的 pv-split-rev。别写反。 */
+  box.classList.toggle('pv-split', split && srcFirst);
+  box.classList.toggle('pv-split-rev', split && !srcFirst);
+  box.classList.toggle('pv-rev', !split && !mono && srcFirst);
+  /* v0.9.200：SRT / VTT 无样式可谈 → 打 pv-plain，把两行统一成播放器默认的白 + 同号。
+     只有「行序」是真的（bi-src 原文在上），颜色/字号都得回到中性。 */
+  var isVtt=(expFileFmt()==='vtt');
+  /* v0.9.236：VTT 有自己的样式层，不再走 pv-plain（那是「播放器默认白字」的兜底）。 */
+  box.classList.toggle('pv-plain', !isAss && !isVtt);
+  box.classList.toggle('pv-vtt', isVtt);
+  src.style.display = mono ? 'none' : '';
+  var pvH=box.clientHeight;
+  /* v0.9.209：预览 = 成片的等比缩略图，全篇只有这一个比例 f（预览框是 16:9，与成片同比例）。
+     用户填什么就画什么：填 42 就是成片的 42，填 900 就画到成片的 900（预览里被裁掉，
+     成片里也一样出画）。不放大、不取整、不夹取、不补偿。 */
+  var f = pvH>0 ? pvH/1080 : 0;
+  if(isVtt && pvH>0){ try{ syncVttPreview(box, pvH, f); }catch(e){} }
+  /* v0.9.237：原生对照预览跟着一起刷（它就是同一份导出的另一个渲染器，必须同步）。
+     v0.9.258：本页已不提供 VTT 面板，原生对照也一并关掉 —— 画布不可见时让它转是白烧 CPU。 */
+  if(isVtt && ADV_EXPORT){ try{ vttNatSync(); }catch(e){} }
+  if(isAss && pvH>0){
+    var col=function(id,def){ var v=String(($(id)||{}).value||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:def; };
+    /* v0.9.209：字号 = 成片字号 × f，与位置同源。
+       旧版译文、原文各用一套放大系数（比成片大 1.44 倍），还要再夹到 8~22px 并取整 ——
+       于是 ≤37pt 全是 8px、≥103pt 全是 22px，中间也要 ~4.7pt 才动 1px。 */
+    var fsOf=function(id,def){ var n=parseFloat(($(id)||{}).value);
+      return ((isFinite(n)? n : def) * f)+'px'; };
+    box.style.setProperty('--pv-dst-c', col('assDstColor','#FFFFFF'));
+    box.style.setProperty('--pv-src-c', col('assSrcColor','#FFD700'));
+    box.style.setProperty('--pv-dst', fsOf('assDstSize',56));
+    box.style.setProperty('--pv-src', fsOf('assSrcSize',48));
+    /* v0.9.217：描边（粗细+颜色）、不透明度、字体同步到预览。
+       描边用 -webkit-text-stroke 模拟 ASS 的 Outline（值随 f 等比缩小，与字号同源——
+       否则 2.5pt 的描边在 12px 预览里会显得过粗，和成片观感不符）。
+       ⚠️ text-stroke 会吃掉字形内缘（描边越粗字越小），故同时用 paint-order:stroke fill
+       保住字面大小——这是 CSS 侧模拟 ASS 描边的标准做法。 */
+    var olOf=function(id,def){ var n=parseFloat(($(id)||{}).value); return (isFinite(n)?n:def); };
+    var ocOf=function(id){ return col(id,'#000000'); };
+    var alOf=function(id){ var n=parseInt(($(id)||{}).value,10); return ((isFinite(n)&&n>=10&&n<=100)?n:100)/100; };
+    var olD=olOf('assDstOutline',2.5), olS=olOf('assSrcOutline',2.5);
+    box.style.setProperty('--pv-dst-ow', (olD*f).toFixed(2)+'px');
+    box.style.setProperty('--pv-src-ow', (olS*f).toFixed(2)+'px');
+    box.style.setProperty('--pv-dst-oc', ocOf('assDstOutlineColor'));
+    box.style.setProperty('--pv-src-oc', ocOf('assSrcOutlineColor'));
+    box.style.setProperty('--pv-dst-o', String(alOf('assDstAlpha')));
+    box.style.setProperty('--pv-src-o', String(alOf('assSrcAlpha')));
+    /* 字体：预览用 CSS font-family 近似。ASS 的 Fontname 是「回退到有该字体的字体」，
+       预览只能按名字挑 closest family，故挑最接近的同族（黑体/宋体/西文分别映射）。 */
+    var famOf=function(id){
+      var f=String((($(id)||{}).value)||'').toLowerCase();
+      if(/serif|宋体|simsun|noto serif/.test(f)) return '"Noto Serif CJK SC","Songti SC","SimSun",serif';
+      if(/mono|courier/.test(f)) return 'ui-monospace,Menlo,monospace';
+      if(/times|georgia/.test(f)) return 'Georgia,"Times New Roman",serif';
+      if(/arial|helvetica|yahei|黑体|heiti|pingfang|source han sans|noto sans/.test(f)) return '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+      return '';
+    };
+    box.style.setProperty('--pv-dst-f', famOf('assDstFont'));
+    box.style.setProperty('--pv-src-f', famOf('assSrcFont'));
+    /* 两块描边都�� 0 时不生成描边层：0 宽在部分浏览器仍会多一次栅格化，还可能让字边缘发虚 */
+    box.classList.toggle('pv-ow', olD>0 || olS>0);
+  }else{
+    /* 回落 CSS 默认（白 + 淡紫）：SRT/VTT 播放器不读 ASS 那套自定义色 */
+    ['--pv-dst-c','--pv-src-c','--pv-dst','--pv-src',
+     '--pv-dst-ow','--pv-src-ow','--pv-dst-oc','--pv-src-oc','--pv-dst-o','--pv-src-o',
+     '--pv-dst-f','--pv-src-f'].forEach(function(k){ box.style.removeProperty(k); });
+  }
+  /* v0.9.209：纵向位置 = 成片位置 × f，与字号同源。
+     两个 mv 输入框的语义本来就是「距底边像素」：分屏时画面上方那块，UI 里给的就是
+     「1080 − 离底 − 块高」那个大数；双行时上方块的推荐值由导出端 assStackMV 直接给出。
+     所以两块都用同一个 f 映射即可 —— 不必再区分顶部/底部，也不需要任何补偿项。
+     ⚠️ 非 ASS 不套 mv（那两个输入框本来就隐藏，SRT/VTT 的位置由播放器定）→ 清掉 inline 回 CSS 示意位。 */
+  dst.style.top='auto'; src.style.top='auto';
+  if(isAss && pvH>0){
+    var ML=assLH();
+    var toPx=function(v){ var n=parseFloat(v); return isFinite(n)? n*f : 0; };
+    /* v0.9.204~208 那套「实测行盒高 lhOf + 墨迹间隙 × k + 相对推荐值偏移 upOff」整体作废：
+       它存在的唯一理由是补偿「字号各用一套放大系数、位置却按画面缩」这处尺度错位。
+       现在字号与位置同源，块的 bottom 就是成片的 MarginV × f，
+       于是 207「固定值被压扁」、205「间隙要不要单独加」、204「行高该按多少估」全部自动消失；
+       也不再有 8~22px / 2~pvH-12 的夹取，改一点就动一点、改到出画就真的出画（与成片一致）。 */
+    dst.style.bottom=toPx(ML.dstMV)+'px';
+    src.style.bottom=toPx(ML.srcMV)+'px';
+  }else{
+    ['dst','src'].forEach(function(k){
+      var el = k==='dst'? dst : src;
+      el.style.top=''; el.style.bottom='';
+    });
+  }
+}
+/* 预览里的字号/颜色只在 ASS 模式下有意义，但统一用委托监听最省：改哪个字段都能立刻反映。
+   v0.9.197：离底距离两个输入框也在这块里，靠同一条委托就能跟着动。 */
+(function(){ var ab=$('assStyleBox'); if(ab) ab.addEventListener('input', function(){ syncExpPreview(); }); })();
+/* v0.9.197：位置是按「1080 → 预览框高」的比例算的，框变高变矮都得重算（否则换窗口大小、
+   切布局后位置就飘了）。 */
+(function(){ window.addEventListener('resize', function(){ try{ syncExpPreview(); }catch(e){} }); })();
+/* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
+   典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */
+function assDefaultMV(role){
+  if(expFmtOf()==='mono') return 42;           // 单语导出没有原文行
+  var s=assStyleOf();
+  var lhDst=C.assLineHeight(s.dstSize), lhSrc=C.assLineHeight(s.srcSize);
+  var lh = role==='dst' ? lhDst : lhSrc, other = role==='dst' ? lhSrc : lhDst;
+  var dstFirst = expFmtOf()==='bi-dst';
+  if(assStacked()){
+    var atBottom = (role==='dst') !== dstFirst;   // 译文在上时贴底的是原文
+    if(atBottom) return 42;
+    /* v0.9.110：上方块按「下方块墨迹顶 + 12px」定位（旧逻辑按行框堆叠 → 两行墨迹间空 ~36px）。
+       下方块行数按 1 行估（与旧行为一致：默认值只是给个起点，导出时按实际行数重算）。 */
+    var bSz   = role==='dst' ? s.srcSize : s.dstSize;
+    var tSz   = role==='dst' ? s.dstSize : s.srcSize;
+    var bLang = role==='dst' ? (($('srcLang')||{}).value||'auto') : (($('dstLang')||{}).value||'en');
+    var tLang = role==='dst' ? (($('dstLang')||{}).value||'en') : (($('srcLang')||{}).value||'auto');
+    if(typeof C.assStackMV!=='function') return 42 + other + 8;   // 旧 core 缓存兜底
+    return C.assStackMV({bottomMV:42, bottomSize:bSz, bottomLang:bLang,
+                         bottomLines:1, topSize:tSz, topLang:tLang});
+  }
+  var atTop = (role==='dst') === dstFirst;        // 分屏：译文在上→译文在画面顶部
+  return atTop ? (1080 - 42 - lh) : 42;
+}
+function syncAssMVBox(){
+  if(!UI.assDstMVSet && $('assDstMV')) $('assDstMV').value=assDefaultMV('dst');
+  if(!UI.assSrcMVSet && $('assSrcMV')) $('assSrcMV').value=assDefaultMV('src');
+  /* v0.9.111：推荐值常驻显示且可点（点一下即填入输入框），不再标「你的 X」也不再给「应用」按钮。
+     单语导出没有原文行，原文那条整行隐藏（见 syncAssStyleBox）。 */
+  var mono = expFmtOf()==='mono';
+  var dh=$('assDstMVHint'), sh=$('assSrcMVHint');
+  var dRec=assDefaultMV('dst'), sRec=assDefaultMV('src');
+  renderRecHint(dh, t('assMVRec'), dRec, '', 'dmv');
+  if(mono) renderAssHint(sh, '');
+  else renderRecHint(sh, t('assMVRec'), sRec, '', 'smv');
+}
+ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefaultMV('dst');},
+           isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
+ASS_F.smv={el:$('assSrcMV'),hint:$('assSrcMVHint'),rec:function(){return assDefaultMV('src');},
+           isT:function(){return !!UI.assSrcMVSet;},setT:function(v){UI.assSrcMVSet=v;},after:function(){syncAssMVBox();}};
+$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); syncVttStyleBox(); assCtxSync(); syncExpPreview(); syncWrapField(); save(); });
+syncAssStyleBox(); syncVttStyleBox(); syncAssMVBox(); syncExpPreview();
+/* v0.9.217：字体下拉填充 + 描边色/滑杆的事件绑定（各函数内部有 dataset 幂等标记，重复调用安全） */
+try{ fillAssFonts(); }catch(e){}
+/* v0.9.236：VTT 字体下拉 + 面板改动即时重画预览（VTT 预览读的就是面板当前值，不重画等于改了没反应） */
+try{ fillVttFonts(); }catch(e){}
+/* v0.9.236：VTT 样式记忆回填。必须在 fillVttFonts 之后（select.value 要求 option 已存在）；
+   select 只认列表内的值——列表升级删掉某项时老存档静默回默认，不留空 select。 */
+(function(){
+  function put(id, v){
+    var e=$(id); if(!e || v==null || v==='') return;
+    if(e.type==='checkbox'){ e.checked=(v==='1'); return; }
+    if(e.tagName==='SELECT'){
+      for(var i=0;i<e.options.length;i++){ if(e.options[i].value===v){ e.value=v; break; } }
+      return;
+    }
+    e.value=v;
+  }
+  put('vttLine',sv.vttLine); put('vttLineAlign',sv.vttLineAlign); put('vttPos',sv.vttPos);
+  put('vttWidth',sv.vttWidth); put('vttAlign',sv.vttAlign); put('vttSize',sv.vttSize);
+  put('vttColor',sv.vttColor); put('vttFont',sv.vttFont); put('vttLH',sv.vttLH);
+  put('vttBold',sv.vttBold); put('vttItalic',sv.vttItalic);
+  /* v0.9.241：老存档里的 vttSrcDiff（'0' = 不区分原文）等价于「字号、颜色都沿用」——
+     键换了也必须能还原用户原来的样子，不能因为改版就把旧快照恢复错。
+     ⚠️ 不走上面的 put()：它把空串当「没值」跳过，而 '' = 沿用 正是本版新增的合法值。 */
+  (function(){
+    var m=function(id,v){ var e=$(id); if(!e || v==null) return; e.value=v; };
+    var legacyInh = (sv.vttSrcDiff === '0');
+    m('vttSrcSizeMode', sv.vttSrcSizeMode!=null ? sv.vttSrcSizeMode : (legacyInh ? '' : null));
+    m('vttSrcColorMode', sv.vttSrcColorMode!=null ? sv.vttSrcColorMode : (legacyInh ? '' : null));
+  })();
+  put('vttSrcColor',sv.vttSrcColor); put('vttSrcSize',sv.vttSrcSize);
+  put('vttBgOn',sv.vttBgOn); put('vttBgColor',sv.vttBgColor); put('vttBgAlpha',sv.vttBgAlpha);
+  put('vttShadowOn',sv.vttShadowOn); put('vttShadowW',sv.vttShadowW); put('vttShadowColor',sv.vttShadowColor);
+  try{ syncVttStyleBox(); }catch(e){}
+})();
+(function(){
+  var b=$('vttStyleBox'); if(!b) return;
+  b.addEventListener('input', function(){ syncVttStyleBox(); syncExpPreview(); save(); });
+  b.addEventListener('change', function(){ syncVttStyleBox(); syncExpPreview(); save(); });
+})();
+try{ bindAssNew(); }catch(e){}
+/* v0.9.220：字体记忆回填。必须在 fillAssFonts 之后（select.value 需 option 已存在）；
+   只认列表内的值——列表升级删掉某字体时，老存档静默回默认，不留空 select。 */
+(function(){
+  function restoreFont(id, v){
+    var el=$(id); if(!el || !v) return;
+    for(var i=0;i<el.options.length;i++){ if(el.options[i].value===v){ el.value=v; break; } }
+  }
+  restoreFont('assDstFont', sv.assDstFont); restoreFont('assSrcFont', sv.assSrcFont);
+})();
+/* v0.9.110：页面初始化末尾记录当前上下文，之后用户的每一次切换都能被正确判定 */
+ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
+/* v0.9.100：ASS 外观改动即时记忆 */
+['assDstSize','assSrcSize'].forEach(function(id){ var e=$(id); if(e) e.addEventListener('change',function(){ syncAssMVBox(); save(); }); });
+/* v0.9.102：改动离底距离即视为「用户固定」，此后不再随模式/字号联动。
+   v0.9.110：① 清空后 blur 解除固定（旧版无此通道，清空后值空而标记仍在 → 永久锁死在 42）；
+             ② 空值不再触发固定，避免「清空」这个动作本身被当成一次自定义。 */
+['assDstMV','assSrcMV'].forEach(function(id){
+  var e=$(id); if(!e) return;
+  e.addEventListener('change',function(){
+    if(e.value==='') return;
+    if(id==='assDstMV') UI.assDstMVSet=true; else UI.assSrcMVSet=true;
+    /* v0.9.208：input 阶段就刷过一次预览，可那时「已固定」标记还是旧的 false（change 才置真），
+       看到的仍是按「未固定」算出来的位置，要等下一次输入才重算 —— 实测：敲完数字两行纹丝不动，
+       改一下字号才忽然跳过去。这里补一次，改完离底距离预览立刻跟着动。 */
+    try{ syncExpPreview(); }catch(err){}
+    try{ assResetNote(false); }catch(err){}
+    save();
+  });
+  e.addEventListener('blur',function(){
+    if(e.value!=='') return;
+    if(id==='assDstMV') UI.assDstMVSet=false; else UI.assSrcMVSet=false;
+    syncAssMVBox(); save();
+  });
+});
+/* v0.9.101：颜色文本框——input 时实时刷新预览，change 时规范大小写并落盘 */
+['assDstColor','assSrcColor'].forEach(function(id){
+  var e=$(id); if(!e) return;
+  e.addEventListener('input',function(){ syncColorSw(id); });
+  e.addEventListener('change',function(){ normColor(id); save(); });
+});
+syncColorSw('assDstColor'); syncColorSw('assSrcColor');
+/* v0.9.220：描边色方块初始同步（回填的存档值也要显色；此前 id 写错导致这里压根没绑上） */
+syncColorSw('assDstOutlineColor'); syncColorSw('assSrcOutlineColor');
+/* v0.9.383：源语言 == 目标语言 → 在语言选择器下面常驻提示一句（非阻塞，不拦人）。
+   为什么不做自动识别：franc 那类统计法拿项目自带的真实语料（100 语 × 3 句短字幕）实测，
+   限定候选后仍有 25% 会被判成别的语言（hi→mar、bg→bos、nl→afr、ms→ind…），
+   而且它**从不返回「我不知道」**——一个四分之一概率瞎说的提示，不如不给。
+   但「用户自己选了源 = 目标」这条信息 100% 准确，不需要猜，值得直接说出来。
+   为什么不拦：用户可能就是想同语言润色/改写，觉得没错继续就行，流程一步不改。 */
+function sameLangHintSync(){
+  var el=document.getElementById('langSameHint'); if(!el) return;
+  var s=(document.getElementById('srcLang')||{}).value||'';
+  var msg='', warn=false;
+  if(s && s!=='auto'){
+    /* 多语言页的目标是 chips 队列（ML.langs），单语页是 dstLang 下拉 —— 两页共用这一段 */
+    var hit=(typeof ML!=='undefined' && ML && Array.isArray(ML.langs))
+      ? ML.langs.indexOf(s)>=0
+      : (s===((document.getElementById('dstLang')||{}).value||''));
+    if(hit){ msg=t('sameLangHint', LBY(s).zh||s); warn=true; }
+  } else if(s==='auto'){
+    /* 自动检测时无从判断是否同语言，退一步提醒「建议手动指定」：
+       手动选了才谈得上准确提醒，也才谈得上后面那一串省下来的无效重译。 */
+    msg=t('srcAutoHint');
+  }
+  el.textContent=msg;
+  el.style.display=msg?'':'none';
+  el.className='hint'+(warn?' alert':'');
+}
+$('srcLang').addEventListener('change',()=>{ setColLabels(); sameLangHintSync(); save(); });
+$('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); sameLangHintSync(); save(); });
+sameLangHintSync();
+
+/* 其余字段自动保存 */
+/* v0.9.232：温度与转发开关也要跟着存档（此前只有 base/model/key/extra/terms/mode/maxW） */
+['base','model','apikey','extra','temp','viaSrv','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
+
+/* ---------------- 服务商预设（v0.9.30 分组：海外/国内/其他，模型自填） ---------------- */
+const sel=$('provider');
+function buildProviderOptions(){
+  const cur=sel.value;
+  sel.innerHTML='';
+  /* 全部服务商平铺（无分组） */
+  PROVIDERS.forEach(p=>{
+    const o=document.createElement('option'); o.value=p.id;
+    if(p.id==='custom'){ o.dataset.i18n='optCustom'; o.textContent=t('optCustom'); }
+    else o.textContent=(UI.lang==='zh-CN'||UI.lang==='zh-TW')&&p.zhName ? p.zhName : p.name;
+    sel.appendChild(o);
+  });
+  sel.value = PROVIDERS.some(p=>p.id===cur) ? cur : 'deepseek';
+}
+/* 刷新 Key 链接与提示（不触碰 base/model 输入框） */
+function providerAuxUI(){
+  const p=PROVIDERS.find(x=>x.id===sel.value)||PROVIDERS[0];
+  const kl=$('keyLink'), pn=$('providerNote');
+  if(p.keyUrl){ kl.href=p.keyUrl; kl.textContent=t('getKey'); kl.style.display=''; }
+  else kl.style.display='none';
+  if(p.note){ pn.textContent=t(p.note); pn.style.display=''; }
+  else pn.style.display='none';
+}
+sel.addEventListener('change', ()=>{
+  const p=PROVIDERS.find(x=>x.id===sel.value); if(!p) return;
+  if(p.id!=='custom'){ $('base').value=p.base; $('model').value=''; }  /* 模型由用户自填 */
+  providerAuxUI(); save();
+});
+buildProviderOptions();
+/* 恢复上次选择：优先 provider id 记忆；老数据按 base 匹配；都对不上但有自定义 base → 自定义；
+   空配置 → 默认 DeepSeek。修复 v0.9.29 及之前「加载即被第一个预设覆盖」的 bug */
+(function(){
+  let pid=sv.provider;
+  if(!PROVIDERS.some(p=>p.id===pid)){
+    const saved=(sv.base||'').replace(/\/+$/,'');
+    const m=PROVIDERS.find(p=>p.base && p.base===saved);
+    pid = m ? m.id : (saved ? 'custom' : 'deepseek');
+  }
+  sel.value=pid;
+  if(!$('base').value.trim()){ const p=PROVIDERS.find(x=>x.id===pid); if(p&&p.base) $('base').value=p.base; }
+  providerAuxUI();
+})();
+
+/* 测试连接（v0.9.30）：用当前配置发一条最小请求，验证 Base URL / Key / 模型名三件套 */
+$('btnTest').addEventListener('click', async ()=>{
+  const out=$('testOut'), btn=$('btnTest');
+  const base=$('base').value.trim(), key=$('apikey').value.trim(), model=$('model').value.trim();
+  if(!base||!model){ out.style.color='#dc2626'; out.textContent=t('testFail','Base URL / Model'); return; }
+  /* v0.9.124：附加参数必须是 JSON 对象——非法就当场提示（否则会被静默忽略，用户不知道没生效） */
+  const exRaw=String(($('extra')||{}).value||'').trim();
+  if(exRaw){
+    let okObj=false;
+    try{ const eo=JSON.parse(exRaw); okObj=!!eo&&typeof eo==='object'&&!Array.isArray(eo); }catch(e){ okObj=false; }
+    if(!okObj){ out.style.color='#dc2626'; out.textContent=t('errBadJson'); return; }
+  }
+  btn.disabled=true; out.style.color=''; out.textContent=t('testRun');
+  const relaying = relayOn();
+  try{
+    /* v0.9.232：max_tokens 256 与后台「测试连接」一致（v0.9.44）——思考型模型在极小上限下
+       会把 token 全花在 thinking 上，content 直接缺失，会被误判成「模型返回空」。 */
+    const r=await chatOnce(base,key,model,[{role:'user',content:'Reply with exactly: OK'}],20000,undefined,{maxTokens:256});
+    out.style.color='#059669';
+    const echo=String(r||'').trim().replace(/\s+/g,' ').slice(0,24);
+    out.textContent=t('testOk')+(echo?' · '+echo:'');
+  }catch(e){
+    out.style.color='#dc2626';
+    let m=String((e&&e.message)||e).slice(0,140);
+    /* v0.9.232：直连最常见的死因是端点不放行浏览器跨域（CORS 预检被网关吞掉，
+       实测 api.z.ai 即如此），而浏览器只给一句 Failed to fetch，用户无从判断。
+       点明原因 + 给出可执行的下一步；转发也失败时则说明是本站代发同样不通。 */
+    if(/Failed to fetch|NetworkError|Load failed|net::ERR_FAILED/i.test(m)){
+      m = relaying ? t('errRelay', m) : t('errCors');
+    }
+    out.textContent=t('testFail', m);
+  }finally{ btn.disabled=false; }
+});
+
+/* 模式切换显示 */
+function modeUI(){
+  const m=$('mode').value;
+  $('apiBox').style.display = m==='api' ? '' : 'none';
+  $('builtinHint').style.display = m==='builtin' ? '' : 'none';
+  if(m==='builtin') refreshBuiltinHint(); // 刷新状态文案（配置了什么模型/限额）
+}
+$('mode').addEventListener('change', ()=>{ modeUI(); save(); });
+$('mode').dispatchEvent(new Event('change'));
+
+/* ---------------- 界面语言初始化（浏览器语言优先，手动切换后记忆） ---------------- */
+const ulang=$('uiLang');
+UI_LANGS.forEach(pair=>{ const o=document.createElement('option'); o.value=pair[0]; o.textContent=pair[1]; ulang.appendChild(o); });
+/* 语言来源优先级：URL 路径（/en/ 等，SEO 多语言版本）> 用户手动选择过并记忆的语言 > 浏览器语言自动检测 */
+function pathUiLang(){
+  try{
+    /* v0.9.277：工作台的 URL 是 /ja/translate.html 这种带文件名的，原正则只认 /ja/ */
+    const m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)(?:\/(?:translate\.html)?)?$/);
+    if (m && UI_LANGS.some(x=>x[0]===m[1])) return m[1];
+  }catch(e){}
+  return null;
+}
+const pLang = pathUiLang();
+UI.lang = pLang || (sv.langManual && UI_LANGS.some(x=>x[0]===sv.uiLang) ? sv.uiLang : detectUiLang());
+/* v0.9.407：界面字典按语言分片，确定 UI.lang 之后同步取回当前语言那 1~2 片。
+   必须在这一行之后、任何 t() 调用之前 —— 放早了取错语言，放晚了首屏全是键名。 */
+I18NBoot.sync(UI.lang);
+ulang.value=UI.lang;
+ulang.addEventListener('change', ()=>{
+  UI.lang=ulang.value; UI.langManual=true; save();
+  /* 界面语言切换时，若用户从未手动选过目标语言，目标语言跟随切换 */
+  if(!UI.dstManual && LANGS.some(l=>l.v===UI.lang)){
+    $('dstLang').value = UI.lang;
+  }
+  const go = ()=>{
+    applyI18n();
+    /* v0.9.212：数字排版跟随界面语言（万/亿 ↔ K/M/B），切语言后按已取到的值重排一次，
+       不重新请求接口（statsRaw 存的是接口原始数字，与语言无关）。 */
+    if(typeof repaintStats==='function') repaintStats();
+    /* URL 与界面语言保持一致（可分享、可被搜索引擎按语言收录）；仅 http(s) 环境下改写。
+       v0.9.339：新增的 73 种界面语言还没有本地化页面 → 统一回到不带语言段的 /translate.html，
+       否则刷一下就 404。 */
+    if(location.protocol.startsWith('http')){
+      try{
+        /* v0.9.277：本页自带文件名，别把 /ja/translate.html 改写成 /ja/（会跳回落地页） */
+        /* v0.9.410：100 语都有本地化页面了，语言段的拼法统一走 uiHref()
+           —— 以前这里按 UI27 判断，切到 ms 会把地址栏写回 /translate.html，
+              与首页 logo 链接的口径对不上。 */
+        const base = (typeof uiHref==='function') ? uiHref(UI.lang) : '/';
+        const p = base + SELF_PAGE + (location.search||'') + (location.hash||'');
+        history.replaceState(null,'',p);
+      }catch(e){}
+    }
+  };
+  /* v0.9.339：新增语言是独立分片，先取回字典再重绘（否则只显示英文） */
+  if(window.SiteI18N && SiteI18N.loadShard) SiteI18N.loadShard(UI.lang, go); else go();
+});
+
+applyI18n();
+/* v0.9.212：初始化补一次 —— 上面的 applyI18n 是包装前的原始函数（包装在下方 10505 行才生效），
+   而用户上次的「导出字幕样式」可能就是双语（此时该显示双语行宽、并隐藏单语行宽）。 */
+if(typeof syncWrapField==='function') syncWrapField();
+/* v0.9.258：导出格式按钮面板的高亮 —— 必须等上面把 srtTool.expStyle 写回 select 之后再刷，
+   否则用户上次选的双语组合，这次打开会显示成默认的单语被选中。 */
+if(typeof syncFmtPanel==='function') syncFmtPanel();
+/* v0.9.212：启动顶栏累计统计的拉取（打开页面拉一次，之后每 30 分钟一次）。
+   纯附加，读接口失败也不影响其它初始化。 */
+if(typeof startStats==='function') startStats();
+
+/* ================= v0.9.70 两段式界面：首页 ↔ 工作台（纯增量逻辑，不改动上方任何代码） ================= */
+function showView(which){
+  var land=document.getElementById('viewLanding'), ws=document.getElementById('viewWorkspace');
+  if(!land||!ws) return;
+  var target = which==='workspace' ? 'ws' : 'land';
+  var cur = ws.style.display==='flex' ? 'ws' : (land.style.display==='none' ? 'ws' : 'land');
+  land.style.display = target==='ws' ? 'none' : 'block';
+  ws.style.display  = target==='ws' ? 'flex' : 'none';
+  if(cur!==target) window.scrollTo(0,0);
+  if(window.syncLstQueue) window.syncLstQueue();
+  /* v0.9.197：预览的纵向位置按「预览框实测高」算比例，隐藏时拿不到高度（=0）→ 进工作台补算一次 */
+  try{ syncExpPreview(); }catch(e){}
+}
+/* v0.9.104：编辑区上限 = 与左栏齐平（宽屏）。左栏折叠/展开、面板显隐、进度条出现都会改变可用高度，
+   故用 ResizeObserver 跟着重算；窄屏（三列变单列）清掉上限，回落到 CSS 里的视口上限。 */
+function syncListHeight(){
+  var lst=document.querySelector('.lst'); if(!lst) return;
+  if(window.innerWidth<=1080){ lst.style.removeProperty('--lstMax'); return; }
+  var center=lst.parentElement, main=document.querySelector('.main');
+  var left=main&&main.querySelector('aside.panel');
+  if(!center||!left) return;
+  var avail=left.offsetHeight-(lst.offsetTop-center.offsetTop);
+  lst.style.setProperty('--lstMax',(avail>280?avail:280)+'px');
+}
+(function(){
+  var queued=false;
+  function queue(){
+    if(queued) return; queued=true;
+    requestAnimationFrame(function(){ queued=false; syncListHeight(); });
+  }
+  window.syncLstQueue=queue;
+  window.addEventListener('resize',queue);
+  window.addEventListener('load',queue);
+  queue();
+  if(window.ResizeObserver){
+    var ro=new ResizeObserver(queue), main=document.querySelector('.main');
+    var l=main&&main.querySelector('aside.panel'); if(l) ro.observe(l);
+    var pw=document.getElementById('progWrap'); if(pw) ro.observe(pw);
+    var mt=document.querySelector('.metrics'); if(mt) ro.observe(mt);
+  }
+})();
+/* 悬停解释跟随界面语言：applyI18n 不认识 data-tip-i18n，这里包一层补上 */
+function applyTipI18n(){
+  document.querySelectorAll('[data-tip-i18n]').forEach(function(el){
+    el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
+  });
+}
+(function(){
+  var origApply = applyI18n;
+  applyI18n = function(){
+    origApply();
+    applyTipI18n();
+    /* v0.9.202：行宽说明文案按当前模式取（wrapTip / wrapTipBi），
+       必须在 origApply 之后重设 —— 否则切语言会被 data-i18n 覆盖回单语那条。 */
+    if(typeof syncWrapField==='function') syncWrapField();
+    var u2=document.getElementById('uiLang2');
+    if(u2) u2.value=UI.lang;
+    if(typeof updateProjChip==='function') updateProjChip();
+  };
+})();
+/* 工作台顶栏：返回首页 / 随时上传新字幕 */
+document.getElementById('btnBackHome').addEventListener('click', function(){ location.href='/'; });
+document.getElementById('btnUploadNew').addEventListener('click', function(){ $('file').click(); });
+/* 首页上传区：点击选文件 + 键盘可达 + 拖拽投放 */
+(function(){
+  var dz=document.getElementById('dropzone');
+  if(!dz) return;
+  dz.addEventListener('click', function(){ $('file').click(); });
+  dz.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('file').click(); } });
+  dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag');
+    var f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ setSrc(String(rd.result||''), f.name); };
+    rd.readAsText(f,'utf-8');
+  });
+})();
+/* 首页备选入口：粘贴文本 → 工作台聚焦粘贴框；载入示例 → 走 btnDemo 原逻辑 */
+var ap=$('altPaste'), ad=$('altDemo');
+if (ap) ap.addEventListener('click', function(){ showView('workspace'); setTimeout(function(){ $('paste').focus(); }, 60); });
+if (ad) ad.addEventListener('click', function(){ $('btnDemo').click(); });
+/* 首页导航的语言镜像选择器：与工作台 uiLang 双向同步 */
+(function(){
+  var u2=document.getElementById('uiLang2');
+  if(!u2) return;
+  UI_LANGS.forEach(function(pair){ var o=document.createElement('option'); o.value=pair[0]; o.textContent=pair[1]; u2.appendChild(o); });
+  u2.value=UI.lang;
+  u2.addEventListener('change', function(){
+    var main=$('uiLang'); main.value=u2.value;
+    main.dispatchEvent(new Event('change'));
+  });
+})();
+/* 顶栏项目名：文件名 → 目标语言 */
+function updateProjChip(){
+  var el=document.getElementById('projName'); if(!el) return;
+  el.textContent = S.fileBase ? (S.fileBase+' → '+(LBY($('dstLang').value).zh||'')) : t('projEmpty');
+}
+/* 导入成功自动进入工作台（包装 setSrc，原函数不动） */
+(function(){
+  var origSetSrc = setSrc;
+  setSrc = function(text, fileName){ origSetSrc(text, fileName); showView('workspace'); updateProjChip(); };
+})();
+$('dstLang').addEventListener('change', updateProjChip);
+/* v0.9.277：本页就是工作台，没有首页那一半。
+   showView 依赖 viewLanding 存在（不存在时会直接 return），所以这里自己展开。 */
+(function(){ var ws=document.getElementById('viewWorkspace'); if(ws) ws.style.display='flex'; })();
+/* v0.9.277：本页 <title> 用 wsDocTitle —— applyI18n 里那句通用的 document.title = t('docTitle')
+   会把 server.js 注入的本页 SEO 标题盖成首页那句。这里在它跑完之后补回来。 */
+(function(){
+  var orig = applyI18n;
+  /* v0.9.407：字典分片没到时 t() 会返回键名，别把「wsDocTitle」写成页面标题 —— 
+     此时保留服务端渲染好的 SEO 标题（BASE_TITLE 就是它）。 */
+  applyI18n = function(){ orig(); var _t=t('wsDocTitle'); if(_t!=='wsDocTitle') document.title = _t; };
+  applyI18n();
+})();
+applyTipI18n();
+/* v0.9.171：打开页面就补一次保存的术语。此前只有传新片才回填，重新打开网页时框里是什么
+   全看上次剩下什么——特意保存的术语同样看不见。
+   ⚠️ 必须放在初始化最末尾：实测放在术语区初始化那段（glossLibUI 附近）时调用会静默失败，
+   那里的依赖还没齐备；挪到所有初始化跑完之后才稳定生效。
+   silent：语言对不上只写一行日志说明原因，绝不开屏弹窗。 */
+try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e){ console.error('[glossLibRestore]', e); }); }catch(e){ console.error('[glossLibRestore]', e); }

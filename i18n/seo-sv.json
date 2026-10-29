@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Ljud till undertexter — skapa SRT i webbläsaren | AI-SRTSub",
-    "desc": "Konvertera tal till undertexter direkt i webbläsaren. AI-SRTSub skapar SRT- och VTT-filer lokalt utan uppladdning. Gratis och säkert.",
-    "kw": "ljud till srt,tal till undertext,generera undertexter,automatisk undertextgenerator,transkribera ljud till srt,whisper undertexter,webbläsarbaserad taligenkänning,offline undertextning",
-    "intro": "Ladda upp en ljud- eller videofil, välj språk och modell så körs taligenkänningen direkt i din webbläsare. Resultatet är ett utkast med tidskoder, färdigt uppdelat i meningar.",
-    "feat": "Verktyget bearbetar talströmmen genom att dela upp texten vid naturliga pauser, anpassa radlängden efter skriftsystemet och säkerställa korrekt läshastighet utan överlappande tidskoder.",
-    "who": "Innehållsskapare som textar egna videor, team som transkriberar poddar och kurser, samt användare som behöver ett redigerbart undertextutkast."
-  },
-  "ocrsub": {
-    "title": "OCR för inbrända undertexter — läs text från video | AI-SRTSub",
-    "desc": "Extrahera inbrända undertexter från video med OCR. Markera textområdet, läs bildruta för bildruta och exportera till SRT eller VTT. Gratis.",
-    "kw": "extrahera inbrända undertexter,undertext ocr,video undertext extrahering,inbrända undertexter,ocr undertexter från video,video till srt,undertext från video,ocr för inbränd text",
-    "intro": "Ladda upp en video, markera området där undertexterna visas och låt verktyget läsa bildruta för bildruta för att slå samman identiska ramar till tidsatta undertexter.",
-    "feat": "Genom att isolera textremsan och använda tröskelvärden för ljusstyrka omvandlas inbränd text till redigerbara SRT- eller VTT-filer med automatisk tidsinställning.",
-    "who": "Undertextteam som lokaliserar utländska videor, personer som textar om äldre utgåvor och redigerare som saknar originalfilen för undertexter."
-  }
+ "autosub": {
+  "title": "Ljud till undertexter — skapa SRT i webbläsaren | AI-SRTSub",
+  "desc": "Konvertera tal till undertexter direkt i webbläsaren. AI-SRTSub skapar SRT- och VTT-filer lokalt utan uppladdning. Gratis och säkert.",
+  "kw": "ljud till srt,tal till undertext,generera undertexter,automatisk undertextgenerator,transkribera ljud till srt,whisper undertexter,webbläsarbaserad taligenkänning,offline undertextning",
+  "intro": "Ladda upp en ljud- eller videofil, välj språk och modell så körs taligenkänningen direkt i din webbläsare. Resultatet är ett utkast med tidskoder, färdigt uppdelat i meningar.",
+  "feat": "Verktyget bearbetar talströmmen genom att dela upp texten vid naturliga pauser, anpassa radlängden efter skriftsystemet och säkerställa korrekt läshastighet utan överlappande tidskoder.",
+  "who": "Innehållsskapare som textar egna videor, team som transkriberar poddar och kurser, samt användare som behöver ett redigerbart undertextutkast."
+ },
+ "ocrsub": {
+  "title": "OCR för inbrända undertexter — läs text från video | AI-SRTSub",
+  "desc": "Extrahera inbrända undertexter från video med OCR. Markera textområdet, läs bildruta för bildruta och exportera till SRT eller VTT. Gratis.",
+  "kw": "extrahera inbrända undertexter,undertext ocr,video undertext extrahering,inbrända undertexter,ocr undertexter från video,video till srt,undertext från video,ocr för inbränd text",
+  "intro": "Ladda upp en video, markera området där undertexterna visas och låt verktyget läsa bildruta för bildruta för att slå samman identiska ramar till tidsatta undertexter.",
+  "feat": "Genom att isolera textremsan och använda tröskelvärden för ljusstyrka omvandlas inbränd text till redigerbara SRT- eller VTT-filer med automatisk tidsinställning.",
+  "who": "Undertextteam som lokaliserar utländska videor, personer som textar om äldre utgåvor och redigerare som saknar originalfilen för undertexter."
+ },
+ "multilang": {
+  "title": "Flera språk samtidigt — översätt en hel säsong | AI-SRTSub",
+  "desc": "Släpp en hel säsong, kryssa för språken du behöver och tryck start. Avsnitt och språk bildar en enda kö som körs efter varandra; resultatet packas i en zip. Återupptar där den slutade och stannar när du stänger fliken.",
+  "kw": "partiöversättning undertexter,översätt undertexter flera språk,flerspråkiga undertexter,undertexter hela säsongen,exportera undertexter batch,översätt srt till många språk,en säsong många språk",
+  "intro": "Släpp in en hel säsong på en gång, kryssa för målspråken och tryck på start. Avsnitt gånger språk blir en enda kö: varje språk körs till slutet innan nästa börjar, och allt paketeras i en enda zip-fil.",
+  "feat": "Det som brukar gå fel vid massöversättning är samtidighet. Tjugo avsnitt gånger fem språk som skickas samtidigt blir hundratals förfrågningar som landar samtidigt, vilket i tysthet slår ut serverkön – tidiga och sena anrop blandas och ingen kan säga vilken cell som faktiskt blev klar. Därför körs denna sida medvetet som en enda kö: ett parti i taget, ett språk i taget tills det är klart. Framstegen sparas per avsnitt och språk på din maskin, så om det bryts vid avsnitt tre öppnar du sidan igen, laddar samma filer och den fortsätter vid det partiet utan att skicka det som redan är klart. Det som avslöjar en säsong är namn: översätt tjugo avsnitt separat och samma karaktär stavas på tre olika sätt. Det är därför ordlistan är en egen panel här – ladda upp en gång, delas av hela säsongen – och den talar om hur många poster som faktiskt matchade innan du börjar. Stäng fliken och uppgiften stannar omedelbart i stället för att bränna kvot i bakgrunden.",
+  "who": "Undertextningsteam som textar en hel säsong till flera språk, kanaler som distribuerar samma sats av avsnitt till olika marknader, och enskilda översättare som hellre trycker på start en gång och kommer tillbaka senare.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ }
 }

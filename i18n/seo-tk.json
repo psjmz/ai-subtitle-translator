@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "tk",
-    "ogLocale": "tk_TM",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Global Kino we Seriallar, Türkmen Diliňizdäki Subtitrler",
-    "desc": "Mugt AI subtitr terjimeçisi — hasaba durmak ýok, çäklenmeler ýok, filmleriň we seriallaryň subtitrlerini öz diliňize terjime ediň.",
-    "kw": "AI subtitr terjimeçisi,subtitr terjime etmek,mugt subtitr terjimeçisi,SRT faýlyny terjime etmek,VTT terjime etmek,ASS terjime etmek,kino subtitr terjime etmek,serial subtitrleri,Netflix subtitrleri,KDrama subtitrleri,anime subtitrleri,iki dilli subtitrler,daşary ýurt film subtitrleri,onlaýn subtitr terjime etmek,YouTube subtitrleri,mugt subtitr terjime guraly,subtitrleri mugt terjime etmek,mugt SRT terjimeçisi",
-    "ogTitle": "AI-SRTSub - Global Kino we Seriallar, Türkmen Diliňizdäki Subtitrler",
-    "ogDesc": "Film janköýerleri üçin 100% mugt AI subtitr terjimeçisi: daşary ýurt film, serial we dokumental filmleriň subtitrlerini awtomatiki wagt sinhronizasiýasy bilen terjime ediň.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Film janköýerleri üçin 100% mugt AI subtitr terjimeçisi: daşary ýurt film, serial we dokumental filmleriň subtitrlerini awtomatiki wagt sinhronizasiýasy bilen terjime ediň.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Bu gural hakynda\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Mugt AI Awtomatik Subtitr Terjimeçisi</h2>\n    <p data-i18n-html=\"seoIntro\">Bu uly dil modelleri bilen işleýän <strong>mugt onlaýn subtitr terjime guraly</strong>. SRT, VTT ýa-da ASS faýllaryny ýükläň we iňlis, hytaý, ýapon, koreý, ispaniýa, fransuz we 15+ beýleki diller arasynda subtitrleri terjime ediň. Hasaba durmak ýok, gurnamak ýok, filigran ýok — brauzerde açyň we terjime edip başlaň.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Esasy aýratynlyklar:</strong> SRT, VTT we ASS derňewi hem-de AI terjimesi, akylly sözlem birikdirmesi, wagt sinhronizasiýasy, awtomatiki setir bölme, dolduryjy sözleri aýratynlaşdyrmak, ýörite terminologiýa dolandyryşy we sazlanylýan terjime stilleri.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kimler peýdalanýar:</strong> wideo terjimeçiler, YouTube döredijileri we lokalizatorlar, diller öwrenijiler, wideo mazmunyny çalt lokalizasiýa etmeli toparlar.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Bu gural JavaScript talap edýär. AI bilen mugt subtitr terjime etmek üçin brauzeriňizde JavaScript-i işledip, subtitr faýlyny (SRT / VTT / ASS) ýüklediň.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Stilizirlenen Subtitr Ýasawçy - Iki Dilli, ASS we VTT Effektlerini Birikdir",
-    "desc": "Stilizirlenen subtitrler üçin mugt gural: iki faýly iki dilli edip birikdiriň, iki dilli treki täzeden stilizirläň ýa-da effekt goşuň. 5 ASS / 6 VTT nusgasy; SRT / VTT / ASS görnüşinde eksport ediň.",
-    "kw": "subtitrleri birikdirmek,iki dilli subtitrler,subtitr faýllaryny birikdirmek,stilizirlenen subtitrler,ASS subtitr stilleri,VTT subtitr stilleri,subtitr effektleri,iki dilli subtitr ýasawçy,ASS nusgalary,subtitr şablony,mugt subtitr guraly",
-    "intro": "Iki sany subtitr faýlyny iki dilli edip birikdiriň ýa-da treki stilizirläň: şrift, reňk, çyzyk we pozisiýa, hemmesi göni synag arkaly.",
-    "feat": "Iki dilli birikdiriş we sazlaýyş, ASS / VTT stil şablonlary, wagt düzedişleri we eksport ediljek faýlyň hut özü bolan göni synag.",
-    "who": "Iki dilli ýa-da stilizirlenen subtitrleri döredýän döredijiler, kodirleme toparlary we elýeterli titrleri talap edýän toparlar."
-  },
-  "clean": {
-    "title": "Subtitr Arassalaýjy - Suw nyşanlaryny, SDH we HTML teglerini aýryň",
-    "desc": "Mugt onlaýn subtitr arassalaýjy: suw nyşanlaryny, jarmanalary, SDH, HTML teglerini, ASS effektlerini aýryň; baş harp ýalňyşlyklaryny düzediň. 13 düzgün.",
-    "kw": "subtitr arassalaýjy,srt faýlyny arassalamak,subtitr suw nyşanyny aýrmak,SDH subtitrlerini aýrmak,subtitrlerden HTML teglerini aýrmak,baş harpdaky subtitrleri düzeltmek,mojibake düzeltmek,eşidişinde näsazlygy bolanlaryň subtitrlerini aýrmak,ASS effektlerini aýrmak",
-    "intro": "Göçürilip alnan subtitri ilki bu ýerden geçiriň: suw nyşanlary, jarmanalar, SDH we HTML tegleri bir gezekde aýrylýar.",
-    "feat": "Dört topar boýunça 13 düzgün (9-y adaty ýagdaýda işleýär), suw nyşany we SDH aýrylyşy, baş harplary we mojibake düzedişleri, her bir subtitr boýunça üýtgeşmeler sanawy we wagt hiç wagt üýtgemez.",
-    "who": "Ýüklenen subtitrlere arassa we ulanylyşa taýýar ýagdaý bermek isleýänleriň hemmesi."
-  },
-  "glossary": {
-    "title": "Toparlaýyn Subtitr Termin Çalyşmasy - Bir Glossariý, Bütin Faýl | AI-SRTSub",
-    "desc": "Subtitrler üçin glossariý çalşygy: \"köne -> täze\" düzgünini ýazyň we bütin SRT / VTT / ASS / TXT faýly täzelensin. Wagt üýtgemez.",
-    "kw": "subtitr glossariýsi,srt toparlaýyn çalyşmak,subtitr gözlemek we çalyşmak,subtitr terminini çalyşmak,srt toparlaýyn düzediş,subtitrlerde sözleri çalyşmak,subtitr atlaryny birleşdirmek,subtitr terminologiýasy,vtt tekstini çalyşmak,glossariý srt guraly,toparlaýyn terminologiýa çalyşmasy",
-    "intro": "Bütin subtitr faýly boýunça ýeke gezek ulanylýan \"köne term -> täze term\" glossariýsi, wagt we ASS stilleri üýtgewsiz galýar.",
-    "feat": "Her setirde bir düzgün, -> , => , → ýa-da tab bilen bölünýär; # bilen başlaýan setirler teswirlerdir. Bütin söz gabat gelmesi \"start\" sözünden \"art\" sözüni aýratyn saklaýar, harp uly-kiçiligi meýletin we çalyşmany iki dilli subtitrleriň 1-nji ýa-da 2-nji setirine çäklendirip bilersiňiz. Üýtgän her bir subtitr sanawda görkezilýär we islendiklerini yzyna getirip bolýar.",
-    "who": "Bir möwsüm boýunça atlary we terminologiýany birmeňzeş edýänler, maşyn terjimesini düzedýänler ýa-da öz stilini ulanýanlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Subtitle QC - Dil Boýunça Wagt we Düzen Barlagy | AI-SRTSub",
-    "desc": "Mugt onlaýn subtitr QC: SRT, VTT ýa-da ASS ýükläň we üst-üste düşmeleri, dowamlylygy, okaýyş tizligini, setir giňligini we beýleki düzgünleri barlaň. 27 dil, 27 çäk topary.",
-    "kw": "subtitr barlagçy,subtitr qc,srt barlaýjy,subtitr hil barlagy,srt barlamak,subtitr wagt barlagy,subtitr ýerine ýetiriji,srt faýly barlamak,subtitr korektura,subtitr linteri",
-    "intro": "Subtitr faýlyny ýükläň we öz diliniň düzgünleri esasynda barlaň - her bir tapyndy ölçelen bahasy we çägi bilen görkezilýär. Brauzeriňizde işleýär, hiç zat ýüklenmeýär.",
-    "feat": "Üst-üste düşýän subtitrleri, ekranda gysga ýa-da uzak galýanlary, okaýyş tizligini, setir giňligini barlaň. Avtomatiki düzeldilip bilinýän zatlar aýratyn sanalýar.",
-    "who": "Subtitr toparlary, lokalizasiýa satyjylary, redaktorlar we eltip bermezden ozal faýly barlamak isleýänleriň hemmesi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Subtitle Terjimeçisi — SRT/VTT/ASS Diliňize Terjime Edilýär",
-    "desc": "SRT / VTT / ASS faýlyny taşlaň, maksat dili saýlaň we wagt kilidi bilen terjime alyň. 100 dil, mugt, hasaba durmak ýok."
-  },
-  "convert": {
-    "title": "Subtitr Öwüriji - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Mugt onlaýn subtitr öwüriji: wagt bütewiligini saklap, SRT, VTT, ASS, SBV, LRC we TXT arasynda öwürň, ASS effekt tegleri awtomatiki arassalanýar.",
-    "kw": "subtitr öwüriji,srt-den vtt-ä,vtt-den srt-ä,ass-den srt-ä,sbv-den srt-ä,srt-den lrc-ä,subtitr txt-e,subtitrleri öwür,srt öwüriji,vtt öwüriji",
-    "intro": "Wagt bütewiligini saklap, SRT, VTT, ASS, SBV, LRC we TXT arasynda öwürň.",
-    "feat": "Giriziş formaty awtomatiki ýüze çykarylýar we wagt belgileri maksat format üçin täzeden ýazylýar; ASS effekt tegleri we mejbury setir bölmeler adaty tekste öwrülýär.",
-    "who": "Oýunçysy subtitr faýlyny kabul etmeýänleriň we materiallary redaktor bilen onlaýn oýunçy arasynda geçirýänleriň hemmesi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Ikidilli Subtitr Bölüji - Diňe Bir Dili Saklaň | AI-SRTSub",
-    "desc": "Mugt onlaýn ikidilli subtitr bölüji: ikidilli subtitr faýlyny asyl we terjime edilen trekli ikä bölüň ýa-da diňe birini saklaň.",
-    "kw": "ikidilli subtitr bölüji,ikidilli srt bölmek,ikinji dilli subtitri aýrmak,diňe iňlis subtitri saklamak,terjime edilen subtitri çykarmak,srt ikidilli bölüş,ass ikidilli bölüş",
-    "intro": "Ikidilli subtitr faýlyny asyl trek we terjime edilen trek edip bölüň ýa-da diňe birini saklaň.",
-    "feat": "Iki sany umumy ýerleşişi işleýär - bir subtitrde iki setir bolmagy we iki subtitrin şol bir wagty paýlaşmagy.",
-    "who": "Taýýar ikidilli faýly alyp, diňe bir dili ulanmak isleýänleriň hemmesi we asyl nusgasy bilen terjimesini aýratyn arhiwleýän subtitr toparlary.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Subtitr Wagt Süyşürmesi - Süýşür, Masshtablaşdyr, Birikdir we Böl | AI-SRTSub",
-    "desc": "Mugt onlaýn subtitr wagt guraly: ähli zady bir wagtda süýşüriň, masshtablaşdyryň ýa-da iki sany daýanç nokady bilen gabatlaşdyryň. SRT, VTT, ASS, SBV, LRC we TXT goldaýar.",
-    "kw": "subtitr wagt süýşürmesi,srt wagtyny süýşürmek,subtitr sinhronizasiýa sazlamasy,subtitr wagtyny masshtablaşdyrmak,subtitr gijä galmasyny düzetmek,srt wagt gyşarmasy,subtitr gyşarmasyny düzetmek,subtitrleri birikdirmek,subtitrleri bölmek,srt birikdirmek,uzyn subtitri bölmek",
-    "intro": "Subtitrler sinhronizasiýadan çykanda, bütin wagty süýşüriň, masshtablaşdyryň ýa-da iki daýanç nokady bilen düzediň. Ol bölünen setirleri birikdirip hem biler.",
-    "feat": "Süýşürmek her bir subtitriň ekranda galýan wagtyny üýtgetmän hereketlendirýär. Masshtablaşdyrmak iki tarapyny hem köpeldýär, şonuň üçin subtitriň dowamlylygy şoňa görä üýtgeýär - 24 we 25 fps arasynda peýdalydyr. Iki nokatly düzediş hem süýşmek, hem-de nädogry tizlik bilen işleýän faýllary işleýär. Negatiw çykan wagtlar nola çenli çäklendirilýär we gural size näçesiniň täsir edendigini aýdýar. Giriş hili nähili bolsa, çykyş hili hem şol - hiç hili öwrüliş ýok we ASS stilleri, setir boýunça stil beriş we effekt tegleri asyl ýagdaýynda saklanýar. Ikidilli subtitrler birikdirilende iki setirde galýar we bölnende geçirilýär.",
-    "who": "Subtitrleri çeşme üýtgeýşinden soň gyşaranlaryň, çalt ýa-da haýal işleýänleriň ýa-da başga kadada işleýänleriň materiallaryny ulanýanlaryň hemmesi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Bozuk Subtitrleri Düzet - Mojibake / Nädogry Kodlamany Düzet | AI-SRTSub",
-    "desc": "Bozuk subtitrler üçin mugt onlaýn düzediş: faýlyň UTF-8, GBK, Big5, Shift_JIS ýa-da EUC-KR-digini ýüze çykarýar, nädogry okalan teksti dikeldýär, oýunçyňyz üçin täzeden ýatda saklaýar.",
-    "kw": "bozuk subtitrleri düzetmek,subtitr mojibake,srt kodlama düzedişi,subtitr kodlamasyny düzetmek,utf8-den gbk subtitre,srt geň simwollary görkezýär,subtitr nädogry kodlama,ass bozuk,vtt bozuk,subtitr kodlamasyny ýüze çykarmak",
-    "intro": "Düşnüksiz sözler diwary bolup açylýan subtitrler köplenç nädogry kodlama bilen okalýar. Faýly taşlaň we ol haýsy kodlama bilen ýazylandygyny tapyp, nädogry okalan simwollary yzyna getirýär.",
-    "feat": "Ýüklenen faýllar asyl baýtlardan täzeden koddan çykarylýar, şonuň üçin hiç zat ýitirilmeýär: eger faýl GBK bolup çyksa, şeýle diýýär we eger oýunçyňyz ony nädogry okaýan bolsa, göçürmäni \"BOM bilen UTF-8\" hökmünde saklamak adatça ony çözýär. Setir belgileri we wagt belgileri hiç wagt üýtgemez, ASS stil tegleri bolsa asyl ýagdaýynda galdyrylyr.",
-    "who": "Müşderilerden ýa-da başga ýerden nädogry kodlamaly subtitr alan we olary düzetmek isleýänleriň hemmesi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Subtitrlerden Tekst Çykaryň - SRT/ASS/VTT Adaty Tekste | AI-SRTSub",
-    "desc": "Mugt onlaýn subtitr-tekst çykaryjy: SRT, VTT, ASS, SBV, LRC we TXT okaýar, wagt belgilerini we setir belgilerini aýyrýar, arassa dialogy abzaslar ýa-da her subtitr üçin bir setir hökmünde çykarýar.",
-    "kw": "subtitrlerden tekst çykarmak,subtitrerden tekste,srt-den txt-ä,srt adaty tekst,ass-den txt-ä,vtt-den txt-ä,subtitr transkripti,srt-den dialog çykarmak,srt wagt belgilerini aýrmak,subtitr tekst çykaryjy",
-    "intro": "SRT / VTT / ASS / SBV / LRC / TXT subtitrlerinden dialoglary arassa adaty tekst hökmünde çykaryň: wagt belgileri, subtitr belgileri we stil tegleri awtomatiki aýrylýar.",
-    "feat": "Iki sany ýerleşiş:arakesmelerde we sözlem ahyrynda bölünen dowamly abzaslar ýa-da dialog sanawy üçin her subtitr boýunça bir setir. Ses subtitrleri, çeşme suw nyşanlary we gaýtalanýan setirler adaty ýagdaýda aýrylýar; \"TOM:\" ýaly gürleýji atlary we aýdym setirleri saklanylyp ýa-da aýrylyp bilner.",
-    "who": "Ýazgylar, ssenariýler, terjime tejribesi ýa-da başga bir gural üçin subtitr teksti isleýän, ýüzlerçe wagt belgisini el bilen pozmak islemeýänleriň hemmesi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "MKV / MP4 Faýllaryndan Gurlan Subtitrleri SRT-ä Çykaryň | AI-SRTSub",
-    "desc": "MKV, WebM, MP4, MOV içinden gurlan subtitrleri çykaryň; SRT / VTT / ASS / TXT görnüşinde eksport ediň. Ýükleme ýa-da täzeden kodlama ýok — faýllar brauzeriňizde okalýar.",
-    "kw": "gurlan subtitrleri çykarmak,mkv-den srt-ä,mp4 subtitr çykarmak,wideodan subtitrleri çykarmak,gurlan subtitr çykaryjy,mkv-den srt,mov subtitr çykarmak,subtitr trek eksporty,mkv-den vtt,ýumşak subtitrleri çykarmak,mkv subtitr alyjy",
-    "intro": "MKV ýa-da MP4 içinde ýerleşdirilen subtitr treki göni SRT-ä çykaryň — ýükleme ýok, hemmesi brauzeriňizde bolup geçýär.",
-    "feat": "Adaty tekst, ASS, WebVTT we mov_text / tx3g trektreri okaýar, asyl ASS ýokarky bölegini we resolution saklaýar, uly faýl hi̇ç wagt ýady doldurmaz ýaly bölekleýin okaýar.",
-    "who": "Ýumşak subtitrleri bolan filmi bar bolan we teksti çykarmak isleýänleriň hemmesi, kodirleme toparlary we asyl trekden başlaýan toparlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Hytaý Subtitr Öwüriji - Ýönekeýleşdirilen ⇄ Däp bolan | AI-SRTSub",
-    "desc": "Mugt hytaý subtitr öwüriji: Ýönekeýleşdirilen ⇄ Däp bolan (Taýwan / Gonkong) we yzyna. Diňe dialog üýtgeýär — wagt belgileri we ASS tegleri galýar. OpenCC esasynda gurlan.",
-    "kw": "hytaý subtitr öwüriji,ýönekeýleşdirilenden däp bolana,däp bolandan ýönekeýleşdirilene,srt däp bolan hytaý,subtitr hytaý öwür,taýwan däp bolan hytaý,gonkong däp bolan hytaý,han öwrülişi,srt-ni däp bolan hytaý diline öwür,ýönekeýleşdirilen hytaý srt,opencc subtitr",
-    "intro": "Bütin subtitr faýlyny Ýönekeýleşdirilen we Däp bolan görnüşleriň arasynda öwürň, dialogdan başga hiç zady üýtgetmezden.",
-    "feat": "Dokuz ugra çenli: umumy Däp bolan, Taýwan sözlük qatnaşygy, Gonkong, Ýönekeýleşdirilene yzyna.",
-    "who": "Taýwan ýa-da Gonkong auditoriýasyna subtitr hödürleýänleriň hemmesi, sebit wersiýalaryny taýýarlaýan paýlaýjylar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Subtitr Bölüji we Birikdiriji - SRT / VTT | AI-SRTSub",
-    "desc": "Subtitrleri dowamlylygy ýa-da sany boýunça bölüň, ýa-da köp faýllary tertip boýunça birikdiriň. Nomerleme awtomatiki, dialog üýtgewsiz. SRT & VTT.",
-    "kw": "subtitr bölüji,subtitrleri bölmek,srt faýllaryny birikdirmek,srt birikdiriji,subtitrleri birleşdirmek,srt böl,srt faýllaryny birikdir,subtitrleri kesmek,vtt böl,subtitr birikdiriji",
-    "intro": "Uzyn subtitri böleklere kesiň ýa-da köp faýllary birine birikdiriň. Doly brauzeriňizde işleýär — hiç zat ýüklenmeýär.",
-    "feat": "Dowamlylyk ýa-da sany boýunça böleklere bölüň, täzeden nomerleme we noldan başlaýan wagt bilen; tertipli birikdiriň. SRT we VTT.",
-    "who": "Epizodlary ýüklemek üçin bölýän döredijiler, bölekleýin barlaýan toparlar we köp bölekli subtitrleri birikdirýän redaktorlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Subtitrleri Excel/CSV-ä we Yzyna Öwür | AI-SRTSub",
-    "desc": "SRT ýa-da VTT faýlyny barlamak we terjime etmek üçin Excel ýa-da CSV tablisasyna öwürň, soňra yzyna getiriň. Wagt belgileri doly saklanýar. Hiç zat ýüklenmeýär.",
-    "kw": "subtitrleri excel-e,srt-den csv-ä,srt-den excel-e,excel-den srt-ä,csv-den srt-ä,subtitr tablisasy,subtitr öwüriji tablisasy",
-    "intro": "Barlamak we terjime etmek üçin subtitrleri tablisä eksport ediň, soňra tablisany yzyna import ediň. Brauzeriňizde doly işleýär.",
-    "feat": "SRT ýa-da VTT-den xlsx ýa-da CSV-ä bir gezek basmak bilen öwürň; tablisada wagty, teksti we bellikleri redaktirläň.",
-    "who": "Tablisada subtitrleri barlaýan, bellik edýän ýa-da toparlaýyn düzedýän terjimeçiler we fansub toparlary.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Toparlaýyn Subtitrleri SRT/VTT-ä Öwür | AI-SRTSub",
-    "desc": "Onlarça ýa-da ýüzlerçe SRT/VTT faýlyny taşlaň, olary bir formate öwürň we bir ZIP ýükläp alyň. Nomerleme we wagt belgileri kadalaşdyrylýar.",
-    "kw": "toparlaýyn subtitr öwüriji,srt-den vtt-ä,toparlaýyn subtitr öwüriji,köpçülikleýin srt,birnäçe subtitri öwür,subtitr zip",
-    "intro": "Ýüzlerçe subtitr faýlyny süýräp getiriň, olary öwürň we bir ZIP ýükläp alyň. Brauzeriňizde doly işleýär.",
-    "feat": "SRT-den VTT-ä we tersine toparlaýyn öwrüliş; yzygiderli sanlar täzeden tertipleşdirilýär we wagt belgileri kadalaşdyrylýar.",
-    "who": "Bütin seriýa papkalaryny öwürýän redaktorlar we subtitrciler.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "LRC Aýdym Sözi Redaktory - Diňläkäň Wagt Belgiň | AI-SRTSub",
-    "desc": "Aýdymy ýükläň, aýdym sözlerini goýuň we diňläkäň her setiriň wagtyny belläň; LRC ýa-da SRT eksport ediň. Klaviatura bilen dolandyrylýar.",
-    "kw": "onlaýn lrc redaktory,lrc ýasamak,aýdym sözi wagty,lrc dörediji,lrc döretmek,aýdym synxronizatory,lrc-den srt-ä",
-    "intro": "Aýdymy ýükläň, aýdym sözlerini goýuň, diňläkäň setirme-setir wagty belläň we LRC ýa-da SRT eksport ediň. Hiç zat ýüklenmeýär.",
-    "feat": "MP3, M4A, FLAC, WAV we OGG goldaýar. Her setir üçin bir hatar; bar bolan LRC faýllary import edilip bilner.",
-    "who": "Kower aýdymlary synxronizasiýa edýän sazandalar we wideo üçin aýdym goşýan döredijiler.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "YouTube subtitrlerini düzeldiji gural - Bölünen sözlemleri birleşdiriň | AI-SRTSub",
-    "desc": "YouTube awto-titrleri sözlemleri 3-4 sekundda kesýär. Bu gural sözleri üýtgetmän, araçäkleri dogry ýere getirýär. Mugt, 100 dilde.",
-    "kw": "youtube subtitr düzetmek,youtube awtomatiki subtitrler,subtitrleri deňlemek,sözlem boýunça subtitr,döwük subtitrleri düzetmek,srt sözlem deňleýiş,subtitrleri täzeden bölmek,youtube subtitr abatlaýyş,sözlem esasly subtitrler",
-    "intro": "YouTube-da awtomatiki döredilen subtitr faýlyny goýuň, dili saýlaň we gural sözlemleri birleşdirip, täzeden kesip çyksyn. Hiç bir söz üýtgedilmeýär we wagt çäkleri asylky wagt belgilerine mümkin boldugyça ýakyn galýar.",
-    "feat": "YouTube awtomatiki subtitrleri sözlemleriň gutarýan ýerine seretmän 3-4 sekuntlyk böleklere bölünýär. Gural asylky wagt belgilerini esas edinip, sözlemiň nirede gutarýandygyny kesgitleýär we iň amatly bölek nokadyny saýlaýar. 100 diliň her biriniň öz düzgünleri bar: hytaý we ýapon dillerinde söz arasynda boşluk ýok, taý dilinde söz çäkleri belli däl, hindi dilinde . bilen, arap dilinde ؟ , ermeni dilinde ։ bilen gutarýar. Setir giňligi we okaýyş tizligi ýazuw ulgamyna baglydyr - hytaý dili üçin 16 harp, latyn elipbiýi üçin 42 harp. Eksportdan öň tekst harpma-harp deňeşdirilýär we ýitirilen ýa-da goşulan sözler derrew görkezilýär.",
-    "who": "YouTube, podkast we okuw kurslarynyň awtomatiki subtitrlerini taýýar subtitrlere öwürýän toparlar we ýarym ýolda kesilýän sözlemlerden ýadayan wideorežissýorlar üçin.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio-dan subtitrler — brauzeriňizde SRT dörediň | AI-SRTSub",
-    "desc": "Audio ýa-da wideo faýlyňyzy SRT/VTT formatyna öwüriň. AI-SRTSub brauzeriňizde işleýär, hiç zat ýüklemeýär we mugt.",
-    "kw": "audio-dan srt,sesi subtitre öwürmek,awtomatik subtitr generator,sesi tekstlemek,whisper subtitrleri,brauzer ses tanama,offline subtitr döretmek",
-    "intro": "Audio ýa-da wideo faýlyňyzy goýuň, dili we modeli saýlaň, galanyny brauzeriňiz özbaşdak ýerine ýetirer. Netijede, wagt belgileri dogry goýlan taýýar subtitr alarsyňyz.",
-    "feat": "Bu gural sesi tekstleýär we sözlemleriň gurluşyna görä awtomatik bölüp, SRT formatynda eksport edýär.",
-    "who": "Wideo döredijiler, podkastlary tekstlemek isleýänler we subtitrleri çalt taýýarlamak isleýän islendik ulanyjy."
-  },
-  "ocrsub": {
-    "title": "Wideo OCR — wideo içindäki subtitrleri okaň | AI-SRTSub",
-    "desc": "Wideo şekiline ýerleşdirilen subtitrleri OCR arkaly çykaryň. Gural kadr boýunça okaýar we SRT/VTT formatynda eksport edýär. Mugt.",
-    "kw": "wideo subtitr çykarmak,subtitr ocr,wideo ocr,ýerleşdirilen subtitrler,wideo-dan srt,subtitrleri okamak,hardcoded subtitr ocr",
-    "intro": "Wideony goýuň, subtitrleriň ýerleşýän zolagyny belläň we gural kadr boýunça okap, olary birleşdirip wagt belgileri bilen çykarsyn.",
-    "feat": "Wideo şekiline ýerleşdirilen subtitrleri OCR tehnologiýasy arkaly okaýar we kadrlar boýunça birleşdirip SRT faýlyna öwürýär.",
-    "who": "Daşary ýurt wideolaryny terjime edýänler, köne wideolary täzeden subtitrläýänler we subtitr faýly bolmadyk wideolar bilen işleýänler."
-  }
+ "index": {
+  "htmlLang": "tk",
+  "ogLocale": "tk_TM",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Global Kino we Seriallar, Türkmen Diliňizdäki Subtitrler",
+  "desc": "Mugt AI subtitr terjimeçisi — hasaba durmak ýok, çäklenmeler ýok, filmleriň we seriallaryň subtitrlerini öz diliňize terjime ediň.",
+  "kw": "AI subtitr terjimeçisi,subtitr terjime etmek,mugt subtitr terjimeçisi,SRT faýlyny terjime etmek,VTT terjime etmek,ASS terjime etmek,kino subtitr terjime etmek,serial subtitrleri,Netflix subtitrleri,KDrama subtitrleri,anime subtitrleri,iki dilli subtitrler,daşary ýurt film subtitrleri,onlaýn subtitr terjime etmek,YouTube subtitrleri,mugt subtitr terjime guraly,subtitrleri mugt terjime etmek,mugt SRT terjimeçisi",
+  "ogTitle": "AI-SRTSub - Global Kino we Seriallar, Türkmen Diliňizdäki Subtitrler",
+  "ogDesc": "Film janköýerleri üçin 100% mugt AI subtitr terjimeçisi: daşary ýurt film, serial we dokumental filmleriň subtitrlerini awtomatiki wagt sinhronizasiýasy bilen terjime ediň.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Film janköýerleri üçin 100% mugt AI subtitr terjimeçisi: daşary ýurt film, serial we dokumental filmleriň subtitrlerini awtomatiki wagt sinhronizasiýasy bilen terjime ediň.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Bu gural hakynda\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Mugt AI Awtomatik Subtitr Terjimeçisi</h2>\n    <p data-i18n-html=\"seoIntro\">Bu uly dil modelleri bilen işleýän <strong>mugt onlaýn subtitr terjime guraly</strong>. SRT, VTT ýa-da ASS faýllaryny ýükläň we iňlis, hytaý, ýapon, koreý, ispaniýa, fransuz we 15+ beýleki diller arasynda subtitrleri terjime ediň. Hasaba durmak ýok, gurnamak ýok, filigran ýok — brauzerde açyň we terjime edip başlaň.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Esasy aýratynlyklar:</strong> SRT, VTT we ASS derňewi hem-de AI terjimesi, akylly sözlem birikdirmesi, wagt sinhronizasiýasy, awtomatiki setir bölme, dolduryjy sözleri aýratynlaşdyrmak, ýörite terminologiýa dolandyryşy we sazlanylýan terjime stilleri.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kimler peýdalanýar:</strong> wideo terjimeçiler, YouTube döredijileri we lokalizatorlar, diller öwrenijiler, wideo mazmunyny çalt lokalizasiýa etmeli toparlar.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Bu gural JavaScript talap edýär. AI bilen mugt subtitr terjime etmek üçin brauzeriňizde JavaScript-i işledip, subtitr faýlyny (SRT / VTT / ASS) ýüklediň.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Stilizirlenen Subtitr Ýasawçy - Iki Dilli, ASS we VTT Effektlerini Birikdir",
+  "desc": "Stilizirlenen subtitrler üçin mugt gural: iki faýly iki dilli edip birikdiriň, iki dilli treki täzeden stilizirläň ýa-da effekt goşuň. 5 ASS / 6 VTT nusgasy; SRT / VTT / ASS görnüşinde eksport ediň.",
+  "kw": "subtitrleri birikdirmek,iki dilli subtitrler,subtitr faýllaryny birikdirmek,stilizirlenen subtitrler,ASS subtitr stilleri,VTT subtitr stilleri,subtitr effektleri,iki dilli subtitr ýasawçy,ASS nusgalary,subtitr şablony,mugt subtitr guraly",
+  "intro": "Iki sany subtitr faýlyny iki dilli edip birikdiriň ýa-da treki stilizirläň: şrift, reňk, çyzyk we pozisiýa, hemmesi göni synag arkaly.",
+  "feat": "Iki dilli birikdiriş we sazlaýyş, ASS / VTT stil şablonlary, wagt düzedişleri we eksport ediljek faýlyň hut özü bolan göni synag.",
+  "who": "Iki dilli ýa-da stilizirlenen subtitrleri döredýän döredijiler, kodirleme toparlary we elýeterli titrleri talap edýän toparlar."
+ },
+ "clean": {
+  "title": "Subtitr Arassalaýjy - Suw nyşanlaryny, SDH we HTML teglerini aýryň",
+  "desc": "Mugt onlaýn subtitr arassalaýjy: suw nyşanlaryny, jarmanalary, SDH, HTML teglerini, ASS effektlerini aýryň; baş harp ýalňyşlyklaryny düzediň. 13 düzgün.",
+  "kw": "subtitr arassalaýjy,srt faýlyny arassalamak,subtitr suw nyşanyny aýrmak,SDH subtitrlerini aýrmak,subtitrlerden HTML teglerini aýrmak,baş harpdaky subtitrleri düzeltmek,mojibake düzeltmek,eşidişinde näsazlygy bolanlaryň subtitrlerini aýrmak,ASS effektlerini aýrmak",
+  "intro": "Göçürilip alnan subtitri ilki bu ýerden geçiriň: suw nyşanlary, jarmanalar, SDH we HTML tegleri bir gezekde aýrylýar.",
+  "feat": "Dört topar boýunça 13 düzgün (9-y adaty ýagdaýda işleýär), suw nyşany we SDH aýrylyşy, baş harplary we mojibake düzedişleri, her bir subtitr boýunça üýtgeşmeler sanawy we wagt hiç wagt üýtgemez.",
+  "who": "Ýüklenen subtitrlere arassa we ulanylyşa taýýar ýagdaý bermek isleýänleriň hemmesi."
+ },
+ "glossary": {
+  "title": "Toparlaýyn Subtitr Termin Çalyşmasy - Bir Glossariý, Bütin Faýl | AI-SRTSub",
+  "desc": "Subtitrler üçin glossariý çalşygy: \"köne -> täze\" düzgünini ýazyň we bütin SRT / VTT / ASS / TXT faýly täzelensin. Wagt üýtgemez.",
+  "kw": "subtitr glossariýsi,srt toparlaýyn çalyşmak,subtitr gözlemek we çalyşmak,subtitr terminini çalyşmak,srt toparlaýyn düzediş,subtitrlerde sözleri çalyşmak,subtitr atlaryny birleşdirmek,subtitr terminologiýasy,vtt tekstini çalyşmak,glossariý srt guraly,toparlaýyn terminologiýa çalyşmasy",
+  "intro": "Bütin subtitr faýly boýunça ýeke gezek ulanylýan \"köne term -> täze term\" glossariýsi, wagt we ASS stilleri üýtgewsiz galýar.",
+  "feat": "Her setirde bir düzgün, -> , => , → ýa-da tab bilen bölünýär; # bilen başlaýan setirler teswirlerdir. Bütin söz gabat gelmesi \"start\" sözünden \"art\" sözüni aýratyn saklaýar, harp uly-kiçiligi meýletin we çalyşmany iki dilli subtitrleriň 1-nji ýa-da 2-nji setirine çäklendirip bilersiňiz. Üýtgän her bir subtitr sanawda görkezilýär we islendiklerini yzyna getirip bolýar.",
+  "who": "Bir möwsüm boýunça atlary we terminologiýany birmeňzeş edýänler, maşyn terjimesini düzedýänler ýa-da öz stilini ulanýanlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Subtitle QC - Dil Boýunça Wagt we Düzen Barlagy | AI-SRTSub",
+  "desc": "Mugt onlaýn subtitr QC: SRT, VTT ýa-da ASS ýükläň we üst-üste düşmeleri, dowamlylygy, okaýyş tizligini, setir giňligini we beýleki düzgünleri barlaň. 27 dil, 27 çäk topary.",
+  "kw": "subtitr barlagçy,subtitr qc,srt barlaýjy,subtitr hil barlagy,srt barlamak,subtitr wagt barlagy,subtitr ýerine ýetiriji,srt faýly barlamak,subtitr korektura,subtitr linteri",
+  "intro": "Subtitr faýlyny ýükläň we öz diliniň düzgünleri esasynda barlaň - her bir tapyndy ölçelen bahasy we çägi bilen görkezilýär. Brauzeriňizde işleýär, hiç zat ýüklenmeýär.",
+  "feat": "Üst-üste düşýän subtitrleri, ekranda gysga ýa-da uzak galýanlary, okaýyş tizligini, setir giňligini barlaň. Avtomatiki düzeldilip bilinýän zatlar aýratyn sanalýar.",
+  "who": "Subtitr toparlary, lokalizasiýa satyjylary, redaktorlar we eltip bermezden ozal faýly barlamak isleýänleriň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Subtitle Terjimeçisi — SRT/VTT/ASS Diliňize Terjime Edilýär",
+  "desc": "SRT / VTT / ASS faýlyny taşlaň, maksat dili saýlaň we wagt kilidi bilen terjime alyň. 100 dil, mugt, hasaba durmak ýok."
+ },
+ "convert": {
+  "title": "Subtitr Öwüriji - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Mugt onlaýn subtitr öwüriji: wagt bütewiligini saklap, SRT, VTT, ASS, SBV, LRC we TXT arasynda öwürň, ASS effekt tegleri awtomatiki arassalanýar.",
+  "kw": "subtitr öwüriji,srt-den vtt-ä,vtt-den srt-ä,ass-den srt-ä,sbv-den srt-ä,srt-den lrc-ä,subtitr txt-e,subtitrleri öwür,srt öwüriji,vtt öwüriji",
+  "intro": "Wagt bütewiligini saklap, SRT, VTT, ASS, SBV, LRC we TXT arasynda öwürň.",
+  "feat": "Giriziş formaty awtomatiki ýüze çykarylýar we wagt belgileri maksat format üçin täzeden ýazylýar; ASS effekt tegleri we mejbury setir bölmeler adaty tekste öwrülýär.",
+  "who": "Oýunçysy subtitr faýlyny kabul etmeýänleriň we materiallary redaktor bilen onlaýn oýunçy arasynda geçirýänleriň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Ikidilli Subtitr Bölüji - Diňe Bir Dili Saklaň | AI-SRTSub",
+  "desc": "Mugt onlaýn ikidilli subtitr bölüji: ikidilli subtitr faýlyny asyl we terjime edilen trekli ikä bölüň ýa-da diňe birini saklaň.",
+  "kw": "ikidilli subtitr bölüji,ikidilli srt bölmek,ikinji dilli subtitri aýrmak,diňe iňlis subtitri saklamak,terjime edilen subtitri çykarmak,srt ikidilli bölüş,ass ikidilli bölüş",
+  "intro": "Ikidilli subtitr faýlyny asyl trek we terjime edilen trek edip bölüň ýa-da diňe birini saklaň.",
+  "feat": "Iki sany umumy ýerleşişi işleýär - bir subtitrde iki setir bolmagy we iki subtitrin şol bir wagty paýlaşmagy.",
+  "who": "Taýýar ikidilli faýly alyp, diňe bir dili ulanmak isleýänleriň hemmesi we asyl nusgasy bilen terjimesini aýratyn arhiwleýän subtitr toparlary.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Subtitr Wagt Süyşürmesi - Süýşür, Masshtablaşdyr, Birikdir we Böl | AI-SRTSub",
+  "desc": "Mugt onlaýn subtitr wagt guraly: ähli zady bir wagtda süýşüriň, masshtablaşdyryň ýa-da iki sany daýanç nokady bilen gabatlaşdyryň. SRT, VTT, ASS, SBV, LRC we TXT goldaýar.",
+  "kw": "subtitr wagt süýşürmesi,srt wagtyny süýşürmek,subtitr sinhronizasiýa sazlamasy,subtitr wagtyny masshtablaşdyrmak,subtitr gijä galmasyny düzetmek,srt wagt gyşarmasy,subtitr gyşarmasyny düzetmek,subtitrleri birikdirmek,subtitrleri bölmek,srt birikdirmek,uzyn subtitri bölmek",
+  "intro": "Subtitrler sinhronizasiýadan çykanda, bütin wagty süýşüriň, masshtablaşdyryň ýa-da iki daýanç nokady bilen düzediň. Ol bölünen setirleri birikdirip hem biler.",
+  "feat": "Süýşürmek her bir subtitriň ekranda galýan wagtyny üýtgetmän hereketlendirýär. Masshtablaşdyrmak iki tarapyny hem köpeldýär, şonuň üçin subtitriň dowamlylygy şoňa görä üýtgeýär - 24 we 25 fps arasynda peýdalydyr. Iki nokatly düzediş hem süýşmek, hem-de nädogry tizlik bilen işleýän faýllary işleýär. Negatiw çykan wagtlar nola çenli çäklendirilýär we gural size näçesiniň täsir edendigini aýdýar. Giriş hili nähili bolsa, çykyş hili hem şol - hiç hili öwrüliş ýok we ASS stilleri, setir boýunça stil beriş we effekt tegleri asyl ýagdaýynda saklanýar. Ikidilli subtitrler birikdirilende iki setirde galýar we bölnende geçirilýär.",
+  "who": "Subtitrleri çeşme üýtgeýşinden soň gyşaranlaryň, çalt ýa-da haýal işleýänleriň ýa-da başga kadada işleýänleriň materiallaryny ulanýanlaryň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Bozuk Subtitrleri Düzet - Mojibake / Nädogry Kodlamany Düzet | AI-SRTSub",
+  "desc": "Bozuk subtitrler üçin mugt onlaýn düzediş: faýlyň UTF-8, GBK, Big5, Shift_JIS ýa-da EUC-KR-digini ýüze çykarýar, nädogry okalan teksti dikeldýär, oýunçyňyz üçin täzeden ýatda saklaýar.",
+  "kw": "bozuk subtitrleri düzetmek,subtitr mojibake,srt kodlama düzedişi,subtitr kodlamasyny düzetmek,utf8-den gbk subtitre,srt geň simwollary görkezýär,subtitr nädogry kodlama,ass bozuk,vtt bozuk,subtitr kodlamasyny ýüze çykarmak",
+  "intro": "Düşnüksiz sözler diwary bolup açylýan subtitrler köplenç nädogry kodlama bilen okalýar. Faýly taşlaň we ol haýsy kodlama bilen ýazylandygyny tapyp, nädogry okalan simwollary yzyna getirýär.",
+  "feat": "Ýüklenen faýllar asyl baýtlardan täzeden koddan çykarylýar, şonuň üçin hiç zat ýitirilmeýär: eger faýl GBK bolup çyksa, şeýle diýýär we eger oýunçyňyz ony nädogry okaýan bolsa, göçürmäni \"BOM bilen UTF-8\" hökmünde saklamak adatça ony çözýär. Setir belgileri we wagt belgileri hiç wagt üýtgemez, ASS stil tegleri bolsa asyl ýagdaýynda galdyrylyr.",
+  "who": "Müşderilerden ýa-da başga ýerden nädogry kodlamaly subtitr alan we olary düzetmek isleýänleriň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Subtitrlerden Tekst Çykaryň - SRT/ASS/VTT Adaty Tekste | AI-SRTSub",
+  "desc": "Mugt onlaýn subtitr-tekst çykaryjy: SRT, VTT, ASS, SBV, LRC we TXT okaýar, wagt belgilerini we setir belgilerini aýyrýar, arassa dialogy abzaslar ýa-da her subtitr üçin bir setir hökmünde çykarýar.",
+  "kw": "subtitrlerden tekst çykarmak,subtitrerden tekste,srt-den txt-ä,srt adaty tekst,ass-den txt-ä,vtt-den txt-ä,subtitr transkripti,srt-den dialog çykarmak,srt wagt belgilerini aýrmak,subtitr tekst çykaryjy",
+  "intro": "SRT / VTT / ASS / SBV / LRC / TXT subtitrlerinden dialoglary arassa adaty tekst hökmünde çykaryň: wagt belgileri, subtitr belgileri we stil tegleri awtomatiki aýrylýar.",
+  "feat": "Iki sany ýerleşiş:arakesmelerde we sözlem ahyrynda bölünen dowamly abzaslar ýa-da dialog sanawy üçin her subtitr boýunça bir setir. Ses subtitrleri, çeşme suw nyşanlary we gaýtalanýan setirler adaty ýagdaýda aýrylýar; \"TOM:\" ýaly gürleýji atlary we aýdym setirleri saklanylyp ýa-da aýrylyp bilner.",
+  "who": "Ýazgylar, ssenariýler, terjime tejribesi ýa-da başga bir gural üçin subtitr teksti isleýän, ýüzlerçe wagt belgisini el bilen pozmak islemeýänleriň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "MKV / MP4 Faýllaryndan Gurlan Subtitrleri SRT-ä Çykaryň | AI-SRTSub",
+  "desc": "MKV, WebM, MP4, MOV içinden gurlan subtitrleri çykaryň; SRT / VTT / ASS / TXT görnüşinde eksport ediň. Ýükleme ýa-da täzeden kodlama ýok — faýllar brauzeriňizde okalýar.",
+  "kw": "gurlan subtitrleri çykarmak,mkv-den srt-ä,mp4 subtitr çykarmak,wideodan subtitrleri çykarmak,gurlan subtitr çykaryjy,mkv-den srt,mov subtitr çykarmak,subtitr trek eksporty,mkv-den vtt,ýumşak subtitrleri çykarmak,mkv subtitr alyjy",
+  "intro": "MKV ýa-da MP4 içinde ýerleşdirilen subtitr treki göni SRT-ä çykaryň — ýükleme ýok, hemmesi brauzeriňizde bolup geçýär.",
+  "feat": "Adaty tekst, ASS, WebVTT we mov_text / tx3g trektreri okaýar, asyl ASS ýokarky bölegini we resolution saklaýar, uly faýl hi̇ç wagt ýady doldurmaz ýaly bölekleýin okaýar.",
+  "who": "Ýumşak subtitrleri bolan filmi bar bolan we teksti çykarmak isleýänleriň hemmesi, kodirleme toparlary we asyl trekden başlaýan toparlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Hytaý Subtitr Öwüriji - Ýönekeýleşdirilen ⇄ Däp bolan | AI-SRTSub",
+  "desc": "Mugt hytaý subtitr öwüriji: Ýönekeýleşdirilen ⇄ Däp bolan (Taýwan / Gonkong) we yzyna. Diňe dialog üýtgeýär — wagt belgileri we ASS tegleri galýar. OpenCC esasynda gurlan.",
+  "kw": "hytaý subtitr öwüriji,ýönekeýleşdirilenden däp bolana,däp bolandan ýönekeýleşdirilene,srt däp bolan hytaý,subtitr hytaý öwür,taýwan däp bolan hytaý,gonkong däp bolan hytaý,han öwrülişi,srt-ni däp bolan hytaý diline öwür,ýönekeýleşdirilen hytaý srt,opencc subtitr",
+  "intro": "Bütin subtitr faýlyny Ýönekeýleşdirilen we Däp bolan görnüşleriň arasynda öwürň, dialogdan başga hiç zady üýtgetmezden.",
+  "feat": "Dokuz ugra çenli: umumy Däp bolan, Taýwan sözlük qatnaşygy, Gonkong, Ýönekeýleşdirilene yzyna.",
+  "who": "Taýwan ýa-da Gonkong auditoriýasyna subtitr hödürleýänleriň hemmesi, sebit wersiýalaryny taýýarlaýan paýlaýjylar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Subtitr Bölüji we Birikdiriji - SRT / VTT | AI-SRTSub",
+  "desc": "Subtitrleri dowamlylygy ýa-da sany boýunça bölüň, ýa-da köp faýllary tertip boýunça birikdiriň. Nomerleme awtomatiki, dialog üýtgewsiz. SRT & VTT.",
+  "kw": "subtitr bölüji,subtitrleri bölmek,srt faýllaryny birikdirmek,srt birikdiriji,subtitrleri birleşdirmek,srt böl,srt faýllaryny birikdir,subtitrleri kesmek,vtt böl,subtitr birikdiriji",
+  "intro": "Uzyn subtitri böleklere kesiň ýa-da köp faýllary birine birikdiriň. Doly brauzeriňizde işleýär — hiç zat ýüklenmeýär.",
+  "feat": "Dowamlylyk ýa-da sany boýunça böleklere bölüň, täzeden nomerleme we noldan başlaýan wagt bilen; tertipli birikdiriň. SRT we VTT.",
+  "who": "Epizodlary ýüklemek üçin bölýän döredijiler, bölekleýin barlaýan toparlar we köp bölekli subtitrleri birikdirýän redaktorlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Subtitrleri Excel/CSV-ä we Yzyna Öwür | AI-SRTSub",
+  "desc": "SRT ýa-da VTT faýlyny barlamak we terjime etmek üçin Excel ýa-da CSV tablisasyna öwürň, soňra yzyna getiriň. Wagt belgileri doly saklanýar. Hiç zat ýüklenmeýär.",
+  "kw": "subtitrleri excel-e,srt-den csv-ä,srt-den excel-e,excel-den srt-ä,csv-den srt-ä,subtitr tablisasy,subtitr öwüriji tablisasy",
+  "intro": "Barlamak we terjime etmek üçin subtitrleri tablisä eksport ediň, soňra tablisany yzyna import ediň. Brauzeriňizde doly işleýär.",
+  "feat": "SRT ýa-da VTT-den xlsx ýa-da CSV-ä bir gezek basmak bilen öwürň; tablisada wagty, teksti we bellikleri redaktirläň.",
+  "who": "Tablisada subtitrleri barlaýan, bellik edýän ýa-da toparlaýyn düzedýän terjimeçiler we fansub toparlary.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Toparlaýyn Subtitrleri SRT/VTT-ä Öwür | AI-SRTSub",
+  "desc": "Onlarça ýa-da ýüzlerçe SRT/VTT faýlyny taşlaň, olary bir formate öwürň we bir ZIP ýükläp alyň. Nomerleme we wagt belgileri kadalaşdyrylýar.",
+  "kw": "toparlaýyn subtitr öwüriji,srt-den vtt-ä,toparlaýyn subtitr öwüriji,köpçülikleýin srt,birnäçe subtitri öwür,subtitr zip",
+  "intro": "Ýüzlerçe subtitr faýlyny süýräp getiriň, olary öwürň we bir ZIP ýükläp alyň. Brauzeriňizde doly işleýär.",
+  "feat": "SRT-den VTT-ä we tersine toparlaýyn öwrüliş; yzygiderli sanlar täzeden tertipleşdirilýär we wagt belgileri kadalaşdyrylýar.",
+  "who": "Bütin seriýa papkalaryny öwürýän redaktorlar we subtitrciler.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "LRC Aýdym Sözi Redaktory - Diňläkäň Wagt Belgiň | AI-SRTSub",
+  "desc": "Aýdymy ýükläň, aýdym sözlerini goýuň we diňläkäň her setiriň wagtyny belläň; LRC ýa-da SRT eksport ediň. Klaviatura bilen dolandyrylýar.",
+  "kw": "onlaýn lrc redaktory,lrc ýasamak,aýdym sözi wagty,lrc dörediji,lrc döretmek,aýdym synxronizatory,lrc-den srt-ä",
+  "intro": "Aýdymy ýükläň, aýdym sözlerini goýuň, diňläkäň setirme-setir wagty belläň we LRC ýa-da SRT eksport ediň. Hiç zat ýüklenmeýär.",
+  "feat": "MP3, M4A, FLAC, WAV we OGG goldaýar. Her setir üçin bir hatar; bar bolan LRC faýllary import edilip bilner.",
+  "who": "Kower aýdymlary synxronizasiýa edýän sazandalar we wideo üçin aýdym goşýan döredijiler.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "YouTube subtitrlerini düzeldiji gural - Bölünen sözlemleri birleşdiriň | AI-SRTSub",
+  "desc": "YouTube awto-titrleri sözlemleri 3-4 sekundda kesýär. Bu gural sözleri üýtgetmän, araçäkleri dogry ýere getirýär. Mugt, 100 dilde.",
+  "kw": "youtube subtitr düzetmek,youtube awtomatiki subtitrler,subtitrleri deňlemek,sözlem boýunça subtitr,döwük subtitrleri düzetmek,srt sözlem deňleýiş,subtitrleri täzeden bölmek,youtube subtitr abatlaýyş,sözlem esasly subtitrler",
+  "intro": "YouTube-da awtomatiki döredilen subtitr faýlyny goýuň, dili saýlaň we gural sözlemleri birleşdirip, täzeden kesip çyksyn. Hiç bir söz üýtgedilmeýär we wagt çäkleri asylky wagt belgilerine mümkin boldugyça ýakyn galýar.",
+  "feat": "YouTube awtomatiki subtitrleri sözlemleriň gutarýan ýerine seretmän 3-4 sekuntlyk böleklere bölünýär. Gural asylky wagt belgilerini esas edinip, sözlemiň nirede gutarýandygyny kesgitleýär we iň amatly bölek nokadyny saýlaýar. 100 diliň her biriniň öz düzgünleri bar: hytaý we ýapon dillerinde söz arasynda boşluk ýok, taý dilinde söz çäkleri belli däl, hindi dilinde . bilen, arap dilinde ؟ , ermeni dilinde ։ bilen gutarýar. Setir giňligi we okaýyş tizligi ýazuw ulgamyna baglydyr - hytaý dili üçin 16 harp, latyn elipbiýi üçin 42 harp. Eksportdan öň tekst harpma-harp deňeşdirilýär we ýitirilen ýa-da goşulan sözler derrew görkezilýär.",
+  "who": "YouTube, podkast we okuw kurslarynyň awtomatiki subtitrlerini taýýar subtitrlere öwürýän toparlar we ýarym ýolda kesilýän sözlemlerden ýadayan wideorežissýorlar üçin.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio-dan subtitrler — brauzeriňizde SRT dörediň | AI-SRTSub",
+  "desc": "Audio ýa-da wideo faýlyňyzy SRT/VTT formatyna öwüriň. AI-SRTSub brauzeriňizde işleýär, hiç zat ýüklemeýär we mugt.",
+  "kw": "audio-dan srt,sesi subtitre öwürmek,awtomatik subtitr generator,sesi tekstlemek,whisper subtitrleri,brauzer ses tanama,offline subtitr döretmek",
+  "intro": "Audio ýa-da wideo faýlyňyzy goýuň, dili we modeli saýlaň, galanyny brauzeriňiz özbaşdak ýerine ýetirer. Netijede, wagt belgileri dogry goýlan taýýar subtitr alarsyňyz.",
+  "feat": "Bu gural sesi tekstleýär we sözlemleriň gurluşyna görä awtomatik bölüp, SRT formatynda eksport edýär.",
+  "who": "Wideo döredijiler, podkastlary tekstlemek isleýänler we subtitrleri çalt taýýarlamak isleýän islendik ulanyjy."
+ },
+ "ocrsub": {
+  "title": "Wideo OCR — wideo içindäki subtitrleri okaň | AI-SRTSub",
+  "desc": "Wideo şekiline ýerleşdirilen subtitrleri OCR arkaly çykaryň. Gural kadr boýunça okaýar we SRT/VTT formatynda eksport edýär. Mugt.",
+  "kw": "wideo subtitr çykarmak,subtitr ocr,wideo ocr,ýerleşdirilen subtitrler,wideo-dan srt,subtitrleri okamak,hardcoded subtitr ocr",
+  "intro": "Wideony goýuň, subtitrleriň ýerleşýän zolagyny belläň we gural kadr boýunça okap, olary birleşdirip wagt belgileri bilen çykarsyn.",
+  "feat": "Wideo şekiline ýerleşdirilen subtitrleri OCR tehnologiýasy arkaly okaýar we kadrlar boýunça birleşdirip SRT faýlyna öwürýär.",
+  "who": "Daşary ýurt wideolaryny terjime edýänler, köne wideolary täzeden subtitrläýänler we subtitr faýly bolmadyk wideolar bilen işleýänler."
+ },
+ "multilang": {
+  "title": "Bir wagtda köp diller — möwsüm ýükläň, dilleri saýlaň | AI-SRTSub",
+  "desc": "Bütin möwsümi ýükläň, gerek dilleri belläň we başla düwmesine basyň. Bólümler we diller bir hatara düzülip yzly-yzyna işleýär; netijeler bir zip arhiwde berilýär. Tokdandary ýerinden dowam edýär.",
+  "kw": "toplumlaýyn subtitr terjimesi,subtitrleri köp dillere terjime etmek,köp dilli subtitrler,bütin möwsüm subtitrleri,subtitrleri köp dilleşdirmek,srt terjime etmek,möwsüm subtitrlerini terjime etmek,awtomatiki subtitr,ai srtsub",
+  "intro": "Bütin bir möwsümi ýükläň, maksat dilleri belläň we başla düwmesine basyň. Bólümler we diller bir hatara düzülýär: indiki dil başlanýança, her dil ahyryna çenli işleýär we ähli zat bir zip arhiwine ýygnalýar.",
+  "feat": "Toplumlaýyn terjimede ýalňyşlyk köplenç işleriň utgaşyklygyndan çykýar. Ýigrimi bólüm bäş dilde bir wagtda ýüklense, serwere ýüzlerçe sorag gelýär, bu bolsa serweriň nobatyny bozýar we haýsysynyň gutaranyny bilmek kynlaşýar. Şonuň üçin bu sahypa bir wagtda diňe bir nobat boýunça, her dili ahyryna çenli ýeke-ýeke işleýär. Ösüşiňiz kompýuteriňizde ýatda saklanýar, eger 3-nji bólümde dursa, sahypany täzeden açyp, öň edilen işleri gaýtalamazdan dowam edip bilersiňiz. Adlar hem möhümdir: ýigrimi bólümi aýratyn terjime etseňiz, şol bir gahrymanyň ady dürli ýazylyp biler. Şonuň üçin sözlük aýratyn paneldendir — bir gezek ýükläň, bütin möwsüm üçin paýlaşylýar we başlamankäňiz näçe sözüň gabat gelendigini görkezýär. Tab sahypasyny ýapsaňyz, wagt ýitirmän iş derrew durýar.",
+  "who": "Doly möwsümi birnäçe dile terjime edýän subtitr toparlary, şol bir bólüm toplumyny dürli bazarlara paýlaýan kanallar we başla düwmesine basypsoň gaýdyp gelmek isleýän ýeketäk terjimeçiler.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitr Guraly - ASS Eksport | AI-SRTSub",
+  "desc": "Mugt onlaýn karaoke subtitr dörediji: aýdym ýükläň, sözleri goýuň, her setiri tapyň we awtomatiki ýa-da el bilen sazlaň. CapCut we Premiere üçin \\\\kf tegsli ASS ýa-da LRC formatda eksport ediň.",
+  "kw": "karaoke subtitr guraly,ass karaoke,söz derejeli sözler,kf tegleri,karaoke lrc,aýdym sözleri,ass karaoke dörediji,ai srtsub",
+  "intro": "Aýdym ýükläň, sözleri goýuň, her setiri tapyň we aýdym bilen sazlaşykly ýa-da çäkleri süýşürmek arkaly her harp boýunça paýlaşdyryň. Aýdym aýdylýarka sözleriň yşyklanmagyny görüň.",
+  "feat": "Hytaýça harp boýunça, Iňlisçe söz boýunça bölüner. Sazlanan yzky aralyk ahyrky harpyň sesden öňe geçmegini saklaýar. CapCut / Premiere / Aegisub üçin \\\\kf tegleri bilen ASS, söz derejeli oýunçylar üçin giňledilen LRC ýa-da ätiýaçlyk üçin setirleýin SRT eksport ediň. Ähli zat brauzeriňizde işleýär — ýükleme ýok.",
+  "who": "Kower wideo we konsert wideolaryna söz goşýan döredijiler, aýdym wideo (MV) döredijiler we karaoke subtitrlerini öndürýänleriň hemmesi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

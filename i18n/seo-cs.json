@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio na titulky — převod řeči na SRT v prohlížeči | AI-SRTSub",
-    "desc": "Vložte audio nebo video a získejte titulky. Rozpoznávání řeči běží v prohlížeči, dělí text na věty a exportuje SRT / VTT. Nic se nenahrává, zdarma.",
-    "kw": "audio na srt,převod řeči na titulky,generátor titulků,automatické titulky,přepis audia na srt,whisper titulky,rozpoznávání řeči v prohlížeči,offline titulky",
-    "intro": "Vložte audio nebo video soubor, vyberte jazyk a model, a rozpoznávání proběhne přímo ve vašem prohlížeči. Výsledkem je návrh titulků s časováním, rozdělený na věty a upravený na délku řádků.",
-    "feat": "Nástroj zpracovává proud slov z rozpoznávání řeči, dělí je podle interpunkce na logické celky a automaticky upravuje délku řádků podle typu písma. Časování je optimalizováno pro čitelnost bez překryvů, přičemž rozpoznávání probíhá lokálně v prohlížeči bez nahrávání dat na server.",
-    "who": "Tvůrci videí, týmy pracující s podcasty a kurzy, a kdokoli, kdo potřebuje rychle vytvořit návrh titulků k videu bez původního souboru."
-  },
-  "ocrsub": {
-    "title": "OCR vypálených titulků — čtení titulků z videa | AI-SRTSub",
-    "desc": "Vypálené titulky nelze extrahovat jako stopu. Označte oblast, nástroj ji přečte snímek po snímku a sloučí do časovaných titulků. SRT / VTT, zdarma.",
-    "kw": "extrakce vypálených titulků,ocr titulků,převod titulků z videa,vypálené titulky,ocr z videa,video na srt,titulky z videa,ocr pro titulky",
-    "intro": "Vložte video, označte oblast, kde se nacházejí titulky, a nástroj je snímek po snímku přečte a sloučí do jednoho časovaného celku.",
-    "feat": "Tento nástroj ořízne oblast titulků, převede ji na binární obraz pro lepší čitelnost a pomocí OCR rozpozná text, který následně spojí do souvislých časových úseků. Zpracování probíhá lokálně, což umožňuje efektivní převod vypálených titulků na editovatelný formát SRT nebo VTT.",
-    "who": "Lokalizační týmy, editoři pracující se staršími záznamy a kdokoli, kdo má k dispozici pouze finální video bez původního souboru s titulky."
-  }
+ "autosub": {
+  "title": "Audio na titulky — převod řeči na SRT v prohlížeči | AI-SRTSub",
+  "desc": "Vložte audio nebo video a získejte titulky. Rozpoznávání řeči běží v prohlížeči, dělí text na věty a exportuje SRT / VTT. Nic se nenahrává, zdarma.",
+  "kw": "audio na srt,převod řeči na titulky,generátor titulků,automatické titulky,přepis audia na srt,whisper titulky,rozpoznávání řeči v prohlížeči,offline titulky",
+  "intro": "Vložte audio nebo video soubor, vyberte jazyk a model, a rozpoznávání proběhne přímo ve vašem prohlížeči. Výsledkem je návrh titulků s časováním, rozdělený na věty a upravený na délku řádků.",
+  "feat": "Nástroj zpracovává proud slov z rozpoznávání řeči, dělí je podle interpunkce na logické celky a automaticky upravuje délku řádků podle typu písma. Časování je optimalizováno pro čitelnost bez překryvů, přičemž rozpoznávání probíhá lokálně v prohlížeči bez nahrávání dat na server.",
+  "who": "Tvůrci videí, týmy pracující s podcasty a kurzy, a kdokoli, kdo potřebuje rychle vytvořit návrh titulků k videu bez původního souboru."
+ },
+ "ocrsub": {
+  "title": "OCR vypálených titulků — čtení titulků z videa | AI-SRTSub",
+  "desc": "Vypálené titulky nelze extrahovat jako stopu. Označte oblast, nástroj ji přečte snímek po snímku a sloučí do časovaných titulků. SRT / VTT, zdarma.",
+  "kw": "extrakce vypálených titulků,ocr titulků,převod titulků z videa,vypálené titulky,ocr z videa,video na srt,titulky z videa,ocr pro titulky",
+  "intro": "Vložte video, označte oblast, kde se nacházejí titulky, a nástroj je snímek po snímku přečte a sloučí do jednoho časovaného celku.",
+  "feat": "Tento nástroj ořízne oblast titulků, převede ji na binární obraz pro lepší čitelnost a pomocí OCR rozpozná text, který následně spojí do souvislých časových úseků. Zpracování probíhá lokálně, což umožňuje efektivní převod vypálených titulků na editovatelný formát SRT nebo VTT.",
+  "who": "Lokalizační týmy, editoři pracující se staršími záznamy a kdokoli, kdo má k dispozici pouze finální video bez původního souboru s titulky."
+ },
+ "multilang": {
+  "title": "Více jazyků najednou — nahrajte celou sérii | AI-SRTSub",
+  "desc": "Nahrajte celou sérii, zvolte jazyky a spusťte překlad jedním kliknutím. Epizody a jazyky se řadí do jedné fronty a výsledek získáte v jednom zip archivu. Pokračuje tam, kde skončil.",
+  "kw": "dávkový překlad titulků,překlad titulků do více jazyků,vícejazyčné titulky,titulky pro celou sérii,dávkový export titulků,překlad srt do více jazyků,jedna série více jazyků,vícejazyčný překladač",
+  "intro": "Nahrajte celou sérii najednou, označte cílové jazyky a stiskněte start. Epizody a jazyky vytvoří jednu frontu: každý jazyk běží do konce, než začne další, a vše se zabalí do jednoho zip souboru.",
+  "feat": "Největším úskalím dávkového překladu je souběžnost. Dvacet epizod krát pět jazyků spuštěných současně generuje stovky požadavků, což potichu přetěžuje serverovou frontu — požadavky se míchají a nikdo neví, která buňka skutečně skončila. Proto tato stránka běží záměrně jako jedna fronta: vždy jedna dávka, jeden jazyk do úplného dokončení. Postup se ukládá pro každou epizodu a jazyk ve vašem zařízení, takže pokud se proces přeruší u třetí epizody, po opětovném otevření stránky a načtení stejných souborů pokračuje tam, kde skončil, aniž by posílal již hotová data. Problémem sérií bývají jména: při překladu dvaceti epizod zvlášť může mít stejná postava v každé jiné jméno. Proto je glosář samostatným panelem — nahrajete ho jednou a sdílí ho celá série, přičemž před spuštěním uvidíte počet shodných záznamů. Zavřením karty se úloha okamžitě zastaví, namísto aby na pozadí čerpala váš limit.",
+  "who": "Týmy titulkovačů připravující celou sérii do několika jazyků, kanály distribuující stejné epizody na různé trhy a samostatní překladatelé, kteří chtějí spustit proces jedním kliknutím a vrátit se později.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Dávkový vícejazyčný překladač titulků"
+ }
 }

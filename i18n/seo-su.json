@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "su",
-    "ogLocale": "su_ID",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Tarjamahkeun Subtitle Film & Séries Global",
-    "desc": "Penterjemah subtitle AI gratis — euweuh pendaptaran, euweuh wates, euweuh watermark. Ubah subtitle pilem asing, séries, jeung dokumenter kana basa anjeun dina sakali klik.",
-    "kw": "penterjemah_subtitle_ai,terjemahkeun_subtitle,penterjemah_subtitle_gratis,terjemahkeun_file_srt,terjemahkeun_vtt,terjemahkeun_ass,tarjamah_subtitle_pilem,subtitle_séries_tv,subtitle_netflix,subtitle_kdrama,subtitle_anime,subtitle_bilingual,subtitle_pilem_asing,terjemahkeun_subtitle_online,subtitle_youtube,alat_tarjamah_subtitle_gratis,terjemahkeun_subtitle_gratis,penterjemah_srt_gratis",
-    "ogTitle": "AI-SRTSub - Tarjamahkeun Subtitle Film & Séries Global",
-    "ogDesc": "Penterjemah subtitle AI 100% gratis pikeun kipas pilem: sakali klik ngarobah subtitle pilem asing, séries, jeung dokumenter kana basa pituin anjeun, otomatis nyaluyukeun timeline. Nikmati eusi global tanpa wates.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Penterjemah subtitle AI 100% gratis pikeun kipas pilem: sakali klik ngarobah subtitle pilem asing, séries, jeung dokumenter kana basa pituin anjeun, otomatis nyaluyukeun timeline. Nikmati eusi global tanpa wates.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Ngeunaan alat ieu\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Penterjemah Subtitle Otomatis AI Gratis</h2>\n    <p data-i18n-html=\"seoIntro\">Ieu mangrupikeun <strong>alat tarjamahan subtitle online gratis anu ditenagai ku modél basa ageung</strong>. Unggah file SRT, VTT atanapi ASS sareng terjemahkeun subtitle antara Inggris, Cina, Jepang, Korséa, Spanyol, Perancis sareng 15+ basa séjénna. Euweuh pendaptaran, euweuh pamasangan, euweuh watermark — buka dina panyungsi tur mimitian terjemahkeun. Data subtitle tetep aya dina panyungsi anjeun iwal ti anjeun ngaktipkeun tarjamahan awan.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Fitur utama:</strong> Parsing SRT, VTT jeung ASS sarta tarjamahan AI, ngahijikeun kalimah pinter (nalika hiji kalimah ngalibatkeun sababaraha cue, cue digabungkeun, diterjemahkeun, tuluy dipisahkeun deui sapanjang timeline asal), panyaluyuan timeline, panybungkus garis otomatis pikeun téks CJK jeung Kulon, ngaleungitkeun kecap eusi tambahan, nanganan términologi khusus, jeung gaya tarjamahan anu tiasa dipilih. Ékspor file standar SRT, VTT, ASS atanapi TXT anu siap diselapkeun kana vidéo anjeun.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Saha anu ngagunakeunana:</strong> penterjemah vidéo, panyipta YouTube jeung pelokalan, nu diajar basa, grup subtitle jeung tim anu kedah melokalisasi eusi vidéo kalayan gancang.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Alat ieu meryogikeun JavaScript. Mangga aktipkeun JavaScript dina panyungsi anjeun, tuluy unggah file subtitle (SRT / VTT / ASS) pikeun terjemahkeun subtitle nganggo AI sacara gratis.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Pembuat Subtitle Bergaya - Gabungkeun Bilingual, ASS & Efek VTT",
-    "desc": "Alat gratis pikeun subtitle bergaya: gabungkeun dua file janten bilingual, atur ulang gaya jalur bilingual, atanapi tambahkeun efek. 5 prasetél ASS / 6 VTT; ékspor salaku SRT / VTT / ASS.",
-    "kw": "gabungkeun_subtitle,subtitle_bilingual,kombinasikeun_file_subtitle,subtitle_bergaya,gaya_subtitle_ass,gaya_subtitle_vtt,efek_subtitle,pembuat_subtitle_ganda,prasetél_ass, témplat_subtitle,alat_subtitle_gratis",
-    "intro": "Gabungkeun dua file subtitle janten bilingual, atanapi atur gaya jalur: font, warna, outline sareng posisi, sadayana WYSIWYG.",
-    "feat": "Gabungan bilingual sareng panyaluyuan, prasetél gaya ASS / VTT, slot gaya per-nilai, perbaikan timeline di tempat sareng massal, sareng sawangan langsung anu sacara harfiah mangrupikeun file anu diékspor.",
-    "who": "Panyipta anu ngadamel subtitle bilingual atanapi bergaya, grup éncoding, sareng tim anu peryogi caption anu tiasa diaksés."
-  },
-  "clean": {
-    "title": "Pembersih Subtitle - Hapus Watermark, Cue SDH & Tag HTML",
-    "desc": "Pembersih subtitle online gratis: hapus watermark, iklan, SDH, tag HTML, efek ASS; perbaiki huruf kapital, mojibake. 13 aturan, undo, timeline aman.",
-    "kw": "pambersih_subtitle,bersihkeun_file_srt,coplokkeun_watermark_subtitle,coplokkeun_subtitle_sdh,coplokkeun_tag_html_ti_subtitle,lereskeun_huruf_kapital_subtitle,lereskeun_mojibake,coplokkeun_subtitle_tuna_rungu,coplokkeun_efek_ass",
-    "intro": "Jalurkeun subtitle anu diunduh ngaliwatan dieu heula: watermark, iklan, cue SDH sareng tag HTML, leungit dina sakali jalan.",
-    "feat": "13 aturan dina opat grup (9 aktip sacara standar), ngaleungitkeun watermark sareng SDH, perbaikan huruf kapital sareng mojibake, daptar parobahan per cue kalayan mbalikeun deui masing-masing, sareng waktu moal pernah kaganggu.",
-    "who": "Sing saha waé anu nyandak subtitle anu aya teras hoyong tiasa dianggo, sareng grup anu ngabersihkeun bahan sacara massal."
-  },
-  "glossary": {
-    "title": "Ganti Istilah Subtitle Batch - Hiji Glosarium, Sadaya File | AI-SRTSub",
-    "desc": "Ganti glosarium pikeun subtitle: daptar \"lami → énggal\" sakali sareng sadaya file SRT / VTT / ASS / TXT dianyarkeun. Waktu, gaya sareng blok NOTE tetep; malikeun per baris.",
-    "kw": "glosarium_subtitle,ganti_massal_srt,milarian_sareng_ganti_subtitle,ganti_istilah_subtitle,édit_massal_srt,ganti_kecap_dina_subtitle,nyaluyukeun_nami_subtitle,términologi_subtitle,ganti_téks_dina_vtt,alat_srt_glosarium,ganti_términologi_massal",
-    "intro": "Glosarium aturan \"istilah lami → istilah énggal\" diterapkeun dina sakabéh file subtitle sakaligus, kalayan waktu, gaya ASS sareng blok catetan VTT tetep sarua persis.",
-    "feat": "Hiji aturan per baris, dipisahkeun ku ->, =>, → atanapi tab; baris anu dimimitian ku # mangrupikeun koméntar. Cocog kecap utuh ngajaga \"art\" kaluar tina \"start\", sensitif huruf opsional, sareng anjeun tiasa ngwatesan panggantian kana baris 1 atanapi baris 2 tina cue bilingual. Saban cue anu robih didaptarkeun, sareng naon waé anu tiasa dibalikeun deui.",
-    "who": "Sing saha waé anu nyaluyukeun nami sareng términologi dina hiji musim, ngalereskeun kecap tarjamahan mesin sacara massal, atau adaptasi subtitle batur kana gaya sorangan.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "QC Subtitle - Cek Waktu & Tata Letak per Basa | AI-SRTSub",
-    "desc": "Layanan pamariksaan kualitas subtitle online gratis: unggah SRT, VTT atanapi ASS sareng pariksa tumpang tindih, durasi, kecepatan maca, lebar baris, pemecahan baris, panomeran sareng éncoding numutkeun aturan basa éta. 27 basa, 27 sét ambang wates, ditambah aturan khusus basa.",
-    "kw": "panyek_subtitle,qc_subtitle,validator_srt,pamariksaan_kualitas_subtitle,pamariksaan_srt,pamariksaan_waktu_subtitle,validator_file_srt,pamariksaan_file_srt,koreksi_subtitle,linter_subtitle",
-    "intro": "Unggah file subtitle sareng parios kana aturan basana sorangan - unggah penemuan dilengkepan ku nilai anu diukur sareng ambang watesna.",
-    "feat": "Pariksa cue anu tumpang tindih, durasi pondok atanapi panjang teuing, kecepatan baca, lebar baris, jumlah baris, pemecahan baris, panomoran, cue kosong, mojibake sareng karakter kontrol. Aturan khusus basa nyertakeun tanda Tanya Spanyol, spasi Perancis, tanda Tanya Yunani, tanda baca pinuh dina Cina sareng Jepang. Item anu tiasa dibenerkeun otomatis didaptarkeun sacara terpisah.",
-    "who": "Grup subtitle, vendor pelokalan, editor sareng saha waé anu hoyong mariksa file sateuacan dikirimkeun.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Penterjemah Subtitle — SRT/VTT/ASS kana Basa Anjeun",
-    "desc": "Lebetkeun file SRT / VTT / ASS, pilih basa target, sareng kéngingkeun tarjamahan anu dikonci timeline-na. 100 basa, gratis, tanpa pendaptaran."
-  },
-  "convert": {
-    "title": "Konverter Subtitle - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Konverter subtitle online gratis: konversi antara SRT, VTT, ASS, SBV, LRC sareng TXT kalayan timeline tetep utuh, tag efek ASS dibersihkeun otomatis.",
-    "kw": "konverter_subtitle,srt_ka_vtt,vtt_ka_srt,ass_ka_srt,sbv_ka_srt,srt_ka_lrc,subtitle_ka_txt,konversi_subtitle,konverter_srt,konverter_vtt",
-    "intro": "Konversi antara SRT, VTT, ASS, SBV, LRC sareng TXT kalayan timeline anu tetep utuh.",
-    "feat": "Format masukan dideteksi sacara otomatis sareng cap waktu ditulis ulang pikeun format target; tag efek ASS sareng pemecahan baris paksa janten téks anu tiasa dibaca nalika anjeun ngékspor kana format biasa; file lirik teu gaduh widang jam.",
-    "who": "Sing saha waé anu panyajak videona nolak file subtitle, sareng saha waé anu ngalihkeun bahan antara editor sareng pamuter wéb.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Pamisah Subtitle Bilingual - Simpen Ngan Hiji Basa | AI-SRTSub",
-    "desc": "Pamisah subtitle bilingual online gratis: pisahkeun file subtitle bilingual janten jalur asal sareng jalur tarjamahan, atau simpen ngan hiji.",
-    "kw": "pamisah_subtitle_bilingual,pisah_srt_bilingual,coplokkeun_subtitle_basa_kadua,simpen_ngan_subtitle_inggris,ekstrak_subtitle_terjemahan,pisah_bilingual_srt,pisah_bilingual_ass",
-    "intro": "Pisahkeun file subtitle bilingual janten jalur asal sareng jalur tarjamahan, atau simpen ngan salah sahijina.",
-    "feat": "Nanganan duanana tata letak umum - hiji cue mawa dua baris, sareng dua cue ngabagi timeline anu sami. Jalur dipisahkeun dumasar kana urutan sareng jenis aksrip, timeline dijaga tetep sapertos kieu, sareng file basa tunggal ditandaan alih-alih dikosongkeun sacara meneng.",
-    "who": "Sing saha waé anu dibéré file bilingual anu siap dianggo sareng ngan ukur hoyong hiji basa, sareng tim subtitle anu ngarsipkeun asal sareng tarjamahan sacara terpisah.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Parobahan Timeline Subtitle - Pindah, Rescale, Gabung & Pisah | AI-SRTSub",
-    "desc": "Alat timing subtitle online gratis: pindahkeun sadayana sakaligus, rescale dumasar rasio, atanapi perbaiki drift kalayan dua titik jangkar. Gawé sareng SRT, VTT, ASS, SBV, LRC sareng TXT.",
-    "kw": "parobahan_timing_subtitle,geser_timing_srt,saluyukeun_sinkronisasi_subtitle,rescale_timing_subtitle,perbaiki_keterlambatan_subtitle,offset_waktu_srt,perbaiki_drift_subtitle,gabungkeun_subtitle,pisahkeun_subtitle,gabung_srt,pisah_subtitle_panjang",
-    "intro": "Nalika subtitle henteu sinkron, pindahkeun sakabéh timeline, rescale dumasar rasio, atanapi perbaiki nganggo dua titik jangkar. Ogé tiasa ngahijikeun baris anu dipisahkeun, sareng misahkeun baris anu lila teuing.",
-    "feat": "Ngésér mindahkeun unggal cue tanpa ngarobah sabaraha lila unggal cue tetep dina layar. Rescaling ngalikeun dua tungtung, janten panjang cue robah - kapilampah antara 24 sareng 25 fps. Perbaikan dua titik nanganan file anu offset sareng lumpat dina kecepatan anu salah. Waktu négatif diwatesan janten nol, sareng alatna némbongkeun sabaraha anu kapangaruhan. Format sami asup, format sami kaluar - teu aya konversi, sareng gaya ASS tetep dijaga sapertos biasana. Cue bilingual tetep dina dua baris nalika digabungkeun sareng dilewatan nalika dipisahkeun.",
-    "who": "Sing saha waé anu subtitle-na drift saatos parobahan sumber, lumpat rada gancang atanapi lambat, atanapi asalna ti jalma anu damel dina laju pigura anu béda.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Perbaiki Subtitle Ruksak - Lereskeun Mojibake / Éncoding Salah | AI-SRTSub",
-    "desc": "Perbaikan online gratis pikeun subtitle ruksak: ngadeteksi naha file mangrupikeun UTF-8, GBK, Big5, Shift_JIS atanapi EUC-KR, mulihkeun téks anu salah dibaca, sareng simpen ulang kanggo pamuter anjeun.",
-    "kw": "perbaiki_subtitle_ruksak,mojibake_subtitle,perbaikan_encoding_srt,perbaiki_encoding_subtitle,utf8_ka_gbk_subtitle,srt_muncul_karakter_aneh,encoding_subtitle_salah,ass_ruksak,vtt_ruksak,deteksi_encoding_subtitle",
-    "intro": "Subtitle yang kabuka salaku témbok omong kosong ampir sok dibaca nganggo éncoding anu salah. Lebetkeun file, teras alat ieu bakal terang éncoding anu leres.",
-    "feat": "File anu diunggah didekode ulang tina bait asal, janten teu aya anu leungit: upami mangrupikeun GBK, alat bakal nyarios kitu, sareng upami pamuter anjeun anu salah maca, nyimpen salinan salaku \"UTF-8 kalayan BOM\" biasana ngabéréskeunana. Nomer baris jeung cap waktu teu pernah digentos, sarta tag gaya ASS dibiarkeun sakumaha ayana.",
-    "who": "Sing saha waé anu ngaunduh subtitle anu kabuka salaku omong kosong, ningali kotak tinimbang Aksara Cina dina pamuter, atanapi nampi file kalayan éncoding anu teu dipikanyaho.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Ekstrak Téks Tina Subtitle - SRT/ASS/VTT ka Téks Biasa | AI-SRTSub",
-    "desc": "Ekstraktor subtitle-ka-téks online gratis: baca SRT, VTT, ASS, SBV, LRC sareng TXT, hapus cap waktu sareng nomer baris, kaluarkeun dialog bersih.",
-    "kw": "ekstrak_téks_tina_subtitle,subtitle_ka_téks,srt_ka_txt,srt_ka_téks_biasa,ass_ka_txt,vtt_ka_txt,transkrip_subtitle,ekstrak_dialog_tina_srt,srt_hapus_cap_waktu,ekstraktor_téks_subtitle",
-    "intro": "Tarik dialog kaluar tina subtitle SRT / VTT / ASS / SBV / LRC / TXT salaku téks biasa anu bersih: cap waktu, nomer cue jeung tag gaya dipiceun sacara otomatis.",
-    "feat": "Dua tata letak: paragraf kontinyu dipisahkeun dina jeda jeung tanda baca ahir kalimah, atanapi hiji baris per cue pikeun daptar dialog. Cue sora sapertos \"(telepon disada)\" jeung tanda cai sumber dipiceun sacara standar; nami panyatur tiasa disimpen atanapi dipiceun. Pembungkusan baris digabungkeun deui per aksara — CJK ngagabung langsung, Koréa jeung Latin nambahkeun spasi.",
-    "who": "Sing saha waé anu hoyong téks subtitle pikeun catetan, naskah, prakték tarjamahan atanapi tuang alat séjén, tanpa mupus ratusan cap waktu ku leungeun.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Ekstrak Subtitle Tersembunyi tina MKV / MP4 ka SRT | AI-SRTSub",
-    "desc": "Ekstrak subtitle tersembunyi tina MKV, WebM, MP4, MOV; ékspor salaku SRT / VTT / ASS / TXT. Teu aya unggah atanapi éncoding ulang — file dibaca dina panyungsi anjeun.",
-    "kw": "ekstrak_subtitle_tersembunyi,mkv_ka_srt,ekstrak_subtitle_mp4,ekstrak_subtitle_tina_video,ekstraktor_subtitle_tersembunyi,srt_tina_mkv,ekstrak_subtitle_mov,ekspor_jalur_subtitle,vtt_tina_mkv,ekstrak_subtitle_lemes,rip_subtitle_mkv",
-    "intro": "Tarik jalur subtitle anu disegel di jero MKV atanapi MP4 langsung kana SRT — teu aya unggah, sadayana kajantenan dina panyungsi anjeun.",
-    "feat": "Maca jalur téks biasa, ASS, WebVTT sareng mov_text / tx3g, ngajaga lulugu sareng résolusi ASS asli, sareng maca dina potongan leutik ku offset supados file ageung henteu pernah ngeusian mémori.",
-    "who": "Sing saha waé anu mawa pilem anu ngagaduhan subtitle lemes anu hoyong kaluar téksna, grup éncoding, sareng tim fansub dimimitian tina jalur asli.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Konverter Subtitle Cina - Sederhana ⇄ Tradisional | AI-SRTSub",
-    "desc": "Konverter subtitle Cina gratis: Sederhana ⇄ Tradisional (Taiwan / Hong Kong) sareng sabalikna. Ngan dialog anu robah — cap waktu sareng tag ASS tetep. Dihasilkeun dina OpenCC.",
-    "kw": "konverter_subtitle_cina,sederhana_ka_tradisional,tradisional_ka_sederhana,srt_cina_tradisional,konversi_subtitle_cina,cina_tradisional_taiwan,cina_tradisional_hong_kong,konversi_han,konversi_srt_ka_cina_tradisional,srt_cina_sederhana,subtitle_opencc",
-    "intro": "Konversi sakabéh file subtitle antara Sederhana sareng Tradisional, teu ngarobah nanaon iwal dialog.",
-    "feat": "Salapan arah: Tradisional umum, kosa kata Taiwan, wangun Taiwan, Hong Kong, balik deui ka Sederhana, sareng wangun régional Tradisional ka Tradisional. Ngagunakeun kamus OpenCC.",
-    "who": "Sing saha waé anu nganteurkeun subtitle ka pamiarsa Taiwan atanapi Hong Kong, distributor anu nyiapkeun vérsi régional, sareng editor anu nampi file Tradisional teras hoyong Sederhana.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Pemisah & Penggabung Subtitle - SRT / VTT | AI-SRTSub",
-    "desc": "Pisahkeun subtitle dumasar durasi atanapi jumlah, atanapi gabungkeun sababaraha file sacara berurutan atanapi ku cap waktu. Penomoran ulang otomatis, dialog tetep. SRT & VTT.",
-    "kw": "pamisah_subtitle,pisahkeun_subtitle,gabung_file_srt,penggabung_srt,kombinasikeun_subtitle,pisah_srt,gabung_file_srt,potong_subtitle,pisah_vtt,penggabung_subtitle",
-    "intro": "Potong hiji subtitle panjang janten sababaraha bagian, atanapi gabungkeun sababaraha file janten hiji. Gawé sapinuhna dina panyungsi anjeun — teu aya anu diunggah.",
-    "feat": "Pisahkeun dumasar durasi atanapi jumlah kalayan penomoran ulang per bagian sareng timing dumasar nol opsional; gabungkeun sacara runtuyan kalayan celah atanapi diselingi ku cap waktu asli. SRT sareng VTT.",
-    "who": "Panyipta anu mungkasan épisode pikeun diunggah, tim anu marios dina sababaraha bagian, sareng editor anu menggabungkan subtitle sababaraha bagian.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Subtitle ka Excel/CSV sareng Sabalikna | AI-SRTSub",
-    "desc": "Robah SRT atanapi VTT janten lambaran Excel atanapi CSV pikeun ulasan sareng tarjamahan, teras bawa deui. Cap waktu tetep pas, pemecahan baris salamet. Teu aya anu diunggah.",
-    "kw": "subtitle_ka_excel,srt_ka_csv,srt_ka_excel,excel_ka_srt,csv_ka_srt,spreadsheet_subtitle,tabel_konverter_subtitle",
-    "intro": "Ékspor subtitle kana spreadsheet pikeun ulasan sareng tarjamahan, teras impor lambaranana deui. Gawé sapinuhna dina panyungsi anjeun.",
-    "feat": "Hiji klik tina SRT atanapi VTT ka xlsx atanapi CSV; édit waktu, téks sareng catetan dina spreadsheet anjeun, teras ékspor deui ka SRT atanapi VTT. Kolom waktu ngajaga presisi milidetik pinuh; pemecahan baris dina sél disimpen. Lulugu Cina sareng Inggris duanana jalan.",
-    "who": "Penterjemah, tim fansub sareng editor anu marios, masihan catetan atanapi ngabenerkeun subtitle sacara massal dina spreadsheet.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Konversi Batch Subtitle ka SRT/VTT | AI-SRTSub",
-    "desc": "Lebetkeun puluhan atanapi ratusan file SRT/VTT, konversi sadayana kana hiji format sareng unduh hiji ZIP. Penomoran ulang sareng cap waktu dinormalisasi.",
-    "kw": "konversi_batch_subtitle,srt_ka_vtt,konverter_subtitle_massal,srt_bulk,konversi_sababaraha_subtitle,zip_subtitle",
-    "intro": "Seret ratusan file subtitle, konversi sadayana, candak hiji ZIP. Gawé sapinuhna dina panyungsi anjeun — teu aya anu diunggah.",
-    "feat": "SRT ka VTT sareng sabalikna sacara massal; nomer urutan diatur ulang sareng cap waktu dinormalisasi per format target. File anu teu tiasa diparsing ditandaan sareng ditinggalkeun tina ZIP. Nami file asal dijaga kalayan éksténsina énggal; tabrakan meunang sufiks.",
-    "who": "Editor sareng penterjemah subtitle anu ngarobah sakabéh folder séri, sareng pamilik situs anu nyayogikeun panyajak hiji format.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Editor Lirik LRC - Ketok Waktu Bari Ngupingkeun | AI-SRTSub",
-    "desc": "Muatkeun lagu, témpél lirik, sareng ketok waktu unggal baris bari ngupingkeun; ékspor LRC atanapi SRT. Impor LRC aya pikeun nyaluyukeun. Didorong kibor, pinuh di panyungsi.",
-    "kw": "editor_lrc_online,jieun_lrc,waktu_lirik,pembuat_lrc,buat_lrc,sinkronisasi_lirik,lrc_ka_srt",
-    "intro": "Muatkeun musik, témpél lirik, ketok timing baris-baris nalika anjeun ngupingkeun, sareng ékspor LRC atanapi SRT. Teu aya anu diunggah.",
-    "feat": "Gawé sareng MP3, M4A, FLAC, WAV sareng OGG. Hiji baris per baris; file LRC anu tos aya tiasa diimpor sareng disaluyukeun. Spasi muter/reureuh, Enter ngecap baris ayeuna, Z ngabatalkeun — panangan tetep dina kibor.",
-    "who": "Musisi anu nyingkronkeun cover, panyipta anu nambahkeun lagu kana vidéo, sareng saha waé anu ngawangun subtitle lirik pikeun pamuter.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "Realigner Subtitle YouTube - Ngahijikeun Kalimah nu Pegat | AI-SRTSub",
-    "desc": "Auto-caption YouTube megat kalimah unggal 3-4 detik. Alat ieu teu ngarobah kecap, ngan mindahkeun wates pas kalimah lekasan. Gratis, 100 basa.",
-    "kw": "ngalereskeun subtitle youtube,caption otomatis youtube,realign subtitle,penyelarasan kalimah subtitle,ngalereskeun subtitle rusak,penyelarasan kalimah srt,re-segmentasi subtitle,ngalereskeun caption youtube,subtitle sadar kalimah",
-    "intro": "Lebetkeun file subtitle otomatis YouTube, pilih basana, teras alat ieu bakal ngahijikeun kalimah nu pegat, tuluy motong deui file éta per kalimah. Henteu aya kecap nu dirobah, sarta waktu cue tetep caket kana timestamp aslina.",
-    "feat": "Caption otomatis YouTube dipotong jadi cue 3-4 detik tanpa merhatikeun tungtung kalimah, sahingga hiji cue mindeng ngandung tungtung kalimah saméméhna jeung awal kalimah saterusna. Alat ieu ngagunakeun timestamp asli salaku jangkar - waktu éta téh wates kecap nyata nu dihasilkeun ku pangenal sora - nangtukeun tungtung kalimah tina tanda baca, sarta ngagunakeun pemrograman dinamis pikeun milih titik potong pangalusna di antara tungtung kalimah, koma, konjungsi jeung potong hard, tuluy nambahkeun waktu dina layar sangkan cocog jeung laju maca. Unggal 100 basa boga aturan kalimah sorangan: Cina jeung Jepang henteu aya spasi antara kecap, Thai ampir henteu méré tanda wates kecap, Hindi mungkas kalimah ku ।, Arab ku ؟, Arménia ku ։. Lébar baris jeung laju maca nuturkeun sistem tulisan - 16 karakter pinuh pikeun Cina, 42 karakter pikeun skrip Latin. Saacan ékspor, téks dibandingkeun karakter demi karakter, sarta kecap nu leungit atawa ditambahkeun bakal ditandaan langsung.",
-    "who": "Tim subtitle nu ngarobah caption otomatis YouTube, podcast jeung kursus jadi subtitle réngsé, sarta kreator nu ngédit videona sorangan nu bosen ku kalimah nu eureun di tengah jalan.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio jadi Subtitle — ubah sora jadi SRT di browser | AI-SRTSub",
-    "desc": "Input audio atawa video, hasilna subtitle: ASR jalan dina browser, motong hasilna jadi cue, sarta ékspor ka SRT / VTT. Taya nu diunggah, gratis.",
-    "kw": "audio jadi srt,sora jadi subtitle,nyieun subtitle tina audio,generator subtitle otomatis,transkripsi audio ka srt,subtitle whisper,pangwanoh sora browser,nyieun subtitle offline",
-    "intro": "Lebetkeun file audio atawa video, pilih basa jeung modél, tuluy prosés pangwanoh jalan dina browser anjeun. Hasilna nyaéta draf subtitle nu geus aya waktuna sarta dipotong per kalimah.",
-    "feat": "Alat ieu ngolah aliran kecap tina ASR jadi cue subtitle nu rapih, motong kalimah dumasar tanda baca, sarta ngatur lebar garis dumasar sistem tulisan.",
-    "who": "Panyipta kontén nu hayang méré caption kana videona, tim nu ngarobah podcast jadi téks, sarta saha waé nu butuh draf subtitle gancang."
-  },
-  "ocrsub": {
-    "title": "OCR Subtitle Hardcoded — baca subtitle dina gambar | AI-SRTSub",
-    "desc": "Subtitle nu nempel dina gambar teu bisa diékstrak biasa. Tandaan bagianana, alat ieu bakal maca per frame sarta ngagabungkeun jadi cue. SRT / VTT, gratis.",
-    "kw": "ékstrak subtitle hardcoded,ocr subtitle,ékstraksi subtitle video,subtitle nempel,ocr subtitle tina video,video ka srt,subtitle tina video,ocr caption hardcoded",
-    "intro": "Lebetkeun video, tandaan bagian tempat subtitle ayana, sarta alat ieu bakal maca per frame pikeun ngagabungkeunana jadi hiji cue nu boga waktu.",
-    "feat": "Alat ieu ngagunakeun téknik OCR pikeun maca téks nu nempel dina gambar ku cara motong bagian handap video, ngabersihkeun latar, sarta ngarobah frame nu sarua jadi hiji cue nu boga durasi.",
-    "who": "Tim subtitle nu keur ngalokalisasi video asing, saha waé nu keur ngédit ulang video lila, sarta éditor nu teu boga file subtitle asli."
-  }
+ "index": {
+  "htmlLang": "su",
+  "ogLocale": "su_ID",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Tarjamahkeun Subtitle Film & Séries Global",
+  "desc": "Penterjemah subtitle AI gratis — euweuh pendaptaran, euweuh wates, euweuh watermark. Ubah subtitle pilem asing, séries, jeung dokumenter kana basa anjeun dina sakali klik.",
+  "kw": "penterjemah_subtitle_ai,terjemahkeun_subtitle,penterjemah_subtitle_gratis,terjemahkeun_file_srt,terjemahkeun_vtt,terjemahkeun_ass,tarjamah_subtitle_pilem,subtitle_séries_tv,subtitle_netflix,subtitle_kdrama,subtitle_anime,subtitle_bilingual,subtitle_pilem_asing,terjemahkeun_subtitle_online,subtitle_youtube,alat_tarjamah_subtitle_gratis,terjemahkeun_subtitle_gratis,penterjemah_srt_gratis",
+  "ogTitle": "AI-SRTSub - Tarjamahkeun Subtitle Film & Séries Global",
+  "ogDesc": "Penterjemah subtitle AI 100% gratis pikeun kipas pilem: sakali klik ngarobah subtitle pilem asing, séries, jeung dokumenter kana basa pituin anjeun, otomatis nyaluyukeun timeline. Nikmati eusi global tanpa wates.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Penterjemah subtitle AI 100% gratis pikeun kipas pilem: sakali klik ngarobah subtitle pilem asing, séries, jeung dokumenter kana basa pituin anjeun, otomatis nyaluyukeun timeline. Nikmati eusi global tanpa wates.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Ngeunaan alat ieu\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Penterjemah Subtitle Otomatis AI Gratis</h2>\n    <p data-i18n-html=\"seoIntro\">Ieu mangrupikeun <strong>alat tarjamahan subtitle online gratis anu ditenagai ku modél basa ageung</strong>. Unggah file SRT, VTT atanapi ASS sareng terjemahkeun subtitle antara Inggris, Cina, Jepang, Korséa, Spanyol, Perancis sareng 15+ basa séjénna. Euweuh pendaptaran, euweuh pamasangan, euweuh watermark — buka dina panyungsi tur mimitian terjemahkeun. Data subtitle tetep aya dina panyungsi anjeun iwal ti anjeun ngaktipkeun tarjamahan awan.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Fitur utama:</strong> Parsing SRT, VTT jeung ASS sarta tarjamahan AI, ngahijikeun kalimah pinter (nalika hiji kalimah ngalibatkeun sababaraha cue, cue digabungkeun, diterjemahkeun, tuluy dipisahkeun deui sapanjang timeline asal), panyaluyuan timeline, panybungkus garis otomatis pikeun téks CJK jeung Kulon, ngaleungitkeun kecap eusi tambahan, nanganan términologi khusus, jeung gaya tarjamahan anu tiasa dipilih. Ékspor file standar SRT, VTT, ASS atanapi TXT anu siap diselapkeun kana vidéo anjeun.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Saha anu ngagunakeunana:</strong> penterjemah vidéo, panyipta YouTube jeung pelokalan, nu diajar basa, grup subtitle jeung tim anu kedah melokalisasi eusi vidéo kalayan gancang.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Alat ieu meryogikeun JavaScript. Mangga aktipkeun JavaScript dina panyungsi anjeun, tuluy unggah file subtitle (SRT / VTT / ASS) pikeun terjemahkeun subtitle nganggo AI sacara gratis.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Pembuat Subtitle Bergaya - Gabungkeun Bilingual, ASS & Efek VTT",
+  "desc": "Alat gratis pikeun subtitle bergaya: gabungkeun dua file janten bilingual, atur ulang gaya jalur bilingual, atanapi tambahkeun efek. 5 prasetél ASS / 6 VTT; ékspor salaku SRT / VTT / ASS.",
+  "kw": "gabungkeun_subtitle,subtitle_bilingual,kombinasikeun_file_subtitle,subtitle_bergaya,gaya_subtitle_ass,gaya_subtitle_vtt,efek_subtitle,pembuat_subtitle_ganda,prasetél_ass, témplat_subtitle,alat_subtitle_gratis",
+  "intro": "Gabungkeun dua file subtitle janten bilingual, atanapi atur gaya jalur: font, warna, outline sareng posisi, sadayana WYSIWYG.",
+  "feat": "Gabungan bilingual sareng panyaluyuan, prasetél gaya ASS / VTT, slot gaya per-nilai, perbaikan timeline di tempat sareng massal, sareng sawangan langsung anu sacara harfiah mangrupikeun file anu diékspor.",
+  "who": "Panyipta anu ngadamel subtitle bilingual atanapi bergaya, grup éncoding, sareng tim anu peryogi caption anu tiasa diaksés."
+ },
+ "clean": {
+  "title": "Pembersih Subtitle - Hapus Watermark, Cue SDH & Tag HTML",
+  "desc": "Pembersih subtitle online gratis: hapus watermark, iklan, SDH, tag HTML, efek ASS; perbaiki huruf kapital, mojibake. 13 aturan, undo, timeline aman.",
+  "kw": "pambersih_subtitle,bersihkeun_file_srt,coplokkeun_watermark_subtitle,coplokkeun_subtitle_sdh,coplokkeun_tag_html_ti_subtitle,lereskeun_huruf_kapital_subtitle,lereskeun_mojibake,coplokkeun_subtitle_tuna_rungu,coplokkeun_efek_ass",
+  "intro": "Jalurkeun subtitle anu diunduh ngaliwatan dieu heula: watermark, iklan, cue SDH sareng tag HTML, leungit dina sakali jalan.",
+  "feat": "13 aturan dina opat grup (9 aktip sacara standar), ngaleungitkeun watermark sareng SDH, perbaikan huruf kapital sareng mojibake, daptar parobahan per cue kalayan mbalikeun deui masing-masing, sareng waktu moal pernah kaganggu.",
+  "who": "Sing saha waé anu nyandak subtitle anu aya teras hoyong tiasa dianggo, sareng grup anu ngabersihkeun bahan sacara massal."
+ },
+ "glossary": {
+  "title": "Ganti Istilah Subtitle Batch - Hiji Glosarium, Sadaya File | AI-SRTSub",
+  "desc": "Ganti glosarium pikeun subtitle: daptar \"lami → énggal\" sakali sareng sadaya file SRT / VTT / ASS / TXT dianyarkeun. Waktu, gaya sareng blok NOTE tetep; malikeun per baris.",
+  "kw": "glosarium_subtitle,ganti_massal_srt,milarian_sareng_ganti_subtitle,ganti_istilah_subtitle,édit_massal_srt,ganti_kecap_dina_subtitle,nyaluyukeun_nami_subtitle,términologi_subtitle,ganti_téks_dina_vtt,alat_srt_glosarium,ganti_términologi_massal",
+  "intro": "Glosarium aturan \"istilah lami → istilah énggal\" diterapkeun dina sakabéh file subtitle sakaligus, kalayan waktu, gaya ASS sareng blok catetan VTT tetep sarua persis.",
+  "feat": "Hiji aturan per baris, dipisahkeun ku ->, =>, → atanapi tab; baris anu dimimitian ku # mangrupikeun koméntar. Cocog kecap utuh ngajaga \"art\" kaluar tina \"start\", sensitif huruf opsional, sareng anjeun tiasa ngwatesan panggantian kana baris 1 atanapi baris 2 tina cue bilingual. Saban cue anu robih didaptarkeun, sareng naon waé anu tiasa dibalikeun deui.",
+  "who": "Sing saha waé anu nyaluyukeun nami sareng términologi dina hiji musim, ngalereskeun kecap tarjamahan mesin sacara massal, atau adaptasi subtitle batur kana gaya sorangan.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "QC Subtitle - Cek Waktu & Tata Letak per Basa | AI-SRTSub",
+  "desc": "Layanan pamariksaan kualitas subtitle online gratis: unggah SRT, VTT atanapi ASS sareng pariksa tumpang tindih, durasi, kecepatan maca, lebar baris, pemecahan baris, panomeran sareng éncoding numutkeun aturan basa éta. 27 basa, 27 sét ambang wates, ditambah aturan khusus basa.",
+  "kw": "panyek_subtitle,qc_subtitle,validator_srt,pamariksaan_kualitas_subtitle,pamariksaan_srt,pamariksaan_waktu_subtitle,validator_file_srt,pamariksaan_file_srt,koreksi_subtitle,linter_subtitle",
+  "intro": "Unggah file subtitle sareng parios kana aturan basana sorangan - unggah penemuan dilengkepan ku nilai anu diukur sareng ambang watesna.",
+  "feat": "Pariksa cue anu tumpang tindih, durasi pondok atanapi panjang teuing, kecepatan baca, lebar baris, jumlah baris, pemecahan baris, panomoran, cue kosong, mojibake sareng karakter kontrol. Aturan khusus basa nyertakeun tanda Tanya Spanyol, spasi Perancis, tanda Tanya Yunani, tanda baca pinuh dina Cina sareng Jepang. Item anu tiasa dibenerkeun otomatis didaptarkeun sacara terpisah.",
+  "who": "Grup subtitle, vendor pelokalan, editor sareng saha waé anu hoyong mariksa file sateuacan dikirimkeun.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Penterjemah Subtitle — SRT/VTT/ASS kana Basa Anjeun",
+  "desc": "Lebetkeun file SRT / VTT / ASS, pilih basa target, sareng kéngingkeun tarjamahan anu dikonci timeline-na. 100 basa, gratis, tanpa pendaptaran."
+ },
+ "convert": {
+  "title": "Konverter Subtitle - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Konverter subtitle online gratis: konversi antara SRT, VTT, ASS, SBV, LRC sareng TXT kalayan timeline tetep utuh, tag efek ASS dibersihkeun otomatis.",
+  "kw": "konverter_subtitle,srt_ka_vtt,vtt_ka_srt,ass_ka_srt,sbv_ka_srt,srt_ka_lrc,subtitle_ka_txt,konversi_subtitle,konverter_srt,konverter_vtt",
+  "intro": "Konversi antara SRT, VTT, ASS, SBV, LRC sareng TXT kalayan timeline anu tetep utuh.",
+  "feat": "Format masukan dideteksi sacara otomatis sareng cap waktu ditulis ulang pikeun format target; tag efek ASS sareng pemecahan baris paksa janten téks anu tiasa dibaca nalika anjeun ngékspor kana format biasa; file lirik teu gaduh widang jam.",
+  "who": "Sing saha waé anu panyajak videona nolak file subtitle, sareng saha waé anu ngalihkeun bahan antara editor sareng pamuter wéb.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Pamisah Subtitle Bilingual - Simpen Ngan Hiji Basa | AI-SRTSub",
+  "desc": "Pamisah subtitle bilingual online gratis: pisahkeun file subtitle bilingual janten jalur asal sareng jalur tarjamahan, atau simpen ngan hiji.",
+  "kw": "pamisah_subtitle_bilingual,pisah_srt_bilingual,coplokkeun_subtitle_basa_kadua,simpen_ngan_subtitle_inggris,ekstrak_subtitle_terjemahan,pisah_bilingual_srt,pisah_bilingual_ass",
+  "intro": "Pisahkeun file subtitle bilingual janten jalur asal sareng jalur tarjamahan, atau simpen ngan salah sahijina.",
+  "feat": "Nanganan duanana tata letak umum - hiji cue mawa dua baris, sareng dua cue ngabagi timeline anu sami. Jalur dipisahkeun dumasar kana urutan sareng jenis aksrip, timeline dijaga tetep sapertos kieu, sareng file basa tunggal ditandaan alih-alih dikosongkeun sacara meneng.",
+  "who": "Sing saha waé anu dibéré file bilingual anu siap dianggo sareng ngan ukur hoyong hiji basa, sareng tim subtitle anu ngarsipkeun asal sareng tarjamahan sacara terpisah.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Parobahan Timeline Subtitle - Pindah, Rescale, Gabung & Pisah | AI-SRTSub",
+  "desc": "Alat timing subtitle online gratis: pindahkeun sadayana sakaligus, rescale dumasar rasio, atanapi perbaiki drift kalayan dua titik jangkar. Gawé sareng SRT, VTT, ASS, SBV, LRC sareng TXT.",
+  "kw": "parobahan_timing_subtitle,geser_timing_srt,saluyukeun_sinkronisasi_subtitle,rescale_timing_subtitle,perbaiki_keterlambatan_subtitle,offset_waktu_srt,perbaiki_drift_subtitle,gabungkeun_subtitle,pisahkeun_subtitle,gabung_srt,pisah_subtitle_panjang",
+  "intro": "Nalika subtitle henteu sinkron, pindahkeun sakabéh timeline, rescale dumasar rasio, atanapi perbaiki nganggo dua titik jangkar. Ogé tiasa ngahijikeun baris anu dipisahkeun, sareng misahkeun baris anu lila teuing.",
+  "feat": "Ngésér mindahkeun unggal cue tanpa ngarobah sabaraha lila unggal cue tetep dina layar. Rescaling ngalikeun dua tungtung, janten panjang cue robah - kapilampah antara 24 sareng 25 fps. Perbaikan dua titik nanganan file anu offset sareng lumpat dina kecepatan anu salah. Waktu négatif diwatesan janten nol, sareng alatna némbongkeun sabaraha anu kapangaruhan. Format sami asup, format sami kaluar - teu aya konversi, sareng gaya ASS tetep dijaga sapertos biasana. Cue bilingual tetep dina dua baris nalika digabungkeun sareng dilewatan nalika dipisahkeun.",
+  "who": "Sing saha waé anu subtitle-na drift saatos parobahan sumber, lumpat rada gancang atanapi lambat, atanapi asalna ti jalma anu damel dina laju pigura anu béda.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Perbaiki Subtitle Ruksak - Lereskeun Mojibake / Éncoding Salah | AI-SRTSub",
+  "desc": "Perbaikan online gratis pikeun subtitle ruksak: ngadeteksi naha file mangrupikeun UTF-8, GBK, Big5, Shift_JIS atanapi EUC-KR, mulihkeun téks anu salah dibaca, sareng simpen ulang kanggo pamuter anjeun.",
+  "kw": "perbaiki_subtitle_ruksak,mojibake_subtitle,perbaikan_encoding_srt,perbaiki_encoding_subtitle,utf8_ka_gbk_subtitle,srt_muncul_karakter_aneh,encoding_subtitle_salah,ass_ruksak,vtt_ruksak,deteksi_encoding_subtitle",
+  "intro": "Subtitle yang kabuka salaku témbok omong kosong ampir sok dibaca nganggo éncoding anu salah. Lebetkeun file, teras alat ieu bakal terang éncoding anu leres.",
+  "feat": "File anu diunggah didekode ulang tina bait asal, janten teu aya anu leungit: upami mangrupikeun GBK, alat bakal nyarios kitu, sareng upami pamuter anjeun anu salah maca, nyimpen salinan salaku \"UTF-8 kalayan BOM\" biasana ngabéréskeunana. Nomer baris jeung cap waktu teu pernah digentos, sarta tag gaya ASS dibiarkeun sakumaha ayana.",
+  "who": "Sing saha waé anu ngaunduh subtitle anu kabuka salaku omong kosong, ningali kotak tinimbang Aksara Cina dina pamuter, atanapi nampi file kalayan éncoding anu teu dipikanyaho.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Ekstrak Téks Tina Subtitle - SRT/ASS/VTT ka Téks Biasa | AI-SRTSub",
+  "desc": "Ekstraktor subtitle-ka-téks online gratis: baca SRT, VTT, ASS, SBV, LRC sareng TXT, hapus cap waktu sareng nomer baris, kaluarkeun dialog bersih.",
+  "kw": "ekstrak_téks_tina_subtitle,subtitle_ka_téks,srt_ka_txt,srt_ka_téks_biasa,ass_ka_txt,vtt_ka_txt,transkrip_subtitle,ekstrak_dialog_tina_srt,srt_hapus_cap_waktu,ekstraktor_téks_subtitle",
+  "intro": "Tarik dialog kaluar tina subtitle SRT / VTT / ASS / SBV / LRC / TXT salaku téks biasa anu bersih: cap waktu, nomer cue jeung tag gaya dipiceun sacara otomatis.",
+  "feat": "Dua tata letak: paragraf kontinyu dipisahkeun dina jeda jeung tanda baca ahir kalimah, atanapi hiji baris per cue pikeun daptar dialog. Cue sora sapertos \"(telepon disada)\" jeung tanda cai sumber dipiceun sacara standar; nami panyatur tiasa disimpen atanapi dipiceun. Pembungkusan baris digabungkeun deui per aksara — CJK ngagabung langsung, Koréa jeung Latin nambahkeun spasi.",
+  "who": "Sing saha waé anu hoyong téks subtitle pikeun catetan, naskah, prakték tarjamahan atanapi tuang alat séjén, tanpa mupus ratusan cap waktu ku leungeun.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Ekstrak Subtitle Tersembunyi tina MKV / MP4 ka SRT | AI-SRTSub",
+  "desc": "Ekstrak subtitle tersembunyi tina MKV, WebM, MP4, MOV; ékspor salaku SRT / VTT / ASS / TXT. Teu aya unggah atanapi éncoding ulang — file dibaca dina panyungsi anjeun.",
+  "kw": "ekstrak_subtitle_tersembunyi,mkv_ka_srt,ekstrak_subtitle_mp4,ekstrak_subtitle_tina_video,ekstraktor_subtitle_tersembunyi,srt_tina_mkv,ekstrak_subtitle_mov,ekspor_jalur_subtitle,vtt_tina_mkv,ekstrak_subtitle_lemes,rip_subtitle_mkv",
+  "intro": "Tarik jalur subtitle anu disegel di jero MKV atanapi MP4 langsung kana SRT — teu aya unggah, sadayana kajantenan dina panyungsi anjeun.",
+  "feat": "Maca jalur téks biasa, ASS, WebVTT sareng mov_text / tx3g, ngajaga lulugu sareng résolusi ASS asli, sareng maca dina potongan leutik ku offset supados file ageung henteu pernah ngeusian mémori.",
+  "who": "Sing saha waé anu mawa pilem anu ngagaduhan subtitle lemes anu hoyong kaluar téksna, grup éncoding, sareng tim fansub dimimitian tina jalur asli.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Konverter Subtitle Cina - Sederhana ⇄ Tradisional | AI-SRTSub",
+  "desc": "Konverter subtitle Cina gratis: Sederhana ⇄ Tradisional (Taiwan / Hong Kong) sareng sabalikna. Ngan dialog anu robah — cap waktu sareng tag ASS tetep. Dihasilkeun dina OpenCC.",
+  "kw": "konverter_subtitle_cina,sederhana_ka_tradisional,tradisional_ka_sederhana,srt_cina_tradisional,konversi_subtitle_cina,cina_tradisional_taiwan,cina_tradisional_hong_kong,konversi_han,konversi_srt_ka_cina_tradisional,srt_cina_sederhana,subtitle_opencc",
+  "intro": "Konversi sakabéh file subtitle antara Sederhana sareng Tradisional, teu ngarobah nanaon iwal dialog.",
+  "feat": "Salapan arah: Tradisional umum, kosa kata Taiwan, wangun Taiwan, Hong Kong, balik deui ka Sederhana, sareng wangun régional Tradisional ka Tradisional. Ngagunakeun kamus OpenCC.",
+  "who": "Sing saha waé anu nganteurkeun subtitle ka pamiarsa Taiwan atanapi Hong Kong, distributor anu nyiapkeun vérsi régional, sareng editor anu nampi file Tradisional teras hoyong Sederhana.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Pemisah & Penggabung Subtitle - SRT / VTT | AI-SRTSub",
+  "desc": "Pisahkeun subtitle dumasar durasi atanapi jumlah, atanapi gabungkeun sababaraha file sacara berurutan atanapi ku cap waktu. Penomoran ulang otomatis, dialog tetep. SRT & VTT.",
+  "kw": "pamisah_subtitle,pisahkeun_subtitle,gabung_file_srt,penggabung_srt,kombinasikeun_subtitle,pisah_srt,gabung_file_srt,potong_subtitle,pisah_vtt,penggabung_subtitle",
+  "intro": "Potong hiji subtitle panjang janten sababaraha bagian, atanapi gabungkeun sababaraha file janten hiji. Gawé sapinuhna dina panyungsi anjeun — teu aya anu diunggah.",
+  "feat": "Pisahkeun dumasar durasi atanapi jumlah kalayan penomoran ulang per bagian sareng timing dumasar nol opsional; gabungkeun sacara runtuyan kalayan celah atanapi diselingi ku cap waktu asli. SRT sareng VTT.",
+  "who": "Panyipta anu mungkasan épisode pikeun diunggah, tim anu marios dina sababaraha bagian, sareng editor anu menggabungkan subtitle sababaraha bagian.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Subtitle ka Excel/CSV sareng Sabalikna | AI-SRTSub",
+  "desc": "Robah SRT atanapi VTT janten lambaran Excel atanapi CSV pikeun ulasan sareng tarjamahan, teras bawa deui. Cap waktu tetep pas, pemecahan baris salamet. Teu aya anu diunggah.",
+  "kw": "subtitle_ka_excel,srt_ka_csv,srt_ka_excel,excel_ka_srt,csv_ka_srt,spreadsheet_subtitle,tabel_konverter_subtitle",
+  "intro": "Ékspor subtitle kana spreadsheet pikeun ulasan sareng tarjamahan, teras impor lambaranana deui. Gawé sapinuhna dina panyungsi anjeun.",
+  "feat": "Hiji klik tina SRT atanapi VTT ka xlsx atanapi CSV; édit waktu, téks sareng catetan dina spreadsheet anjeun, teras ékspor deui ka SRT atanapi VTT. Kolom waktu ngajaga presisi milidetik pinuh; pemecahan baris dina sél disimpen. Lulugu Cina sareng Inggris duanana jalan.",
+  "who": "Penterjemah, tim fansub sareng editor anu marios, masihan catetan atanapi ngabenerkeun subtitle sacara massal dina spreadsheet.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Konversi Batch Subtitle ka SRT/VTT | AI-SRTSub",
+  "desc": "Lebetkeun puluhan atanapi ratusan file SRT/VTT, konversi sadayana kana hiji format sareng unduh hiji ZIP. Penomoran ulang sareng cap waktu dinormalisasi.",
+  "kw": "konversi_batch_subtitle,srt_ka_vtt,konverter_subtitle_massal,srt_bulk,konversi_sababaraha_subtitle,zip_subtitle",
+  "intro": "Seret ratusan file subtitle, konversi sadayana, candak hiji ZIP. Gawé sapinuhna dina panyungsi anjeun — teu aya anu diunggah.",
+  "feat": "SRT ka VTT sareng sabalikna sacara massal; nomer urutan diatur ulang sareng cap waktu dinormalisasi per format target. File anu teu tiasa diparsing ditandaan sareng ditinggalkeun tina ZIP. Nami file asal dijaga kalayan éksténsina énggal; tabrakan meunang sufiks.",
+  "who": "Editor sareng penterjemah subtitle anu ngarobah sakabéh folder séri, sareng pamilik situs anu nyayogikeun panyajak hiji format.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Editor Lirik LRC - Ketok Waktu Bari Ngupingkeun | AI-SRTSub",
+  "desc": "Muatkeun lagu, témpél lirik, sareng ketok waktu unggal baris bari ngupingkeun; ékspor LRC atanapi SRT. Impor LRC aya pikeun nyaluyukeun. Didorong kibor, pinuh di panyungsi.",
+  "kw": "editor_lrc_online,jieun_lrc,waktu_lirik,pembuat_lrc,buat_lrc,sinkronisasi_lirik,lrc_ka_srt",
+  "intro": "Muatkeun musik, témpél lirik, ketok timing baris-baris nalika anjeun ngupingkeun, sareng ékspor LRC atanapi SRT. Teu aya anu diunggah.",
+  "feat": "Gawé sareng MP3, M4A, FLAC, WAV sareng OGG. Hiji baris per baris; file LRC anu tos aya tiasa diimpor sareng disaluyukeun. Spasi muter/reureuh, Enter ngecap baris ayeuna, Z ngabatalkeun — panangan tetep dina kibor.",
+  "who": "Musisi anu nyingkronkeun cover, panyipta anu nambahkeun lagu kana vidéo, sareng saha waé anu ngawangun subtitle lirik pikeun pamuter.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "Realigner Subtitle YouTube - Ngahijikeun Kalimah nu Pegat | AI-SRTSub",
+  "desc": "Auto-caption YouTube megat kalimah unggal 3-4 detik. Alat ieu teu ngarobah kecap, ngan mindahkeun wates pas kalimah lekasan. Gratis, 100 basa.",
+  "kw": "ngalereskeun subtitle youtube,caption otomatis youtube,realign subtitle,penyelarasan kalimah subtitle,ngalereskeun subtitle rusak,penyelarasan kalimah srt,re-segmentasi subtitle,ngalereskeun caption youtube,subtitle sadar kalimah",
+  "intro": "Lebetkeun file subtitle otomatis YouTube, pilih basana, teras alat ieu bakal ngahijikeun kalimah nu pegat, tuluy motong deui file éta per kalimah. Henteu aya kecap nu dirobah, sarta waktu cue tetep caket kana timestamp aslina.",
+  "feat": "Caption otomatis YouTube dipotong jadi cue 3-4 detik tanpa merhatikeun tungtung kalimah, sahingga hiji cue mindeng ngandung tungtung kalimah saméméhna jeung awal kalimah saterusna. Alat ieu ngagunakeun timestamp asli salaku jangkar - waktu éta téh wates kecap nyata nu dihasilkeun ku pangenal sora - nangtukeun tungtung kalimah tina tanda baca, sarta ngagunakeun pemrograman dinamis pikeun milih titik potong pangalusna di antara tungtung kalimah, koma, konjungsi jeung potong hard, tuluy nambahkeun waktu dina layar sangkan cocog jeung laju maca. Unggal 100 basa boga aturan kalimah sorangan: Cina jeung Jepang henteu aya spasi antara kecap, Thai ampir henteu méré tanda wates kecap, Hindi mungkas kalimah ku ।, Arab ku ؟, Arménia ku ։. Lébar baris jeung laju maca nuturkeun sistem tulisan - 16 karakter pinuh pikeun Cina, 42 karakter pikeun skrip Latin. Saacan ékspor, téks dibandingkeun karakter demi karakter, sarta kecap nu leungit atawa ditambahkeun bakal ditandaan langsung.",
+  "who": "Tim subtitle nu ngarobah caption otomatis YouTube, podcast jeung kursus jadi subtitle réngsé, sarta kreator nu ngédit videona sorangan nu bosen ku kalimah nu eureun di tengah jalan.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio jadi Subtitle — ubah sora jadi SRT di browser | AI-SRTSub",
+  "desc": "Input audio atawa video, hasilna subtitle: ASR jalan dina browser, motong hasilna jadi cue, sarta ékspor ka SRT / VTT. Taya nu diunggah, gratis.",
+  "kw": "audio jadi srt,sora jadi subtitle,nyieun subtitle tina audio,generator subtitle otomatis,transkripsi audio ka srt,subtitle whisper,pangwanoh sora browser,nyieun subtitle offline",
+  "intro": "Lebetkeun file audio atawa video, pilih basa jeung modél, tuluy prosés pangwanoh jalan dina browser anjeun. Hasilna nyaéta draf subtitle nu geus aya waktuna sarta dipotong per kalimah.",
+  "feat": "Alat ieu ngolah aliran kecap tina ASR jadi cue subtitle nu rapih, motong kalimah dumasar tanda baca, sarta ngatur lebar garis dumasar sistem tulisan.",
+  "who": "Panyipta kontén nu hayang méré caption kana videona, tim nu ngarobah podcast jadi téks, sarta saha waé nu butuh draf subtitle gancang."
+ },
+ "ocrsub": {
+  "title": "OCR Subtitle Hardcoded — baca subtitle dina gambar | AI-SRTSub",
+  "desc": "Subtitle nu nempel dina gambar teu bisa diékstrak biasa. Tandaan bagianana, alat ieu bakal maca per frame sarta ngagabungkeun jadi cue. SRT / VTT, gratis.",
+  "kw": "ékstrak subtitle hardcoded,ocr subtitle,ékstraksi subtitle video,subtitle nempel,ocr subtitle tina video,video ka srt,subtitle tina video,ocr caption hardcoded",
+  "intro": "Lebetkeun video, tandaan bagian tempat subtitle ayana, sarta alat ieu bakal maca per frame pikeun ngagabungkeunana jadi hiji cue nu boga waktu.",
+  "feat": "Alat ieu ngagunakeun téknik OCR pikeun maca téks nu nempel dina gambar ku cara motong bagian handap video, ngabersihkeun latar, sarta ngarobah frame nu sarua jadi hiji cue nu boga durasi.",
+  "who": "Tim subtitle nu keur ngalokalisasi video asing, saha waé nu keur ngédit ulang video lila, sarta éditor nu teu boga file subtitle asli."
+ },
+ "multilang": {
+  "title": "Sababaraha basa sakaligus - kumpulkeun sakabéh usum, AI-SRTSub",
+  "desc": "Candak sakabéh usum, centang basa anu dipikabutuh, pencét mimitian sakali. Épisode × basa ngabentuk hiji antrian tur jalan babarengan; hasilna mangrupa hiji file zip.",
+  "kw": "tarjamahan subtitle massal,tarjamahkeun subtitle sababaraha basa,subtitle multi basa,subtitle sadaya usum,ékspor subtitle massal,tarjamahkeun srt kana sababaraha basa,hiji usum sababaraha basa",
+  "intro": "Lebetkeun sakabéh usum sakaligus, centang basa targét, teras pencét mimitian. Épisode sareng basa janten hiji antrian: unggal basa jalan dugi ka réngsé sateuacan anu salajengna dimimitian, sareng sadayana dibungkus kana hiji file zip.",
+  "feat": "Hal anu sering salah dina tarjamahan massal nyaéta prosés babarengan. Dua puluh épisode dikalikan lima basa anu dikirim sakaligus nyaéta ratusan pamundut anu badarat babarengan, anu sacara teu langsung ngaganggu antrian di sisi server - pamundut awal sareng akhir campur aduk sareng teu aya anu terang sel mana anu saleresna réngsé. Janten halaman ieu dijalankeun sacara ngahaja salaku hiji antrian: hiji angkatan dina hiji waktos, hiji basa dugi ka réngsé sateuacan anu salajengna. Kamajuan disimpen per épisode sareng per basa dina komputer anjeun, janten upami putus dina épisode katilu anjeun muka deui halaman, muat file anu sami, sareng éta diteruskeun dina angkatan éta tanpa ngirim ulang naon anu parantos réngsé. Hal anu ngabédakeun usum nyaéta ngaran: tarjamahkeun dua puluh épisode sacara séjén sareng karakter anu sami tungtungna diejah tilu cara. Éta sababna glosarium gaduh panel sorangan di dieu - unggah sakali, dibagikeun ku sakabéh usum - sareng éta ngabejaan sabaraha éntri anu saleresna cocog sateuacan anjeun ngamimitian. Tutup tab sareng tugas bakal langsung eureun tibatan ngabuang kuota di kasang tukang.",
+  "who": "Tim subtitle anu masihan tapak kana sakabéh usum kana sababaraha basa, saluran anu ngadistribusikeun deui angkatan épisode anu sami ka pasar anu béda, sareng penerjemah mandiri anu langkung resep pencét mimitian sakali teras wangsul deui engké.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Penerjemah Subtitle Multi-basa Massal"
+ },
+ "ktv": {
+  "title": "Pambuat Subtitle Karaoke KTV - Atur Waktos, Ékspor ASS | AI-SRTSub",
+  "desc": "Pambuat subtitle karaoke online gratis: muatkeun lagu, témpél lirikna, ketok unggal baris, teras bagi janten karakter sacara otomatis atanapi ketok nganggo musik.",
+  "kw": "pambuat subtitle karaoke,ass karaoke,lirik tingkat kecap,tag kf,lrc karaoke,sapuan lirik,pambuat karaoke ass,ai srtsub",
+  "intro": "Muatkeun lagu, témpél lirikna, ketok unggal baris, teras sebarkeun unggal baris kana karakterna - sacara otomatis dumasar lébar, ngetok babarengan jeung musik, atanapi nyered wates. Lalajo kecap-kecap hurung nalika dinyanyikeun.",
+  "feat": "Aksara Tionghoa dibagi per karakter, Basa Inggris per kecap, tanda baca nuturkeun. Jarak tungtung anu tiasa diatur ngajaga karakter terakhir henteu ngaleuwihan vokal. Ékspor ASS kanggo CapCut / Premiere / Aegisub kalayan tag \\\\kf, LRC anu ditingkatkeun kanggo pamuter tingkat kecap, atanapi SRT sakabéh baris salaku cadangan. Sadayana jalan dina panyungsi anjeun - teu aya unggahan.",
+  "who": "Kreator anu nambihan lirik kana pidéo sampul sareng rékaman konsér, pembuat MV musik, sareng saha waé anu ngahasilkeun subtitle karaoke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Pambuat Subtitle Karaoke KTV"
+ }
 }

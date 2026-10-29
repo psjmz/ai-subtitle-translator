@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "ny",
-    "ogLocale": "ny_MW",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Makanema ndi Mndandanda, Zilembo m'Chiyankhulo Chanu",
-    "desc": "Womasulira zilembo za AI waulere — palibe kulembetsa, palibe malire, palibe chizindikiro. Sinthani zilembo za mafilimu aakina, mndandanda ndi zolemba kukhala chiyankhulo chanu ndi k Dinani kumodzi.",
-    "kw": "womasulira zilembo za AI,masulirani zilembo,womasulira zilembo waulere,masulirani fayilo ya SRT,masulira VTT,masulira ASS,kumasulira zilembo za kanema,zilembo za mndandanda wa TV,zilembo za Netflix,zilembo za KDrama,zilembo za anime,zilembo ziwiri,zilembo za mafilimu achilendo,masulirani zilembo pa intaneti,zilembo za YouTube,chida chomasulira zilembo chaulere,masulirani zilembo zaulere,womasulira wa SRT waulere",
-    "ogTitle": "AI-SRTSub - Makanema ndi Mndandanda, Zilembo m'Chiyankhulo Chanu",
-    "ogDesc": "Womasulira zilembo waulere 100% wa AI kwa okonda mafilimu: k Dinani kumodzi kumachititsa kuti zilembo za mafilimu achilendo, mndandanda ndi zolemba zikhale m'chiyankhulo chanu chobadwa, ndikuwongolera nthawi yake. Sangalalani ndi zomwe zili padziko lonse lapansi popanda zopinga.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Womasulira zilembo waulere 100% wa AI kwa okonda mafilimu: k Dinani kumodzi kumachititsa kuti zilembo za mafilimu achilendo, mndandanda ndi zolemba zikhale m'chiyankhulo chanu chobadwa, ndikuwongolera nthawi yake. Sangalalani ndi zomwe zili padziko lonse lapansi popanda zopinga.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Zokhudza chidachi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Womasulira Zilembo za AI Waulere</h2>\n    <p data-i18n-html=\"seoIntro\">Uwu ndi <strong>chida chomasulira zilembo cha pa intaneti chaulere chomwe chimayendetsedwa ndi mitundu ikuluikulu ya chinenero</strong>. Tumizani mafayilo a SRT, VTT kapena ASS ndikumasulira zilembo pakati pa Chingerezi, Chitchaina, Chijapani, Chikorea, Chisipanishi, Chifalansa ndi zinenero zina 15+. Palibe kulembetsa, palibe kuyika, palibe chizindikiro — tsegulani mu msakatuli ndikuyamba kumasulira. Deti la zilembo limakhalabe mu msakatuli wanu pokhapokha mutayambitsa kumasulira kwa mtambo.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Zinthu zazikulu:</strong> Kutanthauzira kwa SRT, VTT ndi ASS ndi kumasulira kwa AI, kuphatikiza mwanzeru ziganizo (pamene chiganizo chimodzi chimafalikira muzithunzi zingapo, zithunzi zimaphatikizidwa, kutanthauziridwa, kenako n'kugawidwanso pa nthawi yake), kulumikiza nthawi, kukulunga mizere yokha kwa malemba a CJK ndi Western, kuchotsa mau osafunikira, kusamalira mawu achizolowezi, ndi masitaelo osankhidwa omasulira. Tumizani kunja mafayilo wamba a SRT, VTT, ASS kapena TXTokonzekera kuika pansi pa kanema wanu.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Amene amagwiritsa ntchito:</strong> omasulira mavidiyo, olenga za YouTube ndi omasulira kudziko lakwawo, ophunzira a zilankhulo, magulu a zilembo ndi timu zomwe zimafunikira kumasulira mavidiyo mwamsanga.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Chidachi chimafuna JavaScript. Chonde yambitsani JavaScript mu msakatuli wanu, kenako tumizani fayilo ya zilembo (SRT / VTT / ASS) kuti mutanthauzire zilembo ndi AI zaulere.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Wopanga Zilembo - Phatikizani Ziwiri, Zotsatira za ASS & VTT",
-    "desc": "Chida chaulere cha zilembo zokonzedwa: phatikizani mafayilo awiri kukhala zilembo ziwiri, sinthaninso njira ya zilembo ziwiri, kapena onjezani zotsatira. Zosankha za ASS 5 / VTT 6; tumizani kunja monga SRT / VTT / ASS.",
-    "kw": "phatikizani zilembo,zilembo ziwiri,phatikizani mafayilo a zilembo,zilembo zokonzedwa,masitaelo a zilembo za ASS,masitaelo a zilembo za VTT,zotsatira za zilembo,wopanga zilembo ziwiri,zosankha za ASS,chithunzi cha zilembo,chida cha zilembo chaulere",
-    "intro": "Phatikizani mafayilo awiri a zilembo kukhala zilembo ziwiri, kapena konzani njira: font, mtundu, mizere kunja ndi malo, zonse WYSIWYG.",
-    "feat": "Kuphatikiza zilembo ziwiri ndikusintha, zosankha za masitaelo a ASS / VTT, malo a masitaelo a mtengo uliwonse, kukonza nthawi m'malo komanso mochuluka, ndi kuwona moyo komwe kuli fayilo yotumizidwa kunja.",
-    "who": "Olenga omwe amapanga zilembo ziwiri kapena zokonzedwa, magulu ojambula, ndi magulu omwe amafunikira zolemba zosavuta kupeza."
-  },
-  "clean": {
-    "title": "Woyeretsa Zilembo - Chotsani Zizindikiro & HTML",
-    "desc": "Woyeretsa zilembo za pa intaneti waulere: chotsani zizindikiro, zotsatsa, SDH, zizindikiro za HTML, zotsatira za ASS; konzani malemba akulu, mojibake. Malamulo 13 osinthika, bwezerani pa kusintha kulikonse, nthawiosakhudzidwa.",
-    "kw": "woyeretsa zilembo,tsukani fayilo ya srt,chotsani chizindikiro cha zilembo,chotsani zilembo za SDH,chotsani zizindikiro za HTML kuchokera ku zilembo,konzani zilembo zonse zazikulu,konzani mojibake,chotsani zilembo zosamva,chotsani zotsatira za ASS",
-    "intro": "Thamangani zilembo zomwe mwatsitsa pano choyamba: zizindikiro, zotsatsa, zithunzi za SDH ndi zizindikiro za HTML, zapita pakadutsa kamodzi.",
-    "feat": "Malamulo 13 m'magulu anayi (9 pa kukhazikika), kuchotsa zizindikiro ndi SDH, zokonza zonse zazikulu ndi mojibake, mndandanda wosintha pa chithunzi uliwonse ndi kubwezeretsa payekha, ndipo nthawi siyikhudzidwa konse.",
-    "who": "Aliyense amene adatenga zilembo zomwe zilipo ndipo akufuna kuti zigwiritsidwe ntchito, ndi magulu omwe akutsuka zida zambiri."
-  },
-  "glossary": {
-    "title": "Kusintha Mawu a Zilembo - Glossary Yimodzi, Fayilo Yonse | AI-SRTSub",
-    "desc": "Kusintha kwa glossary kwa zilembo: lembani \"kale → latsopano\" kamodzi ndipo fayilo yonse ya SRT / VTT / ASS / TXT imasintha. Nthawi, masitaelo ndi midadada ya NOTE zimakhala; bwezerani mzere uliwonse.",
-    "kw": "glossary ya zilembo,sintha srt ambiri,peza ndikusintha zilembo,sintha mawu a zilembo,sintha srt mochuluka,sintha mawu mu zilembo,lumikizani maina a zilembo,malingaliro a zilembo,sintha mawu mu vtt,chida cha glossary srt,sintha mawu ambiri",
-    "intro": "Mndandanda wa malamulo a \"mizu yakale → mawu atsopano\" omwe amagwiritsidwa ntchito pa fayilo yonse ya zilembo kamodzi, ndi nthawi, masitaelo a ASS ndi midadada ya zolemba za VTT zotsalira zofanana ndi ma byte.",
-    "feat": "Lamulo limodzi pa mzere, lolekanitsidwa ndi ->, =>, → kapena tabu; mizere yoyambira ndi # ndi ndemanga. Kufananitsa mawu onse kumalepheretsa \"art\" kukhala \"start\", kukhudzidwa kwa maesi kuli kosankha, ndipo mungathe kuchepetsa kusintha ku mzere 1 kapena mzere 2 wa zilembo ziwiri. Chithunzi chilichonse chosinthidwa chimatchulidwa, ndipo chilichonse chimodzi chikhoza kubwezedwa.",
-    "who": "Aliyense amene akuphatikiza maina ndi mawu m'nyengo yonse, kukonza mawu omasulira makina mochuluka, kapena kusintha zilembo za wina kukhala masitaelo awo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "QC ya Zilembo - Onani Nthawi ndi Layout pa Chinenero | AI-SRTSub",
-    "desc": "Kuyezetsa kwa zilembo za pa intaneti kwaulere: tumizani SRT, VTT kapena ASS ndikuwona kuphimba, nthawi, liworo la kuwerenga, m'lifupi mwa mzere, kupuma kwa mizere, manambala ndi ma encoding motsutsana ndi malamulo a chinenerochi. Zinenero 27, mipata 27, kuphatikiza malamulo apadera a chinenero.",
-    "kw": "wofufuza zilembo,qc ya zilembo,wotsimikizira srt,kuwona khalidwe la zilembo,fufuza srt,kuwona nthawi ya zilembo,wotsimikizira zilembo,onani fayilo ya srt,kuwerenga zilembo,linter ya zilembo",
-    "intro": "Tumizani fayilo ya zilembo ndikuwona motsutsana ndi malamulo a chinenero chake - chilichonse chomwe chapezeka chimabwera ndi mtengo woyesedwa ndi malire. Zimayenda kwathunthu mu msakatuli wanu, palibe chomwe chimatumizidwa.",
-    "feat": "Imafufuza zithunzi zophimba, zazifupi kwambiri kapena zazitali kwambiri pazenera, liwiro la kuwerenga, m'lifupi mwa mzere, kuchuluka kwa mizere, kupuma kolakwa kwa mizere, manambala, zithunzi zopanda kanthu, mojibake ndi zilembo zowongolera. M'lifupi ndi liwiro la kuwerenga zimatsata dongosolo lolemba: Chitchaina chimayesedwa m'malemba athunthu, Thai ndi Arabic zimaphatikiza zizindikiro ngati zero width. Malamulo apadera a chinenero akuphatikiza kutsegulira kwa Spanish ¿, malo a French osaphulika asanakhale ? ! ; :, chizindikiro cha funso la Greek, zizindikiro zathunthu mu Chitchaina ndi Chijapani, ndi chizindikiro cha funso la Arabic ndi comma. Zinthu zomwe zingakonzedwe zokha zalembedwa padera, ndipo chilichonse chomwe chimasintha nthawi sichinasankhidwe mwachikhazikiko.",
-    "who": "Magulu a zilembo, ogulitsa kumeneko, akonzi ndi aliyense amene akufuna kuwona fayilo asanalandire.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Womasulira Zilembo — SRT/VTT/ASS mu Chiyankhulo Chanu",
-    "desc": "Ikani fayilo ya SRT / VTT / ASS, sankhani chilankhulo chomwe mukufuna, ndipo pezani kumasulira kotsekedwa ndi nthawi. Zinenero 100, zaulere, palibe kulembetsa."
-  },
-  "convert": {
-    "title": "Wosintha Zilembo - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Wosintha zilembo za pa intaneti waulere: sinthanitsani pakati pa SRT, VTT, ASS, SBV, LRC ndi TXT ndi nthawi yomwe yasungidwa bwino, zizindikiro za ASS zotsatira zotsukidwa zokha.",
-    "kw": "wosintha zilembo,srt ku vtt,vtt ku srt,ass ku srt,sbv ku srt,srt ku lrc,zilembo ku txt,sinthanitsa zilembo,wosintha srt,wosintha vtt",
-    "intro": "Sinthanitsani pakati pa SRT, VTT, ASS, SBV, LRC ndi TXT ndi nthawi yomwe yasungidwa bwino.",
-    "feat": "Mtundu wa kulowa umazindikirikaokha ndipo masiku a nthawi amatsitsimutsidwa ku mtundu womwe mukufuna; zizindikiro za ASS ndi kupuma kwa mizere yokakamizidwa zimakhala lemba lowoneka mukatumiza kunja ku mtundu wamba; mafayilo a nyimbo alibe gawo la ola, motero chilichonse chopitirira ola limodzi chimawerengedwa m'mphindi.",
-    "who": "Aliyense amene wosewera wake amakana fayilo ya zilembo, ndi aliyense amene akusuntha zida pakati pa mkonzi ndi wosewera wa pa intaneti.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Gawo la Zilembo Ziwiri - Sungani Chin Chimodzi | AI-SRTSub",
-    "desc": "Chida chaulere chogawa zilembo ziwiri pa intaneti: gawani fayilo ya zilembo ziwiri kukhala njira yoyambirira ndi yomasuliridwa, kapena sungani imodzi yokha.",
-    "kw": "wogawa zilembo ziwiri,gawani srt ya zilembo ziwiri,chotsani zilembo za chinenero chachiwiri,sungani zilembo za chingerezi zokha,chotsani zilembo zomasuliridwa,srt ya zilembo ziwiri,ass ya zilembo ziwiri",
-    "intro": "Gawani fayilo ya zilembo ziwiri kukhala njira yoyambirira ndi yomasuliridwa, kapena sungani imodzi yokha mwa izo.",
-    "feat": "Imalimbana ndi kapangidwe kamba - chithunzi chimodzi chonyamula mizere iwiri, ndi zithunzi ziwiri zikugawana nthawi yofanana. Njira zimagawidwa ndi dongosolo ndi mtundu wa lemba, nthawi imasungidwa momwe iliri, ndipo fayilo ya chinenero chimodzi imadziwika m'malo mokhala yopanda kanthu mwachinsinsi.",
-    "who": "Aliyense amene wapatsidwa fayilo ya zilembo ziwiri yokonzeka yemwe akufuna chinenero chimodzi chokha, ndi magulu a zilembo omwe amaika pambali zoyambirira ndi kumasulira padera.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Kusintha Nthawi ya Zilembo - Sunthani, Sikelo, Phatikizani | AI-SRTSub",
-    "desc": "Chida chaulere cha nthawi ya zilembo pa intaneti: sunthani zonse nthawi imodzi, sikelo ndi chiŵerengero, kapena konzani kusiyana ndi mfundo ziwiri.",
-    "kw": "kusintha nthawi ya zilembo,sunthani nthawi ya srt,sintha kulumikizana kwa zilembo,sikelo nthawi ya zilembo,konzani kuchedwa kwa zilembo,nthawi ya srt,konzani kusiyana kwa zilembo,phatikizani zilembo,gawani zilembo,phatikizani srt,gawani zilembo zazitali",
-    "intro": "Pamene zilembo zili kunja kwa kulumikizana, sunthani nthawi yonse, sikelo ndi chiŵerengero, kapena konzani ndi mfundo ziwiri zofunika. Itha kuphatikizanso mizere yomwe inagawika, ndipo kugawa zomwe zimayenda nthawi yayitali.",
-    "feat": "Kusuntha kumasuntha chithunzi chilichonse popanda kusintha nthawi yomwe chikhala pazenera. Kusikelo kumachulukitsa maliri onse awiri, motero kutalika kwa chithunzi kumasintha pamodzi nacho - kothandiza pakati pa 24 ndi 25 fps. Kukonza kwa mfundo ziwiri kumathana ndi mafayilo omwe ali ndi kulakwika komanso kuthamanga molakwika. Nthawi zomwe zimabwera zopanda pake zimayikidwa ku ziro, ndipo chidachi chimakuuzani zingati zomwe zakhudzidwa. Mtundu womwewo ukulowetsawa, mtundu womwewo ukutulukamo - palibe kusintha, ndipo masitaelo a ASS, masitaelo a mzere ndi zizindikiro zimayendetsedwa monga momwe zinaliri. Zilembo ziwiri zimakhalabe pa mizere iwiri zikaphatikizidwa ndipo zimadumpha zikapawika.",
-    "who": "Aliyense amene zilembo zake zimasiyana pambali pakusintha kwa gwero, zimayenda mwachangu pang'ono kapena mochedwa, kapena zidachokera kwa wina wogwira ntchito pamlingo wina wa chimango.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Konzani Zilembo Zolakwika - Konzani Mojibake | AI-SRTSub",
-    "desc": "Kukonza kwaulere kwa intaneti kwa zilembo zolakwika: kumazindikira ngati fayilo ili ndi UTF-8, GBK, Big5, Shift_JIS kapena EUC-KR, kumabwezeretsa malemba olakwika, ndi kusunga kachitidwe ka wosewera wanu.",
-    "kw": "konzani zilembo zolakwika,mojibake ya zilembo,kukonza kachitidwe ka srt,konzani kachitidwe ka zilembo,utf8 ku gbk zilembo,srt ikuwonetsa zilembo zachilendo,kachitidwe ka zilembo kolakwa,ass yosokonezeka,vtt yosokonezeka,zindikira kachitidwe ka zilembo",
-    "intro": "Zilembo zomwe zimatsegulira ngati chipinda cha zopanda pake pafupifupi nthawi zonse zimawerengedwa ndi kachitidwe kolakwa. Ikani fayiloyo, ndipo imapeza kachitidwe kamene fayiloyo idalembedwadi ndikuwezera zilembo zolakwika.",
-    "feat": "Fayilo zomwe zatumizidwa zimatulutsidwa kuchokera ku ma byte oyamba, kotero palibe chomwe chatayika: ngati fayiloyo ikhala GBK, imati choncho, ndipo ngati wosewera wanu ndi amene akuwerenga molakwika, kusunga kope ngati \"UTF-8 with BOM\" nthawi zambiri kumathetsa. Malemba omwe amayikidwa si ma byte oyamba, motero zochepa kwambiri zingabwezeretsedwe; ngati zili kale ndi zilembo zosinthira, izi sizikhoza kubwezeretsedwa ndipo chidachi chimanena choncho m'malo modzinamizira. Manambala a mizere ndi nthawi sizikhudzedwa konse, ndipo zizindikiro za masitaelo a ASS zimasiyidwa momwe zinaliri.",
-    "who": "Aliyense amene adatsitsa zilembo zomwe zimatsegulira ngati zopanda pake, akuwona mabokosi m'malo mwa Chitchaina m'wosewera, kapena adapatsidwa fayilo yosadziwika kachitidwe kake.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Chotsani Malemba a Zilembo - SRT/ASS/VTT ku Malemba Oamba | AI-SRTSub",
-    "desc": "Chotsira zilembo za pa intaneti chaulere ku malemba: amawerenga SRT, VTT, ASS, SBV, LRC ndi TXT, amachotsa nthawi ndi manambala a mizere, ndipo amatulutsa zokambirana zoyera ngati ndime kapena mzere umodzi pa chithunzi.",
-    "kw": "chotsani malemba a zilembo,zilembo ku malemba,srt ku txt,srt ku malemba owoneka bwino,ass ku txt,vtt ku txt,zolemba za zilembo,chotsani zokambirana ku srt,srt chotsani nthawi,chotsira malemba a zilembo",
-    "intro": "Tulutsani zokambirana kuchokera ku zilembo za SRT / VTT / ASS / SBV / LRC / TXT ngati malemba owoneka bwino: nthawi, manambala a zithunzi ndi zizindikiro za masitaelo zimachotsedwa zokha.",
-    "feat": "Mapangidwe awiri: ndime zosasintha zimagawika pa kupuma ndi zizindikiro zomaliza ziganizo, kapena mzere umodzi pa chithunzi cha mndandanda wa zokambirana. Zizindikiro za mawu monga \"(foni ikulira)\", zizindikiro za gwero ndi mizere yobwerezedwa yotsatizana imachotsedwa mwachikhazikiko; maina a okhulupirira monga \"TOM:\" ndi mizere ya nyimbo zikhoza kusungidwa kapena kusiya. Kulungika kwa mizere kumaphatikizidwanso pa script iliyonse - CJK imajowina mwachindunji, Korean ndi Latin zimawonjezera mipata - motero palibe chomwe chimagwirizanitsidwa.",
-    "who": "Aliyense amene akufuna malemba a zilembo za zolemba, ma script, kuchita kumasulira kapena kudyetsa chida china, popanda kuchotsa mazana a nthawi ndi manja.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Chotsani Zilembo Zomwe Zili mu MKV / MP4 ku SRT | AI-SRTSub",
-    "desc": "Chotsani zilembo zomwe zili mkati mwa MKV, WebM, MP4, MOV; tumizani kunja monga SRT / VTT / ASS / TXT. Palibe kukweza kapena kulembetsanso - mafayilo amawerengedwa mu msakatuli wanu; multi-GB OK.",
-    "kw": "chotsani zilembo zomwe zili mkati,mkv ku srt,mp4 kuchotsa zilembo,chotsani zilembo kuchokera ku kanema,wotsitsa zilembo zomwe zili mkati,srt kuchokera ku mkv,mov kuchotsa zilembo,kutumiza njira ya zilembo,vtt kuchokera ku mkv,chotsani zilembo zofewa,mkv subtitle rip",
-    "intro": "Tulutsani njira ya zilembo zosindikizidwa mkati mwa MKV kapena MP4 molunjika mu SRT — palibe kukweza, zonse zimachitika mu msakatuli wanu.",
-    "feat": "Amawerenga malemba osavuta, ASS, WebVTT ndi njira za mov_text / tx3g, amayendetsa mutu woyambirira wa ASS ndi kusamvana, ndipo amawerenga m'magawo ang'onoang'ono ndi offset kotero kuti fayilo yayikulu siyidzaza kukumbukira.",
-    "who": "Aliyense amene ali ndi kanema wokhala ndi zilembo zofewa amene akufuna malembawo atuluke, magulu ojambula, ndi magulu a fansub omwe akuyambira pa njira yoyambirira.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Wosintha Zilembo za Chitchaina - Zosavuta ⇄ Zachikale | AI-SRTSub",
-    "desc": "Wosintha zilembo za Chitchaina waulere: Zosavuta ⇄ Zachikale (Taiwan / Hong Kong) ndi kumbuyo. Zokambirana zokha zimasintha - nthawi ndi zizindikiro za ASS zimakhalapo. Zomangidwa pa OpenCC.",
-    "kw": "wosintha zilembo za chitchaina,zosavuta ku zakale,zakale ku zosavuta,srt chitchaina chakale,sinthanitsa zilembo za chitchaina,taiwan chitchaina chakale,hong kong chitchaina chakale,sinthani chitchaina,sinthanitsa srt ku chitchaina chakale,chitchaina chosavuta srt,opencc subtitle",
-    "intro": "Sinthanitsani fayilo yonse ya zilembo pakati pa Zosavuta ndi Zachikale, osasintha chilichonse kupatula zokambirana.",
-    "feat": "Malangizo asanu na anayi: Zachikale wamba, mawu a ku Taiwan, mawu a ku Taiwan, Hong Kong, kumbuyo ku Zosavuta, ndi mawu achigawo cha Zachikale ku Zachikale. Amagwiritsa ntchito dikishonale ya OpenCC yokhala ndi yankho la mawu ofanana kwambiri loyamba.",
-    "who": "Aliyense amene akupereka zilembo kwa omvera a ku Taiwan kapena Hong Kong, ogawa omwe akukonzekera mitundu yachigawo, ndi akonzi omwe adalandira fayilo ya Zachikale ndipo akufuna Zosavuta.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Wogawa & Wophatikiza Zilembo - SRT / VTT | AI-SRTSub",
-    "desc": "Gawani zilembo ndi nthawi kapena kuchuluka, kapena phatikizani mafayilo ambiri m'dongosolo kapena ndi timestamp. Kusinthanso manambala kumakhala kothekera, zokambirana sizikhudzidwa. SRT & VTT.",
-    "kw": "wogawa zilembo,gawani zilembo,phatikizani mafayilo a srt,srt merger,phatikizani zilembo,gawani srt,lumikizani mafayilo a srt,dula zilembo,gawani vtt,wophatikiza zilembo",
-    "intro": "Dula zilembo imodzi yayitali kukhala magawo, kapena phatikizani mafayilo ambiri kukhala amodzi. Imayenda kwathunthu mu msakatuli wanu — palibe chomwe chimatumizidwa.",
-    "feat": "Gawani ndi nthawi kapena kuchuluka ndi kusinthanso manambala pa gawo lililonse ndipo nthawi yosankha yozikidwa pa ziro; phatikizani molandirana ndi kusiyana kapena kusakaniza ndi ma timestamp oyambirira. SRT ndi VTT.",
-    "who": "Olenga omwe akugawa zigawo kuti akweze, magulu owunikira m'magawo, ndi akonzi omwe akuphatikiza zilembo za zigawo zambiri.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Zilembo ku Excel/CSV ndi Kumbuyo | AI-SRTSub",
-    "desc": "Sinthani SRT kapena VTT kukhala chithunzi cha Excel kapena CSV kuti muwunike ndi kumasulira, kenako mubweretse kumbuyo. Nthawi zimakhalala zolondola, kupuma kwa mizere kumapulumuka. Palibe chomwe chimakwera.",
-    "kw": "zilembo ku excel,srt ku csv,srt ku excel,excel ku srt,csv ku srt,spreadsheet ya zilembo,chida chosintha zilembo",
-    "intro": "Tumizani zilembo kunja ku spreadsheet kuti muwunike ndi kumasulira, kenako tumizani chithunzichi kumbuyo. Zimayenda kwathunthu mu msakatuli wanu.",
-    "feat": "Dinani kamodzi kuchokera ku SRT kapena VTT ku xlsx kapena CSV; sinthani nthawi, malemba ndi zolemba mu spreadsheet yanu, kenako tumizani kunja ku SRT kapena VTT. Mizere ya nthawi imasunga kulondola kwathunthu kwa millisecond; kupuma kwa mizere m'kati mwa cell kumasungidwa. Mutu wa Chitchaina ndi Chingerezi zonse zimagwira ntchito.",
-    "who": "Omasulira, magulu a fansub ndi akonzi omwe amawunikira, kulembetsa kapena kukonza zilembo zambiri mu spreadsheet.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Sinthanitsa Zilembo Zingapo kukhala SRT/VTT | AI-SRTSub",
-    "desc": "Ikani mafayilo ambiri kapena mazana a SRT/VTT, sinthanitsani onse kukhala mtundu umodzi ndipo tsitsani ZIP imodzi. Manambala ndi nthawi zasinthidwa kukhala zikhalidwe; mafayilo osawerengedwa alembedwa.",
-    "kw": "sinthanitsa zilembo zingapo,srt ku vtt,wosintha zilembo zingapo,srt zambiri,sinthanitsa zilembo zingapo,zip ya zilembo",
-    "intro": "Kokani m'kati mazana a mafayilo a zilembo, sinthanitsani onse, tengani ZIP imodzi. Imayenda kwathunthu mu msakatuli wanu — palibe chomwe chimatumizidwa.",
-    "feat": "SRT ku VTT ndi kubwerera zambiri; manambala a mndandanda adakonzedwanso ndipo nthawi zidasinthidwa molingana ndi mtundu wofunika. Mafayilo omwe sangawerengedwe amalembwa ndipo amasiyidwa kunja kwa ZIP. Maina oyambirira a mafayilo amasungidwa ndi extension yatsopano; zokangana zimalandira suffix.",
-    "who": "Akonzi ndi olemba zilembo osintha zikwama zonse zamndandanda, ndi eni ake a masamba omwe amapezera oosewera mtundu umodzi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Mkonzi wa Nyimbo za LRC - Dinani Nthawi Mukumvetsera | AI-SRTSub",
-    "desc": "Ikani nyimbo, ikani mawu, ndipo dinani nthawi ya mzere uliwonse mukumvetsera; tumizani kunja LRC kapena VTT. Ikani LRC yomwe ilipo kuti mukonze bwino. Imayendetsedwa ndi kiyibodi, kwathunthu mu msakatuli.",
-    "kw": "mkonzi wa lrc pa intaneti,pangani lrc,nthawi ya nyimbo,wopanga lrc,pangani lrc,wosinthira nyimbo,lrc ku srt",
-    "intro": "Ikani nyimbo, ikani mawu, dinani nthawi mzere ndi mzere pamene mukumvetsera, ndipo tumizani kunja LRC kapena VTT. Palibe chomwe chimakwera.",
-    "feat": "Imagwira ntchito ndi MP3, M4A, FLAC, WAV ndi OGG. Mzere umodzi pa mzere; mafayilo omwe alipo a LRC akhoza kutumizidwa ndi kusinthidwa. Space imasewera/kuimitsa, Enter imalembetsa mzere wapano, Z imabweza — manja amakhala pa kiyibodi.",
-    "who": "Oimba omwe akugwirizanitsa zivundikiro, olenga omwe akuwonjezera nyimbo ku mavidiyo, ndi aliyense amene akumanga zilembo za nyimbo za wosewera.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "Wokonza Mawu a YouTube - Lumikizani Ziganizo Zoduka | AI-SRTSub",
-    "desc": "Zithunzi zokha zokha za YouTube zimadula ziganiza masekondi 3-4. Chida ichi chimangosuntha malire pomwe ziganiza zimatheradi. Ndi zaulere, zilankhulo 100.",
-    "kw": "kukonza mawu a youtube,mawu a youtube odziyika okha,kukonza mawu,kugwirizanitsa ziganizo za mawu,kukonza mawu oduka,kugwirizanitsa ziganizo za srt,kugawa mawu,kukonza mawu a youtube,ziganizo za mawu",
-    "intro": "Ikani fayilo ya mawu a YouTube, sankhani chilankhulo, ndipo chidachi chidzalumikiza ziganizo pamodzi m'magawo, kenako chidzadulanso fayiloyo chiganizo ndi chiganizo. Palibe mawu amodzi omwe amasintha, ndipo nthawi za magawo zimakhala pafupi ndi nthawi zoyambirira momwe zingathere.",
-    "feat": "Mawu a YouTube amadulidwa m'magawo a masekondi 3-4 mosasamala kanthu za komwe ziganizo zimathera, motero gawo limodzi nthawi zambiri limakhala ndi mapeto a chiganizo cham'mbuyo ndi chiyambi cha chotsatira. Chidachi chimagwiritsa ntchito nthawi zoyambirira ngati maziko - nthawi zimenezo ndizo malire enieni a mawu omwe makina adazindikira - chimaganiza komwe chiganizo chilichonse chimathera kuchokera ku zizindikiro, ndikugwiritsa ntchito njira zamphamvu kusankha malo abwino odulira pakati pa mapeto a chiganizo, koma, mgwirizano ndi kudula kolimba, kenako chimatalikitsa nthawi yowonetsera kuti igwirizane ndi liwiro la kuwerenga. Chilankhulo chilichonse cha 100 chili ndi malamulo ake a ziganizo: Chitchainizi ndi Chijapani zilibe mipata pakati pa mawu, Chithai chimangolemba malire a mawu pang'ono, Chihindi chimatha ziganizo ndi ।, Chiarabu ndi ؟, Chiarmeniya ndi ։. M'lifupi mwa mzere ndi liwiro la kuwerenga zimatsata dongosolo lolemba - zilembo 16 zathunthu pa mzere uliwonse wa Chitchainizi, zilembo 42 za zilembo za Chilatini. Musanatumize, mawu amafanizidwa chilembo ndi chilembo, ndipo mawu aliwonse otayika kapena owonjezeredwa amawonetsedwa nthawi yomweyo.",
-    "who": "Magulu a omasulira omwe akusandutsa mawu a YouTube, ma podcast ndi maphunziro kukhala mawu omalizidwa, ndi opanga mavidiyo omwe atopa ndi ziganizo zomwe zimayima pakati.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Mawu kukhala Ma subtitles — pangani SRT mu browser | AI-SRTSub",
-    "desc": "Tumizani kanema, chida chimazindikira mawu ndi kupanga ma SRT kapena VTT mu browser yanu. Palibe chomwe chimakwezedwa, ndi chaulere.",
-    "kw": "mawu kukhala srt,kupanga ma subtitles,chida cha subtitles,transcribe audio to srt,whisper subtitles,browser speech recognition,chotengera subtitles",
-    "intro": "Ikani fayilo ya kanema, sankhani chinenero, ndipo kuzindikira mawu kumayenda mwachindunji mu browser yanu. Mumapeza ma subtitles okhala ndi nthawi yake.",
-    "feat": "Chidachi chimagawanitsa mawu m'magawo oyenera ndipo chimapanga fayilo ya SRT kapena VTT yomwe mungathe kutsitsa nthawi yomweyo.",
-    "who": "Opanga mavidiyo, anthu amene amapanga ma podcasts, ndi aliyense amene akufuna ma subtitles achangu azaulere."
-  },
-  "ocrsub": {
-    "title": "OCR ya Ma Subtitles — werengani zolemba za mu kanema | AI-SRTSub",
-    "desc": "Werengani ma subtitles ophatikizidwa mu kanema ndikuwasanduliza kukhala SRT kapena VTT pogwiritsa ntchito OCR. Ndi chaulere.",
-    "kw": "chotsa ma subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles from video,video to srt,subtitle from video",
-    "intro": "Ikani kanema, sankhani gawo limene kuli ma subtitles, ndipo chidachi chimawerenga ndikuwapanga kukhala ma subtitles a SRT kapena VTT.",
-    "feat": "Chidachi chimajambula zithunzi za ma subtitles omwe ali mu kanema ndikuwasanduliza kukhala zolemba zenizeni zokhala ndi nthawi yake.",
-    "who": "Otembenuzira mavidiyo, akatswiri osamalira mavidiyo akale, ndi aliyense wofuna ma subtitles ochokera mu kanema wopanda fayilo."
-  }
+ "index": {
+  "htmlLang": "ny",
+  "ogLocale": "ny_MW",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Makanema ndi Mndandanda, Zilembo m'Chiyankhulo Chanu",
+  "desc": "Womasulira zilembo za AI waulere — palibe kulembetsa, palibe malire, palibe chizindikiro. Sinthani zilembo za mafilimu aakina, mndandanda ndi zolemba kukhala chiyankhulo chanu ndi k Dinani kumodzi.",
+  "kw": "womasulira zilembo za AI,masulirani zilembo,womasulira zilembo waulere,masulirani fayilo ya SRT,masulira VTT,masulira ASS,kumasulira zilembo za kanema,zilembo za mndandanda wa TV,zilembo za Netflix,zilembo za KDrama,zilembo za anime,zilembo ziwiri,zilembo za mafilimu achilendo,masulirani zilembo pa intaneti,zilembo za YouTube,chida chomasulira zilembo chaulere,masulirani zilembo zaulere,womasulira wa SRT waulere",
+  "ogTitle": "AI-SRTSub - Makanema ndi Mndandanda, Zilembo m'Chiyankhulo Chanu",
+  "ogDesc": "Womasulira zilembo waulere 100% wa AI kwa okonda mafilimu: k Dinani kumodzi kumachititsa kuti zilembo za mafilimu achilendo, mndandanda ndi zolemba zikhale m'chiyankhulo chanu chobadwa, ndikuwongolera nthawi yake. Sangalalani ndi zomwe zili padziko lonse lapansi popanda zopinga.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Womasulira zilembo waulere 100% wa AI kwa okonda mafilimu: k Dinani kumodzi kumachititsa kuti zilembo za mafilimu achilendo, mndandanda ndi zolemba zikhale m'chiyankhulo chanu chobadwa, ndikuwongolera nthawi yake. Sangalalani ndi zomwe zili padziko lonse lapansi popanda zopinga.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Zokhudza chidachi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Womasulira Zilembo za AI Waulere</h2>\n    <p data-i18n-html=\"seoIntro\">Uwu ndi <strong>chida chomasulira zilembo cha pa intaneti chaulere chomwe chimayendetsedwa ndi mitundu ikuluikulu ya chinenero</strong>. Tumizani mafayilo a SRT, VTT kapena ASS ndikumasulira zilembo pakati pa Chingerezi, Chitchaina, Chijapani, Chikorea, Chisipanishi, Chifalansa ndi zinenero zina 15+. Palibe kulembetsa, palibe kuyika, palibe chizindikiro — tsegulani mu msakatuli ndikuyamba kumasulira. Deti la zilembo limakhalabe mu msakatuli wanu pokhapokha mutayambitsa kumasulira kwa mtambo.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Zinthu zazikulu:</strong> Kutanthauzira kwa SRT, VTT ndi ASS ndi kumasulira kwa AI, kuphatikiza mwanzeru ziganizo (pamene chiganizo chimodzi chimafalikira muzithunzi zingapo, zithunzi zimaphatikizidwa, kutanthauziridwa, kenako n'kugawidwanso pa nthawi yake), kulumikiza nthawi, kukulunga mizere yokha kwa malemba a CJK ndi Western, kuchotsa mau osafunikira, kusamalira mawu achizolowezi, ndi masitaelo osankhidwa omasulira. Tumizani kunja mafayilo wamba a SRT, VTT, ASS kapena TXTokonzekera kuika pansi pa kanema wanu.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Amene amagwiritsa ntchito:</strong> omasulira mavidiyo, olenga za YouTube ndi omasulira kudziko lakwawo, ophunzira a zilankhulo, magulu a zilembo ndi timu zomwe zimafunikira kumasulira mavidiyo mwamsanga.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Chidachi chimafuna JavaScript. Chonde yambitsani JavaScript mu msakatuli wanu, kenako tumizani fayilo ya zilembo (SRT / VTT / ASS) kuti mutanthauzire zilembo ndi AI zaulere.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Wopanga Zilembo - Phatikizani Ziwiri, Zotsatira za ASS & VTT",
+  "desc": "Chida chaulere cha zilembo zokonzedwa: phatikizani mafayilo awiri kukhala zilembo ziwiri, sinthaninso njira ya zilembo ziwiri, kapena onjezani zotsatira. Zosankha za ASS 5 / VTT 6; tumizani kunja monga SRT / VTT / ASS.",
+  "kw": "phatikizani zilembo,zilembo ziwiri,phatikizani mafayilo a zilembo,zilembo zokonzedwa,masitaelo a zilembo za ASS,masitaelo a zilembo za VTT,zotsatira za zilembo,wopanga zilembo ziwiri,zosankha za ASS,chithunzi cha zilembo,chida cha zilembo chaulere",
+  "intro": "Phatikizani mafayilo awiri a zilembo kukhala zilembo ziwiri, kapena konzani njira: font, mtundu, mizere kunja ndi malo, zonse WYSIWYG.",
+  "feat": "Kuphatikiza zilembo ziwiri ndikusintha, zosankha za masitaelo a ASS / VTT, malo a masitaelo a mtengo uliwonse, kukonza nthawi m'malo komanso mochuluka, ndi kuwona moyo komwe kuli fayilo yotumizidwa kunja.",
+  "who": "Olenga omwe amapanga zilembo ziwiri kapena zokonzedwa, magulu ojambula, ndi magulu omwe amafunikira zolemba zosavuta kupeza."
+ },
+ "clean": {
+  "title": "Woyeretsa Zilembo - Chotsani Zizindikiro & HTML",
+  "desc": "Woyeretsa zilembo za pa intaneti waulere: chotsani zizindikiro, zotsatsa, SDH, zizindikiro za HTML, zotsatira za ASS; konzani malemba akulu, mojibake. Malamulo 13 osinthika, bwezerani pa kusintha kulikonse, nthawiosakhudzidwa.",
+  "kw": "woyeretsa zilembo,tsukani fayilo ya srt,chotsani chizindikiro cha zilembo,chotsani zilembo za SDH,chotsani zizindikiro za HTML kuchokera ku zilembo,konzani zilembo zonse zazikulu,konzani mojibake,chotsani zilembo zosamva,chotsani zotsatira za ASS",
+  "intro": "Thamangani zilembo zomwe mwatsitsa pano choyamba: zizindikiro, zotsatsa, zithunzi za SDH ndi zizindikiro za HTML, zapita pakadutsa kamodzi.",
+  "feat": "Malamulo 13 m'magulu anayi (9 pa kukhazikika), kuchotsa zizindikiro ndi SDH, zokonza zonse zazikulu ndi mojibake, mndandanda wosintha pa chithunzi uliwonse ndi kubwezeretsa payekha, ndipo nthawi siyikhudzidwa konse.",
+  "who": "Aliyense amene adatenga zilembo zomwe zilipo ndipo akufuna kuti zigwiritsidwe ntchito, ndi magulu omwe akutsuka zida zambiri."
+ },
+ "glossary": {
+  "title": "Kusintha Mawu a Zilembo - Glossary Yimodzi, Fayilo Yonse | AI-SRTSub",
+  "desc": "Kusintha kwa glossary kwa zilembo: lembani \"kale → latsopano\" kamodzi ndipo fayilo yonse ya SRT / VTT / ASS / TXT imasintha. Nthawi, masitaelo ndi midadada ya NOTE zimakhala; bwezerani mzere uliwonse.",
+  "kw": "glossary ya zilembo,sintha srt ambiri,peza ndikusintha zilembo,sintha mawu a zilembo,sintha srt mochuluka,sintha mawu mu zilembo,lumikizani maina a zilembo,malingaliro a zilembo,sintha mawu mu vtt,chida cha glossary srt,sintha mawu ambiri",
+  "intro": "Mndandanda wa malamulo a \"mizu yakale → mawu atsopano\" omwe amagwiritsidwa ntchito pa fayilo yonse ya zilembo kamodzi, ndi nthawi, masitaelo a ASS ndi midadada ya zolemba za VTT zotsalira zofanana ndi ma byte.",
+  "feat": "Lamulo limodzi pa mzere, lolekanitsidwa ndi ->, =>, → kapena tabu; mizere yoyambira ndi # ndi ndemanga. Kufananitsa mawu onse kumalepheretsa \"art\" kukhala \"start\", kukhudzidwa kwa maesi kuli kosankha, ndipo mungathe kuchepetsa kusintha ku mzere 1 kapena mzere 2 wa zilembo ziwiri. Chithunzi chilichonse chosinthidwa chimatchulidwa, ndipo chilichonse chimodzi chikhoza kubwezedwa.",
+  "who": "Aliyense amene akuphatikiza maina ndi mawu m'nyengo yonse, kukonza mawu omasulira makina mochuluka, kapena kusintha zilembo za wina kukhala masitaelo awo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "QC ya Zilembo - Onani Nthawi ndi Layout pa Chinenero | AI-SRTSub",
+  "desc": "Kuyezetsa kwa zilembo za pa intaneti kwaulere: tumizani SRT, VTT kapena ASS ndikuwona kuphimba, nthawi, liworo la kuwerenga, m'lifupi mwa mzere, kupuma kwa mizere, manambala ndi ma encoding motsutsana ndi malamulo a chinenerochi. Zinenero 27, mipata 27, kuphatikiza malamulo apadera a chinenero.",
+  "kw": "wofufuza zilembo,qc ya zilembo,wotsimikizira srt,kuwona khalidwe la zilembo,fufuza srt,kuwona nthawi ya zilembo,wotsimikizira zilembo,onani fayilo ya srt,kuwerenga zilembo,linter ya zilembo",
+  "intro": "Tumizani fayilo ya zilembo ndikuwona motsutsana ndi malamulo a chinenero chake - chilichonse chomwe chapezeka chimabwera ndi mtengo woyesedwa ndi malire. Zimayenda kwathunthu mu msakatuli wanu, palibe chomwe chimatumizidwa.",
+  "feat": "Imafufuza zithunzi zophimba, zazifupi kwambiri kapena zazitali kwambiri pazenera, liwiro la kuwerenga, m'lifupi mwa mzere, kuchuluka kwa mizere, kupuma kolakwa kwa mizere, manambala, zithunzi zopanda kanthu, mojibake ndi zilembo zowongolera. M'lifupi ndi liwiro la kuwerenga zimatsata dongosolo lolemba: Chitchaina chimayesedwa m'malemba athunthu, Thai ndi Arabic zimaphatikiza zizindikiro ngati zero width. Malamulo apadera a chinenero akuphatikiza kutsegulira kwa Spanish ¿, malo a French osaphulika asanakhale ? ! ; :, chizindikiro cha funso la Greek, zizindikiro zathunthu mu Chitchaina ndi Chijapani, ndi chizindikiro cha funso la Arabic ndi comma. Zinthu zomwe zingakonzedwe zokha zalembedwa padera, ndipo chilichonse chomwe chimasintha nthawi sichinasankhidwe mwachikhazikiko.",
+  "who": "Magulu a zilembo, ogulitsa kumeneko, akonzi ndi aliyense amene akufuna kuwona fayilo asanalandire.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Womasulira Zilembo — SRT/VTT/ASS mu Chiyankhulo Chanu",
+  "desc": "Ikani fayilo ya SRT / VTT / ASS, sankhani chilankhulo chomwe mukufuna, ndipo pezani kumasulira kotsekedwa ndi nthawi. Zinenero 100, zaulere, palibe kulembetsa."
+ },
+ "convert": {
+  "title": "Wosintha Zilembo - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Wosintha zilembo za pa intaneti waulere: sinthanitsani pakati pa SRT, VTT, ASS, SBV, LRC ndi TXT ndi nthawi yomwe yasungidwa bwino, zizindikiro za ASS zotsatira zotsukidwa zokha.",
+  "kw": "wosintha zilembo,srt ku vtt,vtt ku srt,ass ku srt,sbv ku srt,srt ku lrc,zilembo ku txt,sinthanitsa zilembo,wosintha srt,wosintha vtt",
+  "intro": "Sinthanitsani pakati pa SRT, VTT, ASS, SBV, LRC ndi TXT ndi nthawi yomwe yasungidwa bwino.",
+  "feat": "Mtundu wa kulowa umazindikirikaokha ndipo masiku a nthawi amatsitsimutsidwa ku mtundu womwe mukufuna; zizindikiro za ASS ndi kupuma kwa mizere yokakamizidwa zimakhala lemba lowoneka mukatumiza kunja ku mtundu wamba; mafayilo a nyimbo alibe gawo la ola, motero chilichonse chopitirira ola limodzi chimawerengedwa m'mphindi.",
+  "who": "Aliyense amene wosewera wake amakana fayilo ya zilembo, ndi aliyense amene akusuntha zida pakati pa mkonzi ndi wosewera wa pa intaneti.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Gawo la Zilembo Ziwiri - Sungani Chin Chimodzi | AI-SRTSub",
+  "desc": "Chida chaulere chogawa zilembo ziwiri pa intaneti: gawani fayilo ya zilembo ziwiri kukhala njira yoyambirira ndi yomasuliridwa, kapena sungani imodzi yokha.",
+  "kw": "wogawa zilembo ziwiri,gawani srt ya zilembo ziwiri,chotsani zilembo za chinenero chachiwiri,sungani zilembo za chingerezi zokha,chotsani zilembo zomasuliridwa,srt ya zilembo ziwiri,ass ya zilembo ziwiri",
+  "intro": "Gawani fayilo ya zilembo ziwiri kukhala njira yoyambirira ndi yomasuliridwa, kapena sungani imodzi yokha mwa izo.",
+  "feat": "Imalimbana ndi kapangidwe kamba - chithunzi chimodzi chonyamula mizere iwiri, ndi zithunzi ziwiri zikugawana nthawi yofanana. Njira zimagawidwa ndi dongosolo ndi mtundu wa lemba, nthawi imasungidwa momwe iliri, ndipo fayilo ya chinenero chimodzi imadziwika m'malo mokhala yopanda kanthu mwachinsinsi.",
+  "who": "Aliyense amene wapatsidwa fayilo ya zilembo ziwiri yokonzeka yemwe akufuna chinenero chimodzi chokha, ndi magulu a zilembo omwe amaika pambali zoyambirira ndi kumasulira padera.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Kusintha Nthawi ya Zilembo - Sunthani, Sikelo, Phatikizani | AI-SRTSub",
+  "desc": "Chida chaulere cha nthawi ya zilembo pa intaneti: sunthani zonse nthawi imodzi, sikelo ndi chiŵerengero, kapena konzani kusiyana ndi mfundo ziwiri.",
+  "kw": "kusintha nthawi ya zilembo,sunthani nthawi ya srt,sintha kulumikizana kwa zilembo,sikelo nthawi ya zilembo,konzani kuchedwa kwa zilembo,nthawi ya srt,konzani kusiyana kwa zilembo,phatikizani zilembo,gawani zilembo,phatikizani srt,gawani zilembo zazitali",
+  "intro": "Pamene zilembo zili kunja kwa kulumikizana, sunthani nthawi yonse, sikelo ndi chiŵerengero, kapena konzani ndi mfundo ziwiri zofunika. Itha kuphatikizanso mizere yomwe inagawika, ndipo kugawa zomwe zimayenda nthawi yayitali.",
+  "feat": "Kusuntha kumasuntha chithunzi chilichonse popanda kusintha nthawi yomwe chikhala pazenera. Kusikelo kumachulukitsa maliri onse awiri, motero kutalika kwa chithunzi kumasintha pamodzi nacho - kothandiza pakati pa 24 ndi 25 fps. Kukonza kwa mfundo ziwiri kumathana ndi mafayilo omwe ali ndi kulakwika komanso kuthamanga molakwika. Nthawi zomwe zimabwera zopanda pake zimayikidwa ku ziro, ndipo chidachi chimakuuzani zingati zomwe zakhudzidwa. Mtundu womwewo ukulowetsawa, mtundu womwewo ukutulukamo - palibe kusintha, ndipo masitaelo a ASS, masitaelo a mzere ndi zizindikiro zimayendetsedwa monga momwe zinaliri. Zilembo ziwiri zimakhalabe pa mizere iwiri zikaphatikizidwa ndipo zimadumpha zikapawika.",
+  "who": "Aliyense amene zilembo zake zimasiyana pambali pakusintha kwa gwero, zimayenda mwachangu pang'ono kapena mochedwa, kapena zidachokera kwa wina wogwira ntchito pamlingo wina wa chimango.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Konzani Zilembo Zolakwika - Konzani Mojibake | AI-SRTSub",
+  "desc": "Kukonza kwaulere kwa intaneti kwa zilembo zolakwika: kumazindikira ngati fayilo ili ndi UTF-8, GBK, Big5, Shift_JIS kapena EUC-KR, kumabwezeretsa malemba olakwika, ndi kusunga kachitidwe ka wosewera wanu.",
+  "kw": "konzani zilembo zolakwika,mojibake ya zilembo,kukonza kachitidwe ka srt,konzani kachitidwe ka zilembo,utf8 ku gbk zilembo,srt ikuwonetsa zilembo zachilendo,kachitidwe ka zilembo kolakwa,ass yosokonezeka,vtt yosokonezeka,zindikira kachitidwe ka zilembo",
+  "intro": "Zilembo zomwe zimatsegulira ngati chipinda cha zopanda pake pafupifupi nthawi zonse zimawerengedwa ndi kachitidwe kolakwa. Ikani fayiloyo, ndipo imapeza kachitidwe kamene fayiloyo idalembedwadi ndikuwezera zilembo zolakwika.",
+  "feat": "Fayilo zomwe zatumizidwa zimatulutsidwa kuchokera ku ma byte oyamba, kotero palibe chomwe chatayika: ngati fayiloyo ikhala GBK, imati choncho, ndipo ngati wosewera wanu ndi amene akuwerenga molakwika, kusunga kope ngati \"UTF-8 with BOM\" nthawi zambiri kumathetsa. Malemba omwe amayikidwa si ma byte oyamba, motero zochepa kwambiri zingabwezeretsedwe; ngati zili kale ndi zilembo zosinthira, izi sizikhoza kubwezeretsedwa ndipo chidachi chimanena choncho m'malo modzinamizira. Manambala a mizere ndi nthawi sizikhudzedwa konse, ndipo zizindikiro za masitaelo a ASS zimasiyidwa momwe zinaliri.",
+  "who": "Aliyense amene adatsitsa zilembo zomwe zimatsegulira ngati zopanda pake, akuwona mabokosi m'malo mwa Chitchaina m'wosewera, kapena adapatsidwa fayilo yosadziwika kachitidwe kake.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Chotsani Malemba a Zilembo - SRT/ASS/VTT ku Malemba Oamba | AI-SRTSub",
+  "desc": "Chotsira zilembo za pa intaneti chaulere ku malemba: amawerenga SRT, VTT, ASS, SBV, LRC ndi TXT, amachotsa nthawi ndi manambala a mizere, ndipo amatulutsa zokambirana zoyera ngati ndime kapena mzere umodzi pa chithunzi.",
+  "kw": "chotsani malemba a zilembo,zilembo ku malemba,srt ku txt,srt ku malemba owoneka bwino,ass ku txt,vtt ku txt,zolemba za zilembo,chotsani zokambirana ku srt,srt chotsani nthawi,chotsira malemba a zilembo",
+  "intro": "Tulutsani zokambirana kuchokera ku zilembo za SRT / VTT / ASS / SBV / LRC / TXT ngati malemba owoneka bwino: nthawi, manambala a zithunzi ndi zizindikiro za masitaelo zimachotsedwa zokha.",
+  "feat": "Mapangidwe awiri: ndime zosasintha zimagawika pa kupuma ndi zizindikiro zomaliza ziganizo, kapena mzere umodzi pa chithunzi cha mndandanda wa zokambirana. Zizindikiro za mawu monga \"(foni ikulira)\", zizindikiro za gwero ndi mizere yobwerezedwa yotsatizana imachotsedwa mwachikhazikiko; maina a okhulupirira monga \"TOM:\" ndi mizere ya nyimbo zikhoza kusungidwa kapena kusiya. Kulungika kwa mizere kumaphatikizidwanso pa script iliyonse - CJK imajowina mwachindunji, Korean ndi Latin zimawonjezera mipata - motero palibe chomwe chimagwirizanitsidwa.",
+  "who": "Aliyense amene akufuna malemba a zilembo za zolemba, ma script, kuchita kumasulira kapena kudyetsa chida china, popanda kuchotsa mazana a nthawi ndi manja.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Chotsani Zilembo Zomwe Zili mu MKV / MP4 ku SRT | AI-SRTSub",
+  "desc": "Chotsani zilembo zomwe zili mkati mwa MKV, WebM, MP4, MOV; tumizani kunja monga SRT / VTT / ASS / TXT. Palibe kukweza kapena kulembetsanso - mafayilo amawerengedwa mu msakatuli wanu; multi-GB OK.",
+  "kw": "chotsani zilembo zomwe zili mkati,mkv ku srt,mp4 kuchotsa zilembo,chotsani zilembo kuchokera ku kanema,wotsitsa zilembo zomwe zili mkati,srt kuchokera ku mkv,mov kuchotsa zilembo,kutumiza njira ya zilembo,vtt kuchokera ku mkv,chotsani zilembo zofewa,mkv subtitle rip",
+  "intro": "Tulutsani njira ya zilembo zosindikizidwa mkati mwa MKV kapena MP4 molunjika mu SRT — palibe kukweza, zonse zimachitika mu msakatuli wanu.",
+  "feat": "Amawerenga malemba osavuta, ASS, WebVTT ndi njira za mov_text / tx3g, amayendetsa mutu woyambirira wa ASS ndi kusamvana, ndipo amawerenga m'magawo ang'onoang'ono ndi offset kotero kuti fayilo yayikulu siyidzaza kukumbukira.",
+  "who": "Aliyense amene ali ndi kanema wokhala ndi zilembo zofewa amene akufuna malembawo atuluke, magulu ojambula, ndi magulu a fansub omwe akuyambira pa njira yoyambirira.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Wosintha Zilembo za Chitchaina - Zosavuta ⇄ Zachikale | AI-SRTSub",
+  "desc": "Wosintha zilembo za Chitchaina waulere: Zosavuta ⇄ Zachikale (Taiwan / Hong Kong) ndi kumbuyo. Zokambirana zokha zimasintha - nthawi ndi zizindikiro za ASS zimakhalapo. Zomangidwa pa OpenCC.",
+  "kw": "wosintha zilembo za chitchaina,zosavuta ku zakale,zakale ku zosavuta,srt chitchaina chakale,sinthanitsa zilembo za chitchaina,taiwan chitchaina chakale,hong kong chitchaina chakale,sinthani chitchaina,sinthanitsa srt ku chitchaina chakale,chitchaina chosavuta srt,opencc subtitle",
+  "intro": "Sinthanitsani fayilo yonse ya zilembo pakati pa Zosavuta ndi Zachikale, osasintha chilichonse kupatula zokambirana.",
+  "feat": "Malangizo asanu na anayi: Zachikale wamba, mawu a ku Taiwan, mawu a ku Taiwan, Hong Kong, kumbuyo ku Zosavuta, ndi mawu achigawo cha Zachikale ku Zachikale. Amagwiritsa ntchito dikishonale ya OpenCC yokhala ndi yankho la mawu ofanana kwambiri loyamba.",
+  "who": "Aliyense amene akupereka zilembo kwa omvera a ku Taiwan kapena Hong Kong, ogawa omwe akukonzekera mitundu yachigawo, ndi akonzi omwe adalandira fayilo ya Zachikale ndipo akufuna Zosavuta.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Wogawa & Wophatikiza Zilembo - SRT / VTT | AI-SRTSub",
+  "desc": "Gawani zilembo ndi nthawi kapena kuchuluka, kapena phatikizani mafayilo ambiri m'dongosolo kapena ndi timestamp. Kusinthanso manambala kumakhala kothekera, zokambirana sizikhudzidwa. SRT & VTT.",
+  "kw": "wogawa zilembo,gawani zilembo,phatikizani mafayilo a srt,srt merger,phatikizani zilembo,gawani srt,lumikizani mafayilo a srt,dula zilembo,gawani vtt,wophatikiza zilembo",
+  "intro": "Dula zilembo imodzi yayitali kukhala magawo, kapena phatikizani mafayilo ambiri kukhala amodzi. Imayenda kwathunthu mu msakatuli wanu — palibe chomwe chimatumizidwa.",
+  "feat": "Gawani ndi nthawi kapena kuchuluka ndi kusinthanso manambala pa gawo lililonse ndipo nthawi yosankha yozikidwa pa ziro; phatikizani molandirana ndi kusiyana kapena kusakaniza ndi ma timestamp oyambirira. SRT ndi VTT.",
+  "who": "Olenga omwe akugawa zigawo kuti akweze, magulu owunikira m'magawo, ndi akonzi omwe akuphatikiza zilembo za zigawo zambiri.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Zilembo ku Excel/CSV ndi Kumbuyo | AI-SRTSub",
+  "desc": "Sinthani SRT kapena VTT kukhala chithunzi cha Excel kapena CSV kuti muwunike ndi kumasulira, kenako mubweretse kumbuyo. Nthawi zimakhalala zolondola, kupuma kwa mizere kumapulumuka. Palibe chomwe chimakwera.",
+  "kw": "zilembo ku excel,srt ku csv,srt ku excel,excel ku srt,csv ku srt,spreadsheet ya zilembo,chida chosintha zilembo",
+  "intro": "Tumizani zilembo kunja ku spreadsheet kuti muwunike ndi kumasulira, kenako tumizani chithunzichi kumbuyo. Zimayenda kwathunthu mu msakatuli wanu.",
+  "feat": "Dinani kamodzi kuchokera ku SRT kapena VTT ku xlsx kapena CSV; sinthani nthawi, malemba ndi zolemba mu spreadsheet yanu, kenako tumizani kunja ku SRT kapena VTT. Mizere ya nthawi imasunga kulondola kwathunthu kwa millisecond; kupuma kwa mizere m'kati mwa cell kumasungidwa. Mutu wa Chitchaina ndi Chingerezi zonse zimagwira ntchito.",
+  "who": "Omasulira, magulu a fansub ndi akonzi omwe amawunikira, kulembetsa kapena kukonza zilembo zambiri mu spreadsheet.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Sinthanitsa Zilembo Zingapo kukhala SRT/VTT | AI-SRTSub",
+  "desc": "Ikani mafayilo ambiri kapena mazana a SRT/VTT, sinthanitsani onse kukhala mtundu umodzi ndipo tsitsani ZIP imodzi. Manambala ndi nthawi zasinthidwa kukhala zikhalidwe; mafayilo osawerengedwa alembedwa.",
+  "kw": "sinthanitsa zilembo zingapo,srt ku vtt,wosintha zilembo zingapo,srt zambiri,sinthanitsa zilembo zingapo,zip ya zilembo",
+  "intro": "Kokani m'kati mazana a mafayilo a zilembo, sinthanitsani onse, tengani ZIP imodzi. Imayenda kwathunthu mu msakatuli wanu — palibe chomwe chimatumizidwa.",
+  "feat": "SRT ku VTT ndi kubwerera zambiri; manambala a mndandanda adakonzedwanso ndipo nthawi zidasinthidwa molingana ndi mtundu wofunika. Mafayilo omwe sangawerengedwe amalembwa ndipo amasiyidwa kunja kwa ZIP. Maina oyambirira a mafayilo amasungidwa ndi extension yatsopano; zokangana zimalandira suffix.",
+  "who": "Akonzi ndi olemba zilembo osintha zikwama zonse zamndandanda, ndi eni ake a masamba omwe amapezera oosewera mtundu umodzi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Mkonzi wa Nyimbo za LRC - Dinani Nthawi Mukumvetsera | AI-SRTSub",
+  "desc": "Ikani nyimbo, ikani mawu, ndipo dinani nthawi ya mzere uliwonse mukumvetsera; tumizani kunja LRC kapena VTT. Ikani LRC yomwe ilipo kuti mukonze bwino. Imayendetsedwa ndi kiyibodi, kwathunthu mu msakatuli.",
+  "kw": "mkonzi wa lrc pa intaneti,pangani lrc,nthawi ya nyimbo,wopanga lrc,pangani lrc,wosinthira nyimbo,lrc ku srt",
+  "intro": "Ikani nyimbo, ikani mawu, dinani nthawi mzere ndi mzere pamene mukumvetsera, ndipo tumizani kunja LRC kapena VTT. Palibe chomwe chimakwera.",
+  "feat": "Imagwira ntchito ndi MP3, M4A, FLAC, WAV ndi OGG. Mzere umodzi pa mzere; mafayilo omwe alipo a LRC akhoza kutumizidwa ndi kusinthidwa. Space imasewera/kuimitsa, Enter imalembetsa mzere wapano, Z imabweza — manja amakhala pa kiyibodi.",
+  "who": "Oimba omwe akugwirizanitsa zivundikiro, olenga omwe akuwonjezera nyimbo ku mavidiyo, ndi aliyense amene akumanga zilembo za nyimbo za wosewera.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "Wokonza Mawu a YouTube - Lumikizani Ziganizo Zoduka | AI-SRTSub",
+  "desc": "Zithunzi zokha zokha za YouTube zimadula ziganiza masekondi 3-4. Chida ichi chimangosuntha malire pomwe ziganiza zimatheradi. Ndi zaulere, zilankhulo 100.",
+  "kw": "kukonza mawu a youtube,mawu a youtube odziyika okha,kukonza mawu,kugwirizanitsa ziganizo za mawu,kukonza mawu oduka,kugwirizanitsa ziganizo za srt,kugawa mawu,kukonza mawu a youtube,ziganizo za mawu",
+  "intro": "Ikani fayilo ya mawu a YouTube, sankhani chilankhulo, ndipo chidachi chidzalumikiza ziganizo pamodzi m'magawo, kenako chidzadulanso fayiloyo chiganizo ndi chiganizo. Palibe mawu amodzi omwe amasintha, ndipo nthawi za magawo zimakhala pafupi ndi nthawi zoyambirira momwe zingathere.",
+  "feat": "Mawu a YouTube amadulidwa m'magawo a masekondi 3-4 mosasamala kanthu za komwe ziganizo zimathera, motero gawo limodzi nthawi zambiri limakhala ndi mapeto a chiganizo cham'mbuyo ndi chiyambi cha chotsatira. Chidachi chimagwiritsa ntchito nthawi zoyambirira ngati maziko - nthawi zimenezo ndizo malire enieni a mawu omwe makina adazindikira - chimaganiza komwe chiganizo chilichonse chimathera kuchokera ku zizindikiro, ndikugwiritsa ntchito njira zamphamvu kusankha malo abwino odulira pakati pa mapeto a chiganizo, koma, mgwirizano ndi kudula kolimba, kenako chimatalikitsa nthawi yowonetsera kuti igwirizane ndi liwiro la kuwerenga. Chilankhulo chilichonse cha 100 chili ndi malamulo ake a ziganizo: Chitchainizi ndi Chijapani zilibe mipata pakati pa mawu, Chithai chimangolemba malire a mawu pang'ono, Chihindi chimatha ziganizo ndi ।, Chiarabu ndi ؟, Chiarmeniya ndi ։. M'lifupi mwa mzere ndi liwiro la kuwerenga zimatsata dongosolo lolemba - zilembo 16 zathunthu pa mzere uliwonse wa Chitchainizi, zilembo 42 za zilembo za Chilatini. Musanatumize, mawu amafanizidwa chilembo ndi chilembo, ndipo mawu aliwonse otayika kapena owonjezeredwa amawonetsedwa nthawi yomweyo.",
+  "who": "Magulu a omasulira omwe akusandutsa mawu a YouTube, ma podcast ndi maphunziro kukhala mawu omalizidwa, ndi opanga mavidiyo omwe atopa ndi ziganizo zomwe zimayima pakati.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Mawu kukhala Ma subtitles — pangani SRT mu browser | AI-SRTSub",
+  "desc": "Tumizani kanema, chida chimazindikira mawu ndi kupanga ma SRT kapena VTT mu browser yanu. Palibe chomwe chimakwezedwa, ndi chaulere.",
+  "kw": "mawu kukhala srt,kupanga ma subtitles,chida cha subtitles,transcribe audio to srt,whisper subtitles,browser speech recognition,chotengera subtitles",
+  "intro": "Ikani fayilo ya kanema, sankhani chinenero, ndipo kuzindikira mawu kumayenda mwachindunji mu browser yanu. Mumapeza ma subtitles okhala ndi nthawi yake.",
+  "feat": "Chidachi chimagawanitsa mawu m'magawo oyenera ndipo chimapanga fayilo ya SRT kapena VTT yomwe mungathe kutsitsa nthawi yomweyo.",
+  "who": "Opanga mavidiyo, anthu amene amapanga ma podcasts, ndi aliyense amene akufuna ma subtitles achangu azaulere."
+ },
+ "ocrsub": {
+  "title": "OCR ya Ma Subtitles — werengani zolemba za mu kanema | AI-SRTSub",
+  "desc": "Werengani ma subtitles ophatikizidwa mu kanema ndikuwasanduliza kukhala SRT kapena VTT pogwiritsa ntchito OCR. Ndi chaulere.",
+  "kw": "chotsa ma subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles from video,video to srt,subtitle from video",
+  "intro": "Ikani kanema, sankhani gawo limene kuli ma subtitles, ndipo chidachi chimawerenga ndikuwapanga kukhala ma subtitles a SRT kapena VTT.",
+  "feat": "Chidachi chimajambula zithunzi za ma subtitles omwe ali mu kanema ndikuwasanduliza kukhala zolemba zenizeni zokhala ndi nthawi yake.",
+  "who": "Otembenuzira mavidiyo, akatswiri osamalira mavidiyo akale, ndi aliyense wofuna ma subtitles ochokera mu kanema wopanda fayilo."
+ },
+ "multilang": {
+  "title": "Malire ambiri nthawi imodzi - koperani nyengo yonse | AI-SRTSub",
+  "desc": "Ikani nyengo yonse, sankhani malire omwe mukufuna, ndipo nyamula kamodzi. Magawano ndi malire amapanga mzere umodzi ndipo amayenda mmodzi pambuyo pa mnzake; zotsukidwa zimabwera ngati zip imodzi. Zimayambiranso pomwe zidayimira.",
+  "kw": "kumasulira ma subtitles ambiri,kumasulira srt m'malire ambiri,ma subtitles a nyengo yonse,kutumiza srt ambiri,kumasulira srt mu chiŵerengero chachikulu,ma subtitles a chiŵerengero",
+  "intro": "Ikani nyengo yonse nthawi imodzi, sankhani malire omwe mukufuna, ndipo nyamula. Magawano ndi malire zimakhala mzere umodzi: chilichonse chimamaliza musanayambe china, ndipo zonse zimapakidwa mu zip imodzi yokha.",
+  "feat": "Chinthu chimene chimalephera pakumasulira kwakukulu ndi kuchulukana kwa ntchito nthawi imodzi. Magawano makumi awiri ndi malire asanu nthawi imodzi kumapangitsa z pempho zambiri kufika pamodzi, zomwe zimalepheretsa seva kuti igwire bwino ntchito. Chifukwa chake tsambali limagwira ntchito ngati mzere umodzi: gulu limodzi pa nthawi, malire amodzi mpaka kumapeto musanayambe lina. Kupitirira kumayendetsedwa pa kompyuta yanu, motero ngati kusweka pa gawo lachitatu mumayambiranso popanda kutumizanso zomwe zinamalizidwa kale. Chinthu chimene chimapereka nyengo ndizomwe zikunenedwa: kumasulira magawano makumi awiri padera kumapangitsa munthu mmodzi kulembedwa m'njira zitatu. Ichi ndichifukwa chake mndandanda wa mawu uli pano - ikani kamodzi, ndipo umagwiritsidwa ntchito ndi nyengo yonse. Tsekani tabu ndipo ntchito imayima nthawi yomweyo m'malo mowononga quota kumbuyo.",
+  "who": "Magulu a ma subtitles amene akuwongolera nyengo yonse m'malire osiyanasiyana, malo ogawa mndandanda womwewo wamagawano m'misika yosiyanasiyana, ndi omasulira amene amakonda kukanikiza kamodzi ndikubwerera pambuyo pake.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Nthawi ya zilembo zonse | AI-SRTSub",
+  "desc": "Wopanga ma subtitles a karaoke waulere pa intaneti: ikani nyimbo, ikani mawu, dinani mzere uliwonse, ndipo mugawanitse kukhala zilembo kapena mawu mwachangu. Tumizani ku ASS ndi \\\\kf tags za CapCut ndi Premiere, kapena LRC yopangidwa ndi mawu.",
+  "kw": "wopanga ma subtitles a karaoke,ass karaoke,mawu a nyimbo pa mlingo wa mawu,kf tags,karaoke lrc,lyric sweep,ass karaoke maker,ai srtsub",
+  "intro": "Ikani nyimbo, ikani mawu, dinani mzere uliwonse, ndipo falitsani mzere uliwonse m'zilembo zake - mwachangu kapena mwa kukanikiza ndi nyimbo kapena kukoka malire. Onerani mawu akuwala pamene akuimbidwa.",
+  "feat": "Chigawo cha ku China chimagawanika pa zilembo, Chingerezi pa mawu, ndipo zizindikiro zimayenda pamodzi. Kusiyana kwa mapeto kumaletsa zilembo zomaliza kuti zisapitirire mawu. Tumizani ku ASS ya CapCut / Premiere / Aegisub ndi \\\\kf tags, LRC yowonjezera ya osewera a mawu, kapena SRT ya mzere wathunthu ngati njira ina. Zonse zimagwira ntchito mu msakatuli wanu - palibe zotumiza.",
+  "who": "Opanga omwe akuwonjezera mawu a nyimbo ku mavidiyo oimba ndi zithunzi za konsati, opanga ma MV a nyimbo, ndi aliyense amene akupanga ma subtitles a karaoke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

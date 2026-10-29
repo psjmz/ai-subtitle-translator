@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "ga",
-    "ogLocale": "ga_IE",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Scannán & Sraith Dhomhanda, Fotheidil i do Theanga",
-    "desc": "Aistritheoir fotheideal AI saor in aisce — gan síniú isteach, gan teorainneacha, gan comhartha uisce. Tiontaigh fotheidil scannán, sraith agus clár faisnéis i do theanga le cliceáil amháin.",
-    "kw": "aistritheoir fotheideal AI,aistrigh fotheidil,aistritheoir fotheideal saor in aisce,aistrigh comhad SRT,aistrigh VTT,aistrigh ASS,aistriúchán fotheideal scannáin,fotheidil sraithe teilifíse,fotheidil Netflix,fotheidil KDrama,fotheidil anime,fotheidil dhátheangacha,fotheidil scannán coigríche,aistrigh fotheidil ar líne,fotheidil YouTube,uirlis aistriúcháin fotheideal saor in aisce,aistrigh fotheidil saor in aisce,aistritheoir SRT saor in aisce",
-    "ogTitle": "AI-SRTSub - Scannán & Sraith Dhomhanda, Fotheidil i do Theanga",
-    "ogDesc": "Aistritheoir fotheideal AI 100% saor in aisce d'fhatanais scannán: le cliceáil amháin tiontaítear fotheidil scannán, sraith agus clár faisnéis i do dhotheanga, le ailíniú uathoibríoch ar an amlíne. Bain taitneamh as ábhar domhanda gan bhac.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Aistritheoir fotheideal AI 100% saor in aisce d'fhatanais scannán: le cliceáil amháin tiontaítear fotheidil scannán, sraith agus clár faisnéis i do dhotheanga, le ailíniú uathoibríoch ar an amlíne. Bain taitneamh as ábhar domhanda gan bhac.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Maidir leis an uirlis seo\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Aistritheoir Fotheideal Uathoibríoch AI Saor in Aisce</h2>\n    <p data-i18n-html=\"seoIntro\">Is uirlis <strong>aistriúcháin fotheideal ar líne saor in aisce í seo atá cumhachtaithe ag samhlacha teanga mhóra</strong>. Uaslódáil comhaid SRT, VTT nó ASS agus aistrigh fotheidil idir an Béarla, an tSínis, an tSeapáinis, an Chóiréis, an Spáinnis, an Fhraincis agus 15+ teanga eile. Gan síniú isteach, gan suiteáil, gan comhartha uisce — oscail i mbrabhsálaí é agus tús a chur le haistriú. Fanann sonraí fotheidil i do bhrabhsálaí mura gcumasóidh tú aistriúchán scamhaill.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Príomhghnéithe:</strong> Anailís agus aistriúchán AI do SRT, VTT agus ASS, cumasc cliste abairtí (nuair a bhíonn abairt amháin thar roinnt cúanna, cumascann na cúanna, aistrítear iad, agus roinntear ar ais iad thar an amlíne bhunaidh), ailíniú ama, timpeallú línte uathoibríoch do théacs CJK agus Iartharach, baint focal líonta, láimhseáil téarmaíochta saincheaptha, agus stíleanna aistriúcháin inchurtha in eagar. Easpórtáil comhaid chaighdeánacha SRT, VTT, ASS nó TXT atá réidh le haghaidh crua-fhotheidil ar d'fhíseán.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Cé a úsáideann é:</strong> aistritheoirí físeán, cruthaitheoirí YouTube agus logálaithe, foghlaimeoirí teanga, grúpaí fotheideal agus foirne a dteastaíonn uathu ábhar físeáin a logálú go tapa.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Teastaíonn JavaScript ón uirlis seo. Cumasaigh JavaScript i do bhrabhsálaí, le do thoil, ansin uaslódáil comhad fotheidil (SRT / VTT / ASS) chun fotheidil a aistriú le AI saor in aisce.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Déantóir Fotheideal Stílithe - Cumasc Dhátheangach, Éifeacht ASS & VTT",
-    "desc": "Uirlis saor in aisce le haghaidh fotheideal stílithe: cumasc dá chomhad i ndhátheangach, athstíligh rian dátheangach, nó cuir éifeachtaí leis. 5 réamhshocrú ASS / 6 VTT; easpórtáil mar SRT / VTT / ASS.",
-    "kw": "cumasc fotheidil,fotheidil dhátheangacha,comhcheangail comhaid fotheidil,fotheidil stílithe,stíleanna fotheideal ASS,stíleanna fotheideal VTT,éifeachtaí fotheideal,déantóir fotheideal dé-shrutha,réamhshocrú ASS,teimpléad fotheideal,uirlis fotheideal saor in aisce",
-    "intro": "Cumasc dhá chomhad fotheidil i ndhátheangach, nó stíligh rian: cló, dath, imlíne agus suíomh, go léir WYSIWYG.",
-    "feat": "Cumasc agus coigeartú dhátheangach, réamhshocrú stíle ASS / VTT, sliotáin stíle in aghaidh an luacha, ceartuithe amlíne in situ agus mór-mhéide, agus réamhamharc beo gurb é an comhad easpórtáilte é go litriúil.",
-    "who": "Cruthaitheoirí a dhéanann fotheidil dhátheangacha nó stílithe, grúpaí ionchódaithe, agus foirne a dteastaíonn fotheidil inrochtana uathu."
-  },
-  "clean": {
-    "title": "Glantóir Fotheideal - Bain Comharthaí Uisce, Cúanna SDH & Clibeanna HTML",
-    "desc": "Glantóir fotheideal ar líne saor in aisce: bain comharthaí uisce, fógraí, SDH, clibeanna HTML, éifeachtaí ASS; ceartaigh ceannlitreacha, mojibake. 13 riail inathraithe, dí-dhéan in aghaidh an athraithe, amlíne gan teagmháil.",
-    "kw": "glantóir fotheideal,glan comhad srt,bain comhartha uisce fotheidil,bain fotheidil SDH,bain clibeanna HTML ó fhotheidil,ceartaigh fotheidil uile-cheannlitreacha,ceartaigh mojibake,bain fotheidil do dhaoine a bhfuil deacracht éisteachta acu,bain éifeachtaí ASS",
-    "intro": "Rith fotheideal íoslódáilte anseo ar dtús: comharthaí uisce, fógraí, cúanna SDH agus clibeanna HTML, imithe i bpas amháin.",
-    "feat": "13 riail i gceithre ghrúpa (9 ar siúl de réir réamhshocraithe), baint comhartha uisce agus SDH, ceartuithe uile-cheannlitreacha agus mojibake, liosta athruithe in aghaidh an chúa le haisghabháil aonair, agus ní bhaintear le haon am.",
-    "who": "Aon duine a rug ar fhotheideal atá ann cheana féin agus a theastaíonn sé inúsáidte, agus foirne a ghlanann ábhar i mbraislí."
-  },
-  "glossary": {
-    "title": "Athsholáthar Téarmaíochta Fotheideal - Glossary | AI-SRTSub",
-    "desc": "Athsholáthar foclóra le haghaidh fotheideal: liostáil \"sean → nua\" uair amháin agus déantar nuashonrú ar an gcomhad SRT / VTT / ASS / TXT iomlán. Fanann an t-am, na stíleanna agus na bloic NOTE; dí-dhéan in aghaidh na líne.",
-    "kw": "foclóir fotheideal,athchur srt i mbraisle,faigh agus cuir in ionad fotheideal,athsholáthar téarma fotheidil,eagar srt i mbraisle,cuir focail in ionad fotheideal,aontaigh ainmneacha fotheidil,téarmaíocht fotheideal,cuir téacs in ionad vtt,uirlis srt foclóra,athchur téarmaíochta i mbraisle",
-    "intro": "Foclóir de rialacha \"sean-téarma → téarma nua\" i bhfeidhm ar an gcomhad fotheideal iomlán láithreach, agus an t-am, stíleanna ASS agus bloic nótaí VTT fágtha comhionann go beacht.",
-    "feat": "Riail amháin in aghaidh na líne, scartha le -> , => , → nó cluaisín; línte a thosaíonn le # mar thuairimí. Coinníonn comhoiriúnú focal iomlán \"art\" as \"start\", tá íogairás cás roghnach, agus is féidir leat an t-athsholáthar a theorannú go líne 1 nó líne 2 de chúanna dhátheangacha. Tá gach cúa athraithe liostaithe, agus is féidir aon cheann acu a chur ar ais.",
-    "who": "Aon duine aontaíonn ainmneacha agus téarmaíocht thar shéasúr, ag ceartú foclaíochta aistriúcháin mheaisín i mbraisle, nó ag oiriúnú fotheidil duine eile dá stíl tí féin.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "QC Fotheideal - Seiceáil Amlíne & Leagan Amach | AI-SRTSub",
-    "desc": "QC fotheideal ar líne saor in aisce: uaslódáil SRT, VTT nó ASS agus seiceáilforluí, fad, luas léitheoireachta, leithead líne, briseadh línte, uimhriú agus ionchódú. 27 teanga, 27 tacar tairseach, móide rialacha teanga-shonracha.",
-    "kw": "seiceálaí fotheidil,qc fotheidil,bailíochtaitheoir srt,seiceáil kalachta fotheidil,seiceáil srt,seiceáil amlíne fotheidil,bailíochtaitheoir fotheidil,seiceáil comhad srt,cruthúnas fotheidil,linter fotheidil",
-    "intro": "Uaslódáil comhad fotheidil agus seiceáil é in aghaidh rialacha a theanga féin — tagann gach tortha leis an luach a thomhaistear agus leis an tairseach. Ritheann sé go hiomlán i do bhrabhsálaí, ní uaslódáiltear aon rud.",
-    "feat": "Seiceálann sé cúanna forluiteacha, cinn atá ró-ghairid nó ró-fhada ar an scáileán, luas léitheoireachta, leithead líne, líon línte, briseadh línte míchompordach, uimhriú, cúanna folamh, mojibake agus carachtair rialuithe. Leanann an leithead agus an luas léitheoireachta an córas scríbhneoireachta: tomhaistear an tSínis i gcarachtair lán-leithead, agus comharthaí comhcheangailte na Téalainne agus na hAraibe bíonn leithead nialasach acu. Clúdaíonn rialacha teanga-shonracha an comhartha ceiste osclaíoch Spáinnise ¿, an spás neamh-bhriste Fraincise roimh ? ! ; :, an comhartha ceiste Gréagach, poncaíocht lán-leithead sa tSínis agus sa tSeapáinis, agus an comhartha ceiste agus an camóg Araibise. Liostaítear míreanna uathoibríoch-fheabhsaithe ar leithligh, agus déantar aon rud a bhogann cóid ama a dhí-roghnú de réir réamhshocraithe.",
-    "who": "Grúpaí fotheideal, díoltóirí logánaithe, eagarthóirí agus aon duine a dteastaíonn uathu comhad a sheiceáil roimh a sheachadadh.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Aistritheoir Fotheideal — SRT/VTT/ASS i do Theanga",
-    "desc": "Scaoil isteach comhad SRT / VTT / ASS, roghnaigh teanga spriocdhírithe, agus faigh aistriúchán faoi ghlas ama. 100 teanga, saor in aisce, gan síniú isteach."
-  },
-  "convert": {
-    "title": "Tiontaire Fotheideal - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Tiontaire fotheideal ar líne saor in aisce: tiontaigh idir SRT, VTT, ASS, SBV, LRC agus TXT leis an amlíne slán, clibeanna éifeachta ASS glanta go huathoibríoch.",
-    "kw": "tiontaire fotheidil,srt go vtt,vtt go srt,ass go srt,sbv go srt,srt go lrc,fotheideal go txt,tiontaigh fotheidil,tiontaire srt,tiontaire vtt",
-    "intro": "Tiontaigh idir SRT, VTT, ASS, SBV, LRC agus TXT agus an amlíne coinnithe slán.",
-    "feat": "Brathann an format ionchuir go huathoibríoch agus athscríobhtar stampaí ama don fhormat spriocdhírithe; éiríonn le clibeanna éifeachta ASS agus briseadh línte éigeantach ina téacs inléite nuair a easpórtálann tú chuig format plain; ní bhíonn réimse uaire ag comhaid liricí, mar sin áirítear aon rud thar uair an chloig i nóiméid.",
-    "who": "Aon duine nach nglacann a imreoir le comhad fotheidil, agus aon duine a bhogann ábhar idir eagarthóir agus imreoir gréasáin.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Rannálaí Fotheideal Dhátheangach - Coinnigh Aon Teanga Amháin | AI-SRTSub",
-    "desc": "Rannálaí fotheideal dhátheangach ar líne saor in aisce: roinn comhad fotheideal dhátheangach i mbunrian agus rian aistrithe, nó coinnigh ceann amháin díobh.",
-    "kw": "rannálaí fotheideal dhátheangach,roinn srt dhátheangach,bain fotheidil an dara teanga,coinnigh fotheideal an Bhéarla amháin,aisain aistriúchán fotheideal,sroich srt dhátheangach,roinn ass dhátheangach",
-    "intro": "Roinn comhad fotheideal dhátheangach i mbunrian agus rian aistrithe, nó coinnigh ceann amháin díobh.",
-    "feat": "Láimhseáiltear an dá leagan amach coitianta - cúa amháin a iompraíonn dhá líne, agus dhá chú a roinneann an t-amlíne céanna. Roinntear na rianta de réir ordú agus cineál script, coinnítear an t-amlíne go díreach mar a bhí, agus marcáiltear comhad teanga a haon in ionad é a fhágáil folamh go ciúin.",
-    "who": "Aon duine a fhaigheann comhad dhátheangach réamhdhéanta agus nach dteastaíonn uaidh ach teanga amháin, agus foirne fotheideal a thaisceann an bunleagan agus an t-aistriúchán ar leithligh.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Athrú Amlíne Fotheideal - Bog, Scálaigh, Cumasc & Roinn | AI-SRTSub",
-    "desc": "Uirlis amlíne fotheideal ar líne saor in aisce: bog gach rud láithreach, scálaigh de réir cóimheasa, nó ceartaigh an drifte le dhá phointe ancaire. Oibríonn sé le SRT, VTT, ASS, SBV, LRC agus TXT.",
-    "kw": "athrú amlíne fotheideal,bog amlíne srt,coigeartú sioncronaithe fotheideal,scálaigh amlíne fotheideal,ceartaigh moill fotheideal,fritháireamh ama srt,ceartú drifte fotheideal,cumasc fotheidil,roinn fotheidil,comhcheangail srt,roinn fotheideal fada",
-    "intro": "Nuair a bhíonn fotheidil as sioncronú, bog an t-amlíne iomlán, scálaigh é de réir cóimheasa, nó ceartaigh é le dhá phointe ancaire. Is féidir leis línte a roinneadh a bhí scartha, agus cinn a ritheann ró-fhada a roinnt freisin.",
-    "feat": "Bogann athrú gach cúa gan athrú a dhéanamh ar fhad gach ceann acu ar an scáileán. Déanann scálú an dá cheann a iolrú, agus mar sin athraíonn fad an chúa leis - áisiúil idir 24 agus 25 fps. Láimhseáiltear sa phointe dhá phointe comhaid atá fritháirithe agus a ritheann ag an luas mícheart araon. Cuirtear amanna a thagann amach diúltach go dtí nialas, agus insíonn an uirlis duit cé mhéad a bhí buailte. An fhormat chéanna isteach, an fhormat chéanna amach - gan tiontú, agus coinnítear stíleanna ASS, stíliú in aghaidh na líne agus clibeanna éifeachta go díreach mar a bhí. Fanann cúanna dhátheangacha ar dhá líne nuair a chumasaítear iad agus scipeáltear iad nuair a roinntear iad.",
-    "who": "Aon duine a mbíonn a gcuid fotheidil ag tarraingt as rian tar éis athrú foinse, a ritheann beagán tapa nó mall, nó a tháinig ó dhuine a bhí ag obair ag ráta fráma eile.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Deisigh Fotheidil Éillithe - Deisigh Mojibake / Ionchódú Mícheart | AI-SRTSub",
-    "desc": "Deisiúchán ar líne saor in aisce le haghaidh fotheideal éillithe: aimsíonn sé an é UTF-8, GBK, Big5, Shift_JIS nó EUC-KR an comhad, athshlánaíonn sé téacs míléite, agus sábhálann sé arís do d'imreoir.",
-    "kw": "deisigh fotheidil éillithe,mojibake fotheidil,deisiú ioncódaithe srt,deisigh ioncódú fotheidil,utf8 go gbk srt,taispeánann srt carachtair aisteacha,ionchódú mícheart fotheidil,ass éillithe,vtt éillithe,aimsigh ionchódú fotheidil",
-    "intro": "Fotheidil a osclaítear mar bhalla de chiallannas, is minic a léitear iad leis an ionchódú mícheart. Scaoil an comhad isteach, agus oibríonn sé amach cén ionchódú a raibh an comhad scríofa ann i ndáiríre agus cuireann sé na carachtair a léadh go mícheart ar ais.",
-    "feat": "Déantar comhaid uaslódáilte a dhíchódú arís ó na bearta bunaidh, agus mar sin ní chailltear aon rud: má tharlaíonn sé gurb é GBK an comhad, deir sé sin amhlaidh, agus más é d'imreoir an té a léann go mícheart é, is minic a shocraíonn sábháil cóipe mar \"UTF-8 le BOM\" é. Ní na bearta bunaidh a thuilleadh an téacs greamaithe, agus mar sin is lú i bhfad a is féidir a athshlánú; má tá carachtair athsholáthair ann cheana féin, ní féidir é sin a athshlánú agus deir an uirlis sin go soiléir in ionad ligean air nach amhlaidh atá. Ní bhaintear le huimhreacha línte agus le cóid ama riamh, agus fágtear clibeanna stíle ASS go díreach mar a bhí.",
-    "who": "Aon duine a d'íoslódáil fotheideal a osclaítear mar gibiris, a fheiceann boscaí in ionad na Sínise san imreoir, nó a fuair comhad le hionchódú neamhthuigthe.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Bain Téacs as Fotheidil - SRT/ASS/VTT go Téacs Simplí | AI-SRTSub",
-    "desc": "Sliochtóir fotheideal-go-téacs ar líne saor in aisce: léann sé SRT, VTT, ASS, SBV, LRC agus TXT, baineann sé cóid ama agus uimhreacha línte, agus aschuir sé comhrá glan mar ailt nó líne amháin in aghaidh an chúa.",
-    "kw": "bain téacs as fotheidil,fotheideal go téacs,srt go txt,srt go téacs simplí,ass go txt,vtt go txt,tras-scríbhinn fotheidil,bain comhrá as srt,srt baint chód ama,sliochtóir téacs fotheidil",
-    "intro": "Bain an comhrá as fotheidil SRT / VTT / ASS / SBV / LRC / TXT mar téacs simplí glan: baintear cóid ama, uimhreacha cúanna agus clibeanna stíle go huathoibríoch.",
-    "feat": "Dhá leagan amach: ailt le leanúnachas roinnte ar sosanna agus poncaíocht deireadh abairte, nó líne amháin in aghaidh an chúa le haghaidh liostaí comhrá. Baintear cúanna fuaime cosúil le \"(guthán ag glaoch)\", comharthaí uisce foinse agus línte athchleachtacha cúil le cúil de réir réamhshocraithe; is féidir ainmneacha cainteoirí cosúil le \"TOM:\" agus línte liriceacha a choinneáil nó a ligean le sruth. Déantar timpeallú línte a chumasc ar ais in aghaidh an script — cuireann CJK isteach go díreach, cuireann an Chóiréis agus an Laidín spásanna leis — mar sin ní bhíonn aon rud gliúite le chéile.",
-    "who": "Aon duine a dteastaíonn téacs fotheidil uaidh le haghaidh nótaí, scripteanna, cleachtadh aistriúcháin nó chun uirlis eile a bheathú, gan céadta cóid ama a scriosadh de láimh.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Bain Fotheidil Leabaithe as MKV / MP4 go SRT | AI-SRTSub",
-    "desc": "Bain fotheidil leabaithe as MKV, WebM, MP4, MOV; easpórtáil mar SRT / VTT / ASS / TXT. Gan uaslódáil nó ath-chódú — léitear comhaid i do bhrabhsálaí; il-GB ceart go leor.",
-    "kw": "bain fotheidil leabaithe,mkv go srt,baint fotheidil mp4,bain fotheidil ó fhíseán,sliochtóir fotheidil leabaithe,srt ó mkv,baint fotheidil mov,easpórtáil rian fotheidil,vtt ó mkv,bain fotheidil bhog,striáil fotheidil mkv",
-    "intro": "Tarraing an rian fotheidil atá séalaithe laistigh de MKV nó MP4 go díreach isteach i SRT — gan uaslódáil, tarlaíonn sé go léir i do bhrabhsálaí.",
-    "feat": "Léann sé rianta plain-text, ASS, WebVTT agus mov_text / tx3g, coinníonn sé an ceanntásc agus an rún ASS bunaidh, agus léann sé i sliseanna beaga de réir fritháirimh ionas nach líonann comhad ulóg cuimhne riamh.",
-    "who": "Aon duine a bhfuil scannán aige le fotheidil bhog agus a dteastaíonn an téacs uaidh, foirne ionchódaithe, agus foirne fansub ag tosú ón rian bunaidh.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Tiontaire Fotheideal Sínise - Simplithe ⇄ Traidisiúnta | AI-SRTSub",
-    "desc": "Tiontaire fotheideal Sínise saor in aisce: Simplithe ⇄ Traidisiúnta (Téaváin / Hong Cong) agus ar ais. Ní athraíonn ach an comhrá — fanann cóid ama agus clibeanna ASS. Tógtha ar OpenCC.",
-    "kw": "tiontaire fotheidil sínise,simplithe go traidisiúnta,traidisiúnta go simplithe,srt sínis traidisiúnta,tiontaigh fotheideal sínis,sínis traidisiúnta na téaváine,sínis traidisiúnta hong kong,tiontú han,tiontaigh srt go sínis traidisiúnta,srt sínis simplithe,fotheideal opencc",
-    "intro": "Tiontaigh comhad fotheideal iomlán idir Simplithe agus Traidisiúnta, gan aon rud a athrú ach an comhrá.",
-    "feat": "Naoi dtreo: Traidisiúnta ginearálta, stór focal na Téaváine, foirmeacha na Téaváine, Hong Cong, ar ais go Simplithe, agus foirmeacha réigiúnacha Traidisiúnta-go-Traidisiúnta. Úsáideann sé an foclóir OpenCC le rún frása is fada an comhoiriúnú ar dtús.",
-    "who": "Aon duine a sheachadann fotheidil chuig lucht féachana na Téaváine nó Hong Cong, dáileoirí ag ullmhú leaganacha réigiúnacha, agus eagarthóirí a fuair comhad Traidisiúnta agus a dteastaíonn Simplithe uathu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Rannálaí & Cumascóir Fotheideal - SRT / VTT | AI-SRTSub",
-    "desc": "Roinn fotheidil de réir fhaid nó ar mhinicíocht, nó comhcheangail go leor comhad in ord nó de réir stampa ama. Tá athuimhriú uathoibríoch, comhrá gan teagmháil. SRT & VTT.",
-    "kw": "rannálaí fotheideal,roinn fotheidil,cumasc comhaid srt,cumascóir srt,comhcheangail fotheidil,roinn srt,ceangail comhaid srt,gearr fotheidil,roinn vtt,cumascóir fotheidil",
-    "intro": "Gearr fotheideal fada amháin ina chuid, nó comhcheangail go leor comhad i gceann amháin. Ritheann sé go hiomlán i do bhrabhsálaí — ní uaslódáiltear aon rud.",
-    "feat": "Roinn de réir fhaid nó ar mhinicíocht le hathuimhriú in aghaidh na coda agus amú oiriúnach bunaithe ar nialas roghnach; comhcheangail go sreangach le bearna nó idir-leabaithe de réir stampaí ama bunaidh. SRT agus VTT.",
-    "who": "Cruthaitheoirí ag roinnt eipeasóid le haghaidh uaslódála, foirne ag athbhreithniú i gcodanna, agus eagarthóirí ag cumasc fotheidil il-choda.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Fotheidil go Excel/CSV agus Ar Ais | AI-SRTSub",
-    "desc": "Tiontaigh SRT nó VTT go leathánach Excel nó CSV le haghaidh athbhreithnithe agus aistriúcháin, ansin tabhair ar ais é. Fanann cóid ama cruinn, and mhaireann briseadh línte. Gan uaslódáil.",
-    "kw": "fotheideal go excel,srt go csv,srt go excel,excel go srt,csv go srt,scarbhileog fotheideal,tábla tiontaire fotheideal",
-    "intro": "Easpórtáil fotheidil chuig scarbhileog le haghaidh athbhreithnithe agus aistriúcháin, ansin iompórtáil an leathán ar ais. Ritheann sé go hiomlán i do bhrabhsálaí.",
-    "feat": "Cliceáil amháin ó SRT nó VTT go xlsx nó CSV; cuir in eagar amanna, téacs agus nótaí i do scarbhileog, ansin easpórtáil ar ais go SRT nó VTT. Coinníonn colúin ama cruinneas iomlán milliseicind; coimeádtar briseadh línte laistigh de chillíní. Oibríonn ceanntásca Sínise agus Béarla araon.",
-    "who": "Aistritheoirí, foirne fansub agus eagarthóirí a dhéanann athbhreithniú, as anótaí nó a cheartaíonn fotheidil i mbraislí i scarbhileog.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Tiontaigh Fotheidil i mBraisle go SRT/VTT | AI-SRTSub",
-    "desc": "Scaoil isteach dosaen nó céadta comhad SRT/VTT, tiontaigh iad go léir go dtí format amháin agus íoslódáil aon ZIP amháin. Athuimhriú agus stampaí ama caighdeánaithe; comhaid neamhinléite marcáilte.",
-    "kw": "tiontú fotheideal i mbraisle,srt go vtt,tiontaire fotheideal i mbraisle,srt mórchóir,tiontaigh ilfhotheidil,zip fotheideal",
-    "intro": "Tarraing isteach céadta comhad fotheidil, tiontaigh iad go léir, tóg leat ZIP amháin. Ritheann sé go hiomlán i do bhrabhsálaí — ní uaslódáiltear aon rud.",
-    "feat": "SRT go VTT agus ar ais i mbraisle; uimhreacha sevensa athordaithe agus stampaí ama caighdeánaithe in aghaidh an fhormat spriocdhírithe. Déantar comhaid nach féidir a pharsáil a mharcáil agus a fhágáil amach as an ZIP. Coinnítear ainmneacha comhaid bunaidh le hextension nua; faigheann imbhuailtí iarmhír.",
-    "who": "Eagarthóirí agus fotheideoirí ag tiontú fillteáin iomlána sraithe, agus úinéirí suímh ag tabhairt format amháin d'imreoirí.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Eagarthóir Liricí LRC - Tapáil Am Agus Tú ag Éisteacht | AI-SRTSub",
-    "desc": "Luchtaigh amhrán, greamaigh na liricí, agus tapáil am gach líne agus tú ag éisteacht; easpórtáil LRC nó SRT. Iompórtáil LRC atá ann cheana le haghaidh mionchoigeartaithe. Tiomáinte ag an méarchlár, go hiomlán sa bhrabhsálaí.",
-    "kw": "eagarthóir lrc ar líne,déan lrc,amú liricí,déantóir lrc,cruthaigh lrc,sioncronaitheoir liricí,lrc go srt",
-    "intro": "Luchtaigh ceol, greamaigh liricí, tapáil an t-am líne ar líne agus tú ag éisteacht, agus easpórtáil LRC nó SRT. Ní uaslódáiltear aon rud.",
-    "feat": "Oibríonn sé le MP3, M4A, FLAC, WAV agus OGG. Líne amháin in aghaidh an ró; is féidir comhaid LRC atá ann cheana a iompórtáil agus a choigeartú. Imríonn/stadann Space, stampaí Enter an líne reatha, dí-dhéanann Z — fanann na lámha ar an méarchlár.",
-    "who": "Ceoltóirí ag sioncronú clúdaigh, cruthaitheoirí ag cur amhrán le físeáin, agus aon duine a thógann fotheidil liriceacha d'imreoir.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "Athchóiritheoir Fotheideal YouTube - Athcheangail Abairtí Briste | AI-SRTSub",
-    "desc": "Gearann uathoibríoch YouTube abairtí ag tréimhsí seasta 3-4 soicind. Coinníonn an uirlis seo gach focal agus athraíonn sí teorainneacha na gcue go deireadh na n-abairtí. Saor in aisce, 100 teanga.",
-    "kw": "socrú fotheidil youtube,fotheidil uathoibríocha youtube,athchóiriú fotheidil,ailíniú abairtí fotheidil,socraigh fotheidil bhriste,ailíniú abairtí srt,ath-dheighilt fotheidil,deisiú fotheidil youtube,fotheidil le feasacht abairtí",
-    "intro": "Cuir isteach comhad fotheidil uathghinte ó YouTube, roghnaigh an teanga, agus fuaighfidh an uirlis abairtí le chéile thar na ciúnna, ansin gearrfaidh sí an comhad arís abairt ar abairt. Ní athraítear focal amháin, agus fanann amanna na gciúnna chomh gar agus is féidir do na bun-stampaí ama.",
-    "feat": "Gearrtar fotheidil uathoibríocha YouTube i gciúnna beagnach seasta 3-4 soicind beag beann ar áit a gcríochnaíonn abairtí, mar sin is minic a bhíonn deireadh na habairte roimhe sin agus tús na chéad abairte eile i gciú amháin. Úsáideann an uirlis na bun-stampaí ama mar ancaire - is iad sin na teorainneacha focal fíor a tháirg an t-aitheantóir cainte - socraíonn sí cá gcríochnaíonn gach abairt ón bponcaíocht, agus úsáideann sí ríomhchlárú dinimiciúil chun an pointe briste is saoire a roghnú i measc deireadh abairte, camóg, nasc agus gearradh crua, ansin leathnaíonn sí an t-am ar an scáileán chun teacht leis an ráta léitheoireachta. Tá a rialacha abairte féin ag gach ceann de na 100 teanga: níl spásanna idir focail sa tSínis agus sa tSeapáinis, is ar éigean a mharcálann an Téalainnis imill na bhfocal, críochnaíonn an Hiondúis abairtí le ।, an Araibis le ؟, an Airméinis le ։. Leanann leithead na líne agus luas na léitheoireachta an córas scríbhneoireachta - 16 carachtar lánleithead in aghaidh na líne don tSínis, 42 charachtar do scripteanna Laidineacha. Roimh an easpórtáil, déantar an téacs a chur i gcomparáid carachtar ar charachtar, agus cuirtear aon fhocal a cailleadh nó a cuireadh leis in iúl láithreach.",
-    "who": "Foirne fotheidil a dhéanann fotheidil chríochnaithe as fotheidil uathoibríocha YouTube, podchraoltaí agus cúrsaí, agus cruthaitheoirí ag eagarthóireacht a bhfíseáin féin atá tuirseach d'abairtí a stopann leathbhealach.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Fuaim go Fotheidil — cruthaigh SRT sa bhrabhsálaí | AI-SRTSub",
-    "desc": "Fuaim nó físeán isteach, fotheidil amach: aithníonn an brabhsálaí caint, gearrann sé ina chues í agus easpórtálann SRT / VTT. Saor in aisce.",
-    "kw": "fuaim go srt,caint go fotheidil,gineadóir fotheidil,trascríobh fuaim go srt,aithint cainte sa bhrabhsálaí,gineadh fotheidil as líne,asr,ai-srtsub",
-    "intro": "Cuir comhad fuaime nó físeáin isteach, roghnaigh teanga agus samhail, agus rithfear an t-aitheantas sa bhrabhsálaí. Faigheann tú dréacht fotheidil le huainiú, gearrtha ag abairtí agus de réir leithead na líne.",
-    "feat": "Déanann an uirlis seo an t-aitheantas cainte a thiontú ina fhotheidil trí abairtí a ghearradh ag poncaíocht, línte a oiriúnú don scáileán, agus uainiú a bharrfheabhsú gan forluí.",
-    "who": "Cruthaitheoirí ag cur fotheidil lena bhfíseáin, foirne ag déanamh téacs as podchraoltaí, agus daoine a bhfuil dréacht de dhíth orthu."
-  },
-  "ocrsub": {
-    "title": "OCR Fotheideal Dóite — léigh fotheidil sa phictiúr | AI-SRTSub",
-    "desc": "Fotheidil dóite isteach sa phictiúr gan rian le baint. Marcáil an stiall agus léann an uirlis í fráma ar fhráma. Easpórtáil SRT / VTT, saor in aisce.",
-    "kw": "bain fotheidil dóite,ocr fotheidil,fotheidil i bhfíseán,ocr ó fhíseán,fotheidil go srt,ai-srtsub,ocr,srt,vtt",
-    "intro": "Cuir físeán isteach, marcáil an stiall ina bhfuil na fotheidil, agus léann an uirlis fráma ar fhráma iad, ag cumasc frámaí comhionanna ina aon chue amháin.",
-    "feat": "Déantar an stiall ina bhfuil na fotheidil a bharradh agus a phróiseáil bunaithe ar ghile, áit a n-aithnítear an téacs agus a gcumascann frámaí comhionanna ina chue amháin le huainiú cruinn.",
-    "who": "Foirne ag logánú físeáin, daoine ag ath-fhotheidealú sean-ábhair, agus eagarthóirí nach bhfuil comhad fotheidil bunaidh acu."
-  }
+ "index": {
+  "htmlLang": "ga",
+  "ogLocale": "ga_IE",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Scannán & Sraith Dhomhanda, Fotheidil i do Theanga",
+  "desc": "Aistritheoir fotheideal AI saor in aisce — gan síniú isteach, gan teorainneacha, gan comhartha uisce. Tiontaigh fotheidil scannán, sraith agus clár faisnéis i do theanga le cliceáil amháin.",
+  "kw": "aistritheoir fotheideal AI,aistrigh fotheidil,aistritheoir fotheideal saor in aisce,aistrigh comhad SRT,aistrigh VTT,aistrigh ASS,aistriúchán fotheideal scannáin,fotheidil sraithe teilifíse,fotheidil Netflix,fotheidil KDrama,fotheidil anime,fotheidil dhátheangacha,fotheidil scannán coigríche,aistrigh fotheidil ar líne,fotheidil YouTube,uirlis aistriúcháin fotheideal saor in aisce,aistrigh fotheidil saor in aisce,aistritheoir SRT saor in aisce",
+  "ogTitle": "AI-SRTSub - Scannán & Sraith Dhomhanda, Fotheidil i do Theanga",
+  "ogDesc": "Aistritheoir fotheideal AI 100% saor in aisce d'fhatanais scannán: le cliceáil amháin tiontaítear fotheidil scannán, sraith agus clár faisnéis i do dhotheanga, le ailíniú uathoibríoch ar an amlíne. Bain taitneamh as ábhar domhanda gan bhac.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Aistritheoir fotheideal AI 100% saor in aisce d'fhatanais scannán: le cliceáil amháin tiontaítear fotheidil scannán, sraith agus clár faisnéis i do dhotheanga, le ailíniú uathoibríoch ar an amlíne. Bain taitneamh as ábhar domhanda gan bhac.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Maidir leis an uirlis seo\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Aistritheoir Fotheideal Uathoibríoch AI Saor in Aisce</h2>\n    <p data-i18n-html=\"seoIntro\">Is uirlis <strong>aistriúcháin fotheideal ar líne saor in aisce í seo atá cumhachtaithe ag samhlacha teanga mhóra</strong>. Uaslódáil comhaid SRT, VTT nó ASS agus aistrigh fotheidil idir an Béarla, an tSínis, an tSeapáinis, an Chóiréis, an Spáinnis, an Fhraincis agus 15+ teanga eile. Gan síniú isteach, gan suiteáil, gan comhartha uisce — oscail i mbrabhsálaí é agus tús a chur le haistriú. Fanann sonraí fotheidil i do bhrabhsálaí mura gcumasóidh tú aistriúchán scamhaill.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Príomhghnéithe:</strong> Anailís agus aistriúchán AI do SRT, VTT agus ASS, cumasc cliste abairtí (nuair a bhíonn abairt amháin thar roinnt cúanna, cumascann na cúanna, aistrítear iad, agus roinntear ar ais iad thar an amlíne bhunaidh), ailíniú ama, timpeallú línte uathoibríoch do théacs CJK agus Iartharach, baint focal líonta, láimhseáil téarmaíochta saincheaptha, agus stíleanna aistriúcháin inchurtha in eagar. Easpórtáil comhaid chaighdeánacha SRT, VTT, ASS nó TXT atá réidh le haghaidh crua-fhotheidil ar d'fhíseán.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Cé a úsáideann é:</strong> aistritheoirí físeán, cruthaitheoirí YouTube agus logálaithe, foghlaimeoirí teanga, grúpaí fotheideal agus foirne a dteastaíonn uathu ábhar físeáin a logálú go tapa.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Teastaíonn JavaScript ón uirlis seo. Cumasaigh JavaScript i do bhrabhsálaí, le do thoil, ansin uaslódáil comhad fotheidil (SRT / VTT / ASS) chun fotheidil a aistriú le AI saor in aisce.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Déantóir Fotheideal Stílithe - Cumasc Dhátheangach, Éifeacht ASS & VTT",
+  "desc": "Uirlis saor in aisce le haghaidh fotheideal stílithe: cumasc dá chomhad i ndhátheangach, athstíligh rian dátheangach, nó cuir éifeachtaí leis. 5 réamhshocrú ASS / 6 VTT; easpórtáil mar SRT / VTT / ASS.",
+  "kw": "cumasc fotheidil,fotheidil dhátheangacha,comhcheangail comhaid fotheidil,fotheidil stílithe,stíleanna fotheideal ASS,stíleanna fotheideal VTT,éifeachtaí fotheideal,déantóir fotheideal dé-shrutha,réamhshocrú ASS,teimpléad fotheideal,uirlis fotheideal saor in aisce",
+  "intro": "Cumasc dhá chomhad fotheidil i ndhátheangach, nó stíligh rian: cló, dath, imlíne agus suíomh, go léir WYSIWYG.",
+  "feat": "Cumasc agus coigeartú dhátheangach, réamhshocrú stíle ASS / VTT, sliotáin stíle in aghaidh an luacha, ceartuithe amlíne in situ agus mór-mhéide, agus réamhamharc beo gurb é an comhad easpórtáilte é go litriúil.",
+  "who": "Cruthaitheoirí a dhéanann fotheidil dhátheangacha nó stílithe, grúpaí ionchódaithe, agus foirne a dteastaíonn fotheidil inrochtana uathu."
+ },
+ "clean": {
+  "title": "Glantóir Fotheideal - Bain Comharthaí Uisce, Cúanna SDH & Clibeanna HTML",
+  "desc": "Glantóir fotheideal ar líne saor in aisce: bain comharthaí uisce, fógraí, SDH, clibeanna HTML, éifeachtaí ASS; ceartaigh ceannlitreacha, mojibake. 13 riail inathraithe, dí-dhéan in aghaidh an athraithe, amlíne gan teagmháil.",
+  "kw": "glantóir fotheideal,glan comhad srt,bain comhartha uisce fotheidil,bain fotheidil SDH,bain clibeanna HTML ó fhotheidil,ceartaigh fotheidil uile-cheannlitreacha,ceartaigh mojibake,bain fotheidil do dhaoine a bhfuil deacracht éisteachta acu,bain éifeachtaí ASS",
+  "intro": "Rith fotheideal íoslódáilte anseo ar dtús: comharthaí uisce, fógraí, cúanna SDH agus clibeanna HTML, imithe i bpas amháin.",
+  "feat": "13 riail i gceithre ghrúpa (9 ar siúl de réir réamhshocraithe), baint comhartha uisce agus SDH, ceartuithe uile-cheannlitreacha agus mojibake, liosta athruithe in aghaidh an chúa le haisghabháil aonair, agus ní bhaintear le haon am.",
+  "who": "Aon duine a rug ar fhotheideal atá ann cheana féin agus a theastaíonn sé inúsáidte, agus foirne a ghlanann ábhar i mbraislí."
+ },
+ "glossary": {
+  "title": "Athsholáthar Téarmaíochta Fotheideal - Glossary | AI-SRTSub",
+  "desc": "Athsholáthar foclóra le haghaidh fotheideal: liostáil \"sean → nua\" uair amháin agus déantar nuashonrú ar an gcomhad SRT / VTT / ASS / TXT iomlán. Fanann an t-am, na stíleanna agus na bloic NOTE; dí-dhéan in aghaidh na líne.",
+  "kw": "foclóir fotheideal,athchur srt i mbraisle,faigh agus cuir in ionad fotheideal,athsholáthar téarma fotheidil,eagar srt i mbraisle,cuir focail in ionad fotheideal,aontaigh ainmneacha fotheidil,téarmaíocht fotheideal,cuir téacs in ionad vtt,uirlis srt foclóra,athchur téarmaíochta i mbraisle",
+  "intro": "Foclóir de rialacha \"sean-téarma → téarma nua\" i bhfeidhm ar an gcomhad fotheideal iomlán láithreach, agus an t-am, stíleanna ASS agus bloic nótaí VTT fágtha comhionann go beacht.",
+  "feat": "Riail amháin in aghaidh na líne, scartha le -> , => , → nó cluaisín; línte a thosaíonn le # mar thuairimí. Coinníonn comhoiriúnú focal iomlán \"art\" as \"start\", tá íogairás cás roghnach, agus is féidir leat an t-athsholáthar a theorannú go líne 1 nó líne 2 de chúanna dhátheangacha. Tá gach cúa athraithe liostaithe, agus is féidir aon cheann acu a chur ar ais.",
+  "who": "Aon duine aontaíonn ainmneacha agus téarmaíocht thar shéasúr, ag ceartú foclaíochta aistriúcháin mheaisín i mbraisle, nó ag oiriúnú fotheidil duine eile dá stíl tí féin.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "QC Fotheideal - Seiceáil Amlíne & Leagan Amach | AI-SRTSub",
+  "desc": "QC fotheideal ar líne saor in aisce: uaslódáil SRT, VTT nó ASS agus seiceáilforluí, fad, luas léitheoireachta, leithead líne, briseadh línte, uimhriú agus ionchódú. 27 teanga, 27 tacar tairseach, móide rialacha teanga-shonracha.",
+  "kw": "seiceálaí fotheidil,qc fotheidil,bailíochtaitheoir srt,seiceáil kalachta fotheidil,seiceáil srt,seiceáil amlíne fotheidil,bailíochtaitheoir fotheidil,seiceáil comhad srt,cruthúnas fotheidil,linter fotheidil",
+  "intro": "Uaslódáil comhad fotheidil agus seiceáil é in aghaidh rialacha a theanga féin — tagann gach tortha leis an luach a thomhaistear agus leis an tairseach. Ritheann sé go hiomlán i do bhrabhsálaí, ní uaslódáiltear aon rud.",
+  "feat": "Seiceálann sé cúanna forluiteacha, cinn atá ró-ghairid nó ró-fhada ar an scáileán, luas léitheoireachta, leithead líne, líon línte, briseadh línte míchompordach, uimhriú, cúanna folamh, mojibake agus carachtair rialuithe. Leanann an leithead agus an luas léitheoireachta an córas scríbhneoireachta: tomhaistear an tSínis i gcarachtair lán-leithead, agus comharthaí comhcheangailte na Téalainne agus na hAraibe bíonn leithead nialasach acu. Clúdaíonn rialacha teanga-shonracha an comhartha ceiste osclaíoch Spáinnise ¿, an spás neamh-bhriste Fraincise roimh ? ! ; :, an comhartha ceiste Gréagach, poncaíocht lán-leithead sa tSínis agus sa tSeapáinis, agus an comhartha ceiste agus an camóg Araibise. Liostaítear míreanna uathoibríoch-fheabhsaithe ar leithligh, agus déantar aon rud a bhogann cóid ama a dhí-roghnú de réir réamhshocraithe.",
+  "who": "Grúpaí fotheideal, díoltóirí logánaithe, eagarthóirí agus aon duine a dteastaíonn uathu comhad a sheiceáil roimh a sheachadadh.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Aistritheoir Fotheideal — SRT/VTT/ASS i do Theanga",
+  "desc": "Scaoil isteach comhad SRT / VTT / ASS, roghnaigh teanga spriocdhírithe, agus faigh aistriúchán faoi ghlas ama. 100 teanga, saor in aisce, gan síniú isteach."
+ },
+ "convert": {
+  "title": "Tiontaire Fotheideal - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Tiontaire fotheideal ar líne saor in aisce: tiontaigh idir SRT, VTT, ASS, SBV, LRC agus TXT leis an amlíne slán, clibeanna éifeachta ASS glanta go huathoibríoch.",
+  "kw": "tiontaire fotheidil,srt go vtt,vtt go srt,ass go srt,sbv go srt,srt go lrc,fotheideal go txt,tiontaigh fotheidil,tiontaire srt,tiontaire vtt",
+  "intro": "Tiontaigh idir SRT, VTT, ASS, SBV, LRC agus TXT agus an amlíne coinnithe slán.",
+  "feat": "Brathann an format ionchuir go huathoibríoch agus athscríobhtar stampaí ama don fhormat spriocdhírithe; éiríonn le clibeanna éifeachta ASS agus briseadh línte éigeantach ina téacs inléite nuair a easpórtálann tú chuig format plain; ní bhíonn réimse uaire ag comhaid liricí, mar sin áirítear aon rud thar uair an chloig i nóiméid.",
+  "who": "Aon duine nach nglacann a imreoir le comhad fotheidil, agus aon duine a bhogann ábhar idir eagarthóir agus imreoir gréasáin.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Rannálaí Fotheideal Dhátheangach - Coinnigh Aon Teanga Amháin | AI-SRTSub",
+  "desc": "Rannálaí fotheideal dhátheangach ar líne saor in aisce: roinn comhad fotheideal dhátheangach i mbunrian agus rian aistrithe, nó coinnigh ceann amháin díobh.",
+  "kw": "rannálaí fotheideal dhátheangach,roinn srt dhátheangach,bain fotheidil an dara teanga,coinnigh fotheideal an Bhéarla amháin,aisain aistriúchán fotheideal,sroich srt dhátheangach,roinn ass dhátheangach",
+  "intro": "Roinn comhad fotheideal dhátheangach i mbunrian agus rian aistrithe, nó coinnigh ceann amháin díobh.",
+  "feat": "Láimhseáiltear an dá leagan amach coitianta - cúa amháin a iompraíonn dhá líne, agus dhá chú a roinneann an t-amlíne céanna. Roinntear na rianta de réir ordú agus cineál script, coinnítear an t-amlíne go díreach mar a bhí, agus marcáiltear comhad teanga a haon in ionad é a fhágáil folamh go ciúin.",
+  "who": "Aon duine a fhaigheann comhad dhátheangach réamhdhéanta agus nach dteastaíonn uaidh ach teanga amháin, agus foirne fotheideal a thaisceann an bunleagan agus an t-aistriúchán ar leithligh.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Athrú Amlíne Fotheideal - Bog, Scálaigh, Cumasc & Roinn | AI-SRTSub",
+  "desc": "Uirlis amlíne fotheideal ar líne saor in aisce: bog gach rud láithreach, scálaigh de réir cóimheasa, nó ceartaigh an drifte le dhá phointe ancaire. Oibríonn sé le SRT, VTT, ASS, SBV, LRC agus TXT.",
+  "kw": "athrú amlíne fotheideal,bog amlíne srt,coigeartú sioncronaithe fotheideal,scálaigh amlíne fotheideal,ceartaigh moill fotheideal,fritháireamh ama srt,ceartú drifte fotheideal,cumasc fotheidil,roinn fotheidil,comhcheangail srt,roinn fotheideal fada",
+  "intro": "Nuair a bhíonn fotheidil as sioncronú, bog an t-amlíne iomlán, scálaigh é de réir cóimheasa, nó ceartaigh é le dhá phointe ancaire. Is féidir leis línte a roinneadh a bhí scartha, agus cinn a ritheann ró-fhada a roinnt freisin.",
+  "feat": "Bogann athrú gach cúa gan athrú a dhéanamh ar fhad gach ceann acu ar an scáileán. Déanann scálú an dá cheann a iolrú, agus mar sin athraíonn fad an chúa leis - áisiúil idir 24 agus 25 fps. Láimhseáiltear sa phointe dhá phointe comhaid atá fritháirithe agus a ritheann ag an luas mícheart araon. Cuirtear amanna a thagann amach diúltach go dtí nialas, agus insíonn an uirlis duit cé mhéad a bhí buailte. An fhormat chéanna isteach, an fhormat chéanna amach - gan tiontú, agus coinnítear stíleanna ASS, stíliú in aghaidh na líne agus clibeanna éifeachta go díreach mar a bhí. Fanann cúanna dhátheangacha ar dhá líne nuair a chumasaítear iad agus scipeáltear iad nuair a roinntear iad.",
+  "who": "Aon duine a mbíonn a gcuid fotheidil ag tarraingt as rian tar éis athrú foinse, a ritheann beagán tapa nó mall, nó a tháinig ó dhuine a bhí ag obair ag ráta fráma eile.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Deisigh Fotheidil Éillithe - Deisigh Mojibake / Ionchódú Mícheart | AI-SRTSub",
+  "desc": "Deisiúchán ar líne saor in aisce le haghaidh fotheideal éillithe: aimsíonn sé an é UTF-8, GBK, Big5, Shift_JIS nó EUC-KR an comhad, athshlánaíonn sé téacs míléite, agus sábhálann sé arís do d'imreoir.",
+  "kw": "deisigh fotheidil éillithe,mojibake fotheidil,deisiú ioncódaithe srt,deisigh ioncódú fotheidil,utf8 go gbk srt,taispeánann srt carachtair aisteacha,ionchódú mícheart fotheidil,ass éillithe,vtt éillithe,aimsigh ionchódú fotheidil",
+  "intro": "Fotheidil a osclaítear mar bhalla de chiallannas, is minic a léitear iad leis an ionchódú mícheart. Scaoil an comhad isteach, agus oibríonn sé amach cén ionchódú a raibh an comhad scríofa ann i ndáiríre agus cuireann sé na carachtair a léadh go mícheart ar ais.",
+  "feat": "Déantar comhaid uaslódáilte a dhíchódú arís ó na bearta bunaidh, agus mar sin ní chailltear aon rud: má tharlaíonn sé gurb é GBK an comhad, deir sé sin amhlaidh, agus más é d'imreoir an té a léann go mícheart é, is minic a shocraíonn sábháil cóipe mar \"UTF-8 le BOM\" é. Ní na bearta bunaidh a thuilleadh an téacs greamaithe, agus mar sin is lú i bhfad a is féidir a athshlánú; má tá carachtair athsholáthair ann cheana féin, ní féidir é sin a athshlánú agus deir an uirlis sin go soiléir in ionad ligean air nach amhlaidh atá. Ní bhaintear le huimhreacha línte agus le cóid ama riamh, agus fágtear clibeanna stíle ASS go díreach mar a bhí.",
+  "who": "Aon duine a d'íoslódáil fotheideal a osclaítear mar gibiris, a fheiceann boscaí in ionad na Sínise san imreoir, nó a fuair comhad le hionchódú neamhthuigthe.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Bain Téacs as Fotheidil - SRT/ASS/VTT go Téacs Simplí | AI-SRTSub",
+  "desc": "Sliochtóir fotheideal-go-téacs ar líne saor in aisce: léann sé SRT, VTT, ASS, SBV, LRC agus TXT, baineann sé cóid ama agus uimhreacha línte, agus aschuir sé comhrá glan mar ailt nó líne amháin in aghaidh an chúa.",
+  "kw": "bain téacs as fotheidil,fotheideal go téacs,srt go txt,srt go téacs simplí,ass go txt,vtt go txt,tras-scríbhinn fotheidil,bain comhrá as srt,srt baint chód ama,sliochtóir téacs fotheidil",
+  "intro": "Bain an comhrá as fotheidil SRT / VTT / ASS / SBV / LRC / TXT mar téacs simplí glan: baintear cóid ama, uimhreacha cúanna agus clibeanna stíle go huathoibríoch.",
+  "feat": "Dhá leagan amach: ailt le leanúnachas roinnte ar sosanna agus poncaíocht deireadh abairte, nó líne amháin in aghaidh an chúa le haghaidh liostaí comhrá. Baintear cúanna fuaime cosúil le \"(guthán ag glaoch)\", comharthaí uisce foinse agus línte athchleachtacha cúil le cúil de réir réamhshocraithe; is féidir ainmneacha cainteoirí cosúil le \"TOM:\" agus línte liriceacha a choinneáil nó a ligean le sruth. Déantar timpeallú línte a chumasc ar ais in aghaidh an script — cuireann CJK isteach go díreach, cuireann an Chóiréis agus an Laidín spásanna leis — mar sin ní bhíonn aon rud gliúite le chéile.",
+  "who": "Aon duine a dteastaíonn téacs fotheidil uaidh le haghaidh nótaí, scripteanna, cleachtadh aistriúcháin nó chun uirlis eile a bheathú, gan céadta cóid ama a scriosadh de láimh.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Bain Fotheidil Leabaithe as MKV / MP4 go SRT | AI-SRTSub",
+  "desc": "Bain fotheidil leabaithe as MKV, WebM, MP4, MOV; easpórtáil mar SRT / VTT / ASS / TXT. Gan uaslódáil nó ath-chódú — léitear comhaid i do bhrabhsálaí; il-GB ceart go leor.",
+  "kw": "bain fotheidil leabaithe,mkv go srt,baint fotheidil mp4,bain fotheidil ó fhíseán,sliochtóir fotheidil leabaithe,srt ó mkv,baint fotheidil mov,easpórtáil rian fotheidil,vtt ó mkv,bain fotheidil bhog,striáil fotheidil mkv",
+  "intro": "Tarraing an rian fotheidil atá séalaithe laistigh de MKV nó MP4 go díreach isteach i SRT — gan uaslódáil, tarlaíonn sé go léir i do bhrabhsálaí.",
+  "feat": "Léann sé rianta plain-text, ASS, WebVTT agus mov_text / tx3g, coinníonn sé an ceanntásc agus an rún ASS bunaidh, agus léann sé i sliseanna beaga de réir fritháirimh ionas nach líonann comhad ulóg cuimhne riamh.",
+  "who": "Aon duine a bhfuil scannán aige le fotheidil bhog agus a dteastaíonn an téacs uaidh, foirne ionchódaithe, agus foirne fansub ag tosú ón rian bunaidh.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Tiontaire Fotheideal Sínise - Simplithe ⇄ Traidisiúnta | AI-SRTSub",
+  "desc": "Tiontaire fotheideal Sínise saor in aisce: Simplithe ⇄ Traidisiúnta (Téaváin / Hong Cong) agus ar ais. Ní athraíonn ach an comhrá — fanann cóid ama agus clibeanna ASS. Tógtha ar OpenCC.",
+  "kw": "tiontaire fotheidil sínise,simplithe go traidisiúnta,traidisiúnta go simplithe,srt sínis traidisiúnta,tiontaigh fotheideal sínis,sínis traidisiúnta na téaváine,sínis traidisiúnta hong kong,tiontú han,tiontaigh srt go sínis traidisiúnta,srt sínis simplithe,fotheideal opencc",
+  "intro": "Tiontaigh comhad fotheideal iomlán idir Simplithe agus Traidisiúnta, gan aon rud a athrú ach an comhrá.",
+  "feat": "Naoi dtreo: Traidisiúnta ginearálta, stór focal na Téaváine, foirmeacha na Téaváine, Hong Cong, ar ais go Simplithe, agus foirmeacha réigiúnacha Traidisiúnta-go-Traidisiúnta. Úsáideann sé an foclóir OpenCC le rún frása is fada an comhoiriúnú ar dtús.",
+  "who": "Aon duine a sheachadann fotheidil chuig lucht féachana na Téaváine nó Hong Cong, dáileoirí ag ullmhú leaganacha réigiúnacha, agus eagarthóirí a fuair comhad Traidisiúnta agus a dteastaíonn Simplithe uathu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Rannálaí & Cumascóir Fotheideal - SRT / VTT | AI-SRTSub",
+  "desc": "Roinn fotheidil de réir fhaid nó ar mhinicíocht, nó comhcheangail go leor comhad in ord nó de réir stampa ama. Tá athuimhriú uathoibríoch, comhrá gan teagmháil. SRT & VTT.",
+  "kw": "rannálaí fotheideal,roinn fotheidil,cumasc comhaid srt,cumascóir srt,comhcheangail fotheidil,roinn srt,ceangail comhaid srt,gearr fotheidil,roinn vtt,cumascóir fotheidil",
+  "intro": "Gearr fotheideal fada amháin ina chuid, nó comhcheangail go leor comhad i gceann amháin. Ritheann sé go hiomlán i do bhrabhsálaí — ní uaslódáiltear aon rud.",
+  "feat": "Roinn de réir fhaid nó ar mhinicíocht le hathuimhriú in aghaidh na coda agus amú oiriúnach bunaithe ar nialas roghnach; comhcheangail go sreangach le bearna nó idir-leabaithe de réir stampaí ama bunaidh. SRT agus VTT.",
+  "who": "Cruthaitheoirí ag roinnt eipeasóid le haghaidh uaslódála, foirne ag athbhreithniú i gcodanna, agus eagarthóirí ag cumasc fotheidil il-choda.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Fotheidil go Excel/CSV agus Ar Ais | AI-SRTSub",
+  "desc": "Tiontaigh SRT nó VTT go leathánach Excel nó CSV le haghaidh athbhreithnithe agus aistriúcháin, ansin tabhair ar ais é. Fanann cóid ama cruinn, and mhaireann briseadh línte. Gan uaslódáil.",
+  "kw": "fotheideal go excel,srt go csv,srt go excel,excel go srt,csv go srt,scarbhileog fotheideal,tábla tiontaire fotheideal",
+  "intro": "Easpórtáil fotheidil chuig scarbhileog le haghaidh athbhreithnithe agus aistriúcháin, ansin iompórtáil an leathán ar ais. Ritheann sé go hiomlán i do bhrabhsálaí.",
+  "feat": "Cliceáil amháin ó SRT nó VTT go xlsx nó CSV; cuir in eagar amanna, téacs agus nótaí i do scarbhileog, ansin easpórtáil ar ais go SRT nó VTT. Coinníonn colúin ama cruinneas iomlán milliseicind; coimeádtar briseadh línte laistigh de chillíní. Oibríonn ceanntásca Sínise agus Béarla araon.",
+  "who": "Aistritheoirí, foirne fansub agus eagarthóirí a dhéanann athbhreithniú, as anótaí nó a cheartaíonn fotheidil i mbraislí i scarbhileog.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Tiontaigh Fotheidil i mBraisle go SRT/VTT | AI-SRTSub",
+  "desc": "Scaoil isteach dosaen nó céadta comhad SRT/VTT, tiontaigh iad go léir go dtí format amháin agus íoslódáil aon ZIP amháin. Athuimhriú agus stampaí ama caighdeánaithe; comhaid neamhinléite marcáilte.",
+  "kw": "tiontú fotheideal i mbraisle,srt go vtt,tiontaire fotheideal i mbraisle,srt mórchóir,tiontaigh ilfhotheidil,zip fotheideal",
+  "intro": "Tarraing isteach céadta comhad fotheidil, tiontaigh iad go léir, tóg leat ZIP amháin. Ritheann sé go hiomlán i do bhrabhsálaí — ní uaslódáiltear aon rud.",
+  "feat": "SRT go VTT agus ar ais i mbraisle; uimhreacha sevensa athordaithe agus stampaí ama caighdeánaithe in aghaidh an fhormat spriocdhírithe. Déantar comhaid nach féidir a pharsáil a mharcáil agus a fhágáil amach as an ZIP. Coinnítear ainmneacha comhaid bunaidh le hextension nua; faigheann imbhuailtí iarmhír.",
+  "who": "Eagarthóirí agus fotheideoirí ag tiontú fillteáin iomlána sraithe, agus úinéirí suímh ag tabhairt format amháin d'imreoirí.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Eagarthóir Liricí LRC - Tapáil Am Agus Tú ag Éisteacht | AI-SRTSub",
+  "desc": "Luchtaigh amhrán, greamaigh na liricí, agus tapáil am gach líne agus tú ag éisteacht; easpórtáil LRC nó SRT. Iompórtáil LRC atá ann cheana le haghaidh mionchoigeartaithe. Tiomáinte ag an méarchlár, go hiomlán sa bhrabhsálaí.",
+  "kw": "eagarthóir lrc ar líne,déan lrc,amú liricí,déantóir lrc,cruthaigh lrc,sioncronaitheoir liricí,lrc go srt",
+  "intro": "Luchtaigh ceol, greamaigh liricí, tapáil an t-am líne ar líne agus tú ag éisteacht, agus easpórtáil LRC nó SRT. Ní uaslódáiltear aon rud.",
+  "feat": "Oibríonn sé le MP3, M4A, FLAC, WAV agus OGG. Líne amháin in aghaidh an ró; is féidir comhaid LRC atá ann cheana a iompórtáil agus a choigeartú. Imríonn/stadann Space, stampaí Enter an líne reatha, dí-dhéanann Z — fanann na lámha ar an méarchlár.",
+  "who": "Ceoltóirí ag sioncronú clúdaigh, cruthaitheoirí ag cur amhrán le físeáin, agus aon duine a thógann fotheidil liriceacha d'imreoir.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "Athchóiritheoir Fotheideal YouTube - Athcheangail Abairtí Briste | AI-SRTSub",
+  "desc": "Gearann uathoibríoch YouTube abairtí ag tréimhsí seasta 3-4 soicind. Coinníonn an uirlis seo gach focal agus athraíonn sí teorainneacha na gcue go deireadh na n-abairtí. Saor in aisce, 100 teanga.",
+  "kw": "socrú fotheidil youtube,fotheidil uathoibríocha youtube,athchóiriú fotheidil,ailíniú abairtí fotheidil,socraigh fotheidil bhriste,ailíniú abairtí srt,ath-dheighilt fotheidil,deisiú fotheidil youtube,fotheidil le feasacht abairtí",
+  "intro": "Cuir isteach comhad fotheidil uathghinte ó YouTube, roghnaigh an teanga, agus fuaighfidh an uirlis abairtí le chéile thar na ciúnna, ansin gearrfaidh sí an comhad arís abairt ar abairt. Ní athraítear focal amháin, agus fanann amanna na gciúnna chomh gar agus is féidir do na bun-stampaí ama.",
+  "feat": "Gearrtar fotheidil uathoibríocha YouTube i gciúnna beagnach seasta 3-4 soicind beag beann ar áit a gcríochnaíonn abairtí, mar sin is minic a bhíonn deireadh na habairte roimhe sin agus tús na chéad abairte eile i gciú amháin. Úsáideann an uirlis na bun-stampaí ama mar ancaire - is iad sin na teorainneacha focal fíor a tháirg an t-aitheantóir cainte - socraíonn sí cá gcríochnaíonn gach abairt ón bponcaíocht, agus úsáideann sí ríomhchlárú dinimiciúil chun an pointe briste is saoire a roghnú i measc deireadh abairte, camóg, nasc agus gearradh crua, ansin leathnaíonn sí an t-am ar an scáileán chun teacht leis an ráta léitheoireachta. Tá a rialacha abairte féin ag gach ceann de na 100 teanga: níl spásanna idir focail sa tSínis agus sa tSeapáinis, is ar éigean a mharcálann an Téalainnis imill na bhfocal, críochnaíonn an Hiondúis abairtí le ।, an Araibis le ؟, an Airméinis le ։. Leanann leithead na líne agus luas na léitheoireachta an córas scríbhneoireachta - 16 carachtar lánleithead in aghaidh na líne don tSínis, 42 charachtar do scripteanna Laidineacha. Roimh an easpórtáil, déantar an téacs a chur i gcomparáid carachtar ar charachtar, agus cuirtear aon fhocal a cailleadh nó a cuireadh leis in iúl láithreach.",
+  "who": "Foirne fotheidil a dhéanann fotheidil chríochnaithe as fotheidil uathoibríocha YouTube, podchraoltaí agus cúrsaí, agus cruthaitheoirí ag eagarthóireacht a bhfíseáin féin atá tuirseach d'abairtí a stopann leathbhealach.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Fuaim go Fotheidil — cruthaigh SRT sa bhrabhsálaí | AI-SRTSub",
+  "desc": "Fuaim nó físeán isteach, fotheidil amach: aithníonn an brabhsálaí caint, gearrann sé ina chues í agus easpórtálann SRT / VTT. Saor in aisce.",
+  "kw": "fuaim go srt,caint go fotheidil,gineadóir fotheidil,trascríobh fuaim go srt,aithint cainte sa bhrabhsálaí,gineadh fotheidil as líne,asr,ai-srtsub",
+  "intro": "Cuir comhad fuaime nó físeáin isteach, roghnaigh teanga agus samhail, agus rithfear an t-aitheantas sa bhrabhsálaí. Faigheann tú dréacht fotheidil le huainiú, gearrtha ag abairtí agus de réir leithead na líne.",
+  "feat": "Déanann an uirlis seo an t-aitheantas cainte a thiontú ina fhotheidil trí abairtí a ghearradh ag poncaíocht, línte a oiriúnú don scáileán, agus uainiú a bharrfheabhsú gan forluí.",
+  "who": "Cruthaitheoirí ag cur fotheidil lena bhfíseáin, foirne ag déanamh téacs as podchraoltaí, agus daoine a bhfuil dréacht de dhíth orthu."
+ },
+ "ocrsub": {
+  "title": "OCR Fotheideal Dóite — léigh fotheidil sa phictiúr | AI-SRTSub",
+  "desc": "Fotheidil dóite isteach sa phictiúr gan rian le baint. Marcáil an stiall agus léann an uirlis í fráma ar fhráma. Easpórtáil SRT / VTT, saor in aisce.",
+  "kw": "bain fotheidil dóite,ocr fotheidil,fotheidil i bhfíseán,ocr ó fhíseán,fotheidil go srt,ai-srtsub,ocr,srt,vtt",
+  "intro": "Cuir físeán isteach, marcáil an stiall ina bhfuil na fotheidil, agus léann an uirlis fráma ar fhráma iad, ag cumasc frámaí comhionanna ina aon chue amháin.",
+  "feat": "Déantar an stiall ina bhfuil na fotheidil a bharradh agus a phróiseáil bunaithe ar ghile, áit a n-aithnítear an téacs agus a gcumascann frámaí comhionanna ina chue amháin le huainiú cruinn.",
+  "who": "Foirne ag logánú físeáin, daoine ag ath-fhotheidealú sean-ábhair, agus eagarthóirí nach bhfuil comhad fotheidil bunaidh acu."
+ },
+ "multilang": {
+  "title": "Ilm dteanga ag an am céanna - séasúr iomlán | AI-SRTSub",
+  "desc": "Scaoil isteach séasúr iomlán, roghnaigh na teangacha, agus brúigh tús. Ritheann eipeasóidí agus teangacha mar scuaine amháin, agus tagann na torthaí mar zip amháin. Athosaíonn sé ón áit ar stad sé.",
+  "kw": "aistriúchán fotheidil baisc,aistrigh fotheidil ilteangacha,fohteidil ilteanga,fohteidil séasúir iomláin,easpórtáil baisc fhotheidil,aistrigh srt go dtí go leor teangacha,séasúr amháin go leor teangacha,aitriúchán srt,AI-SRTSub",
+  "intro": "Scaoil isteach séasúr iomlán ag an am céanna, seiceáil na sprictheangacha, agus brúigh tús. Déantar scuaine d'eipeasóidí agus teangacha: rith gach teanga go dtí an deireadh sula dtosaíonn an chéad cheann eile, agus pacáiltear gach rud i gcomhad zip amháin.",
+  "feat": "Is é comhthráthacht an rud a théann amú in aistriúchán baisc. Fiche eipeasóid faoi chúig theanga ag an am céanna ciallaíonn céadta iarratas, rud a chuireann isteach ar an scuaine ar an taobh freastalaí. Ritheann an leathanach seo mar scuaine amháin dá bhrí sin: baisc amháin ag an am, teanga amháin go dtí go bhfuil sé críochnaithe sula dtosaíonn an chéad cheann eile. Stóráiltear an dul chun cinn in aghaidh an eipeasóid agus na teanga ar do ríomhaire, mar sin má bhriseann sé ag an tríú eipeasóid, athosclaíonn tú an leathanach agus tógann sé suas ón áit sin gan na comhaid a sheoladh arís. Is iad na hainmneacha a chuireann as do shéasúir: má aistrítear fiche eipeasóid ar leithligh, críochnaíonn an carachtar céanna le trí litriú éagsúla. Sin an fáth a bhfuil an Glossary ina phainéal féin anseo - uaslódáil uair amháin, roinnte ag an séasúr iomlán - agus insíonn sé duit cé mhéad iontráil a d'fhreagair sula dtosaíonn tú. Dún an tab agus stopann an tasc láithreach in ionad cuóta a scriosadh sa chúlra.",
+  "who": "Foirne fhotheidil a chuireann séasúr iomlán i dteangacha éagsúla, cainéil ag dáileadh an bhaisc eipeasóid céanna ar mhargaí éagsúla, agus aistritheoirí aonair a thógfadh sé air brú a chur ar thús uair amháin agus teacht ar ais níos déanaí.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Aistritheoir Fotheideal Ilteangach Baisc"
+ },
+ "ktv": {
+  "title": "Déantúsóir Fotheideal KTV - Am Gach Carachtar, Easpórtáil ASS | AI-SRTSub",
+  "desc": "Déantúsóir fotheideal karaoke ar líne saor in aisce: lódáil amhrán, greamaigh na liricí, sconna ar gach líne, agus roinn ina gcarachtair go huathoibríoch nó le ceol agus scagadh. Easpórtáil ASS le clibeanna \\\\kf do CapCut agus Premiere.",
+  "kw": "déantúsóir fotheideal karaoke,ass karaoke,liricí leibhéal focal,clibeanna kf,lrc karaoke,scuab liricí,déantúsóir ass karaoke,ai srtsub,fotheidil karaoke,easpórtáil ass",
+  "intro": "Lódáil amhrán, greamaigh na liricí, sconna ar gach líne, ansin scaip gach líne thar a chuid carachtar - go huathoibríoch de réir leithead, ag sconneadh leis an gceol, nó ag tarraingt teorainneacha. Féach ar fhocail ag lasadh suas de réir mar a ghabhtar iad.",
+  "feat": "Roinntear Sínis de réir carachtair, Béarla de réir focal, agus téann poncaíocht leis. Coinníonn bearna deiridh inchoigeartaithe an carachtar deiridh ó dhul thar an nguth. Easpórtáil ASS do CapCut / Premiere / Aegisub le clibeanna \\\\kf, LRC feabhsaithe d'imreoirí leibhéal focal, nó SRT líne iomláin mar chúltaca. Ritheann gach rud i do bhrabhsálaí - gan uaslódáil.",
+  "who": "Cruthaitheoirí ag cur liricí le físeáin chövair agus scannáin choirmeacha, déantúsóirí físeán ceoil, agus aon duine a tháirgeann fotheidil karaoke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Déantúsóir Fotheideal Karaoke KTV"
+ }
 }

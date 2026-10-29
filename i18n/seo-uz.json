@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "uz",
-    "ogLocale": "uz_UZ",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Global Movies & Series, Subtitrlar Sizning Tilingizda",
-    "desc": "Bepul sun'iy intellekt subtitr tarjimoni — ro'yxatdan o'tishsiz, cheklovlarsiz, suv belgisiz. Chet tilidagi film, serial va hujjatli filmlar subtitrlarini bir marta bosish bilan o'z tilingizga o'giring.",
-    "kw": "AI subtitr tarjimoni,subtitrlarni tarjima qilish,bepul subtitr tarjimoni,SRT faylni tarjima qilish,VTT tarjima qilish,ASS tarjima qilish,kino subtitrlarini tarjima qilish,serial subtitrlari,Netflix subtitrlari,dorama subtitrlari,anime subtitrlari,ikki tilli subtitrlar,chet tilidagi film subtitrlari,subtitrlarni onlayn tarjima qilish,YouTube subtitrlari,bepul subtitr tarjima vositasi,subtitrlarni bepul tarjima qilish,bepul SRT tarjimoni",
-    "ogTitle": "AI-SRTSub - Global Movies & Series, Subtitrlar Sizning Tilingizda",
-    "ogDesc": "Kino ixlosmandlari uchun 100% bepul sun'iy intellekt subtitr tarjimoni: bir marta bosish orqali chet tilidagi film, serial va hujjatli filmlar subtitrlarini avtomatik vaqt jadvali moslashuvi bilan ona tilingizga o'giring. Global kontentdan to'siqlarsiz bahramand bo'ling.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Kino ixlosmandlari uchun 100% bepul sun'iy intellekt subtitr tarjimoni: bir marta bosish orqali chet tilidagi film, serial va hujjatli filmlar subtitrlarini avtomatik vaqt jadvali moslashuvi bilan ona tilingizga o'giring. Global kontentdan to'siqlarsiz bahramand bo'ling.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Bu vosita haqida\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Bepul AI Avtomatik Subtitr Tarjimoni</h2>\n    <p data-i18n-html=\"seoIntro\">Bu yirik til modellari bilan ishlaydigan <strong>bepul onlayn subtitr tarjima vositasi</strong>. SRT, VTT yoki ASS fayllarini yuklang va subtitrlarni ingliz, xitoy, yapon, koreys, ispan, fransuz va 15+ boshqa tillar o'rtasida tarjima qiling. Ro'yxatdan o'tish, o'rnatish, suv belgisi yo'q — brauzerda oching va tarjimani boshlang. Bulutli tarjimani yoqmaguningizcha subtitr ma'lumotlari brauzeringizda qoladi.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Asosiy xususiyatlar:</strong> SRT, VTT va ASS tahlili va sun'iy intellekt yordamida tarjima, aqlli gaplarni birlashtirish (bir gap bir nechta kuiga bo'linganda, kuylar birlashtiriladi, tarjima qilinadi va keyin asl vaqt jadvali bo'ylab qayta bo'linadi), vaqt jadvalini moslashtirish, CJK va G'arb matnlari uchun avtomatik qatorni o'rash, to'ldiruvchi so'zlarni olib tashlash, maxsus terminologiya bilan ishlash va tanlanadigan tarjima uslublari. Videoga ulashga tayyor standard SRT, VTT, ASS yoki TXT fayllarini eksport qiling.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kimlar foydalanadi:</strong> video tarjimonlar, YouTube ijodkorlari va lokalizatorlar, til o'rganuvchilar, subtitr guruhlari va video kontentni tezda lokalizatsiya qilish kerak bo'lgan jamoalar.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Bu vosita JavaScript'ni talab qiladi. Iltimos, brauzeringizda JavaScript'ni yoqing, so'ngra subtitrlarni AI yordamida bepul tarjima qilish uchun subtitr faylini (SRT / VTT / ASS) yuklang.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Stilizatsiyalangan Subtitr Yaratuvchi - Ikki Tilli, ASS va VTT Effektlarini Birlashtirish",
-    "desc": "Stilizatsiyalangan subtitrlar uchun bepul vosita: ikki faylni ikki tilliga birlashtirish, ikki tilli trekni qayta stilizatsiya qilish yoki effektlar qo'shish. 5 ta ASS / 6 ta VTT shablonlari; SRT / VTT / ASS sifatida eksport qilish.",
-    "kw": "subtitrlarni birlashtirish,ikki tilli subtitrlar,subtitr fayllarini qo'shish,stilizatsiyalangan subtitrlar,ASS subtitr uslublari,VTT subtitr uslublari,subtitr effektlari,ikki tilli subtitr yaratuvchi,ASS shablonlari,subtitr qolipi,bepul subtitr vositasi",
-    "intro": "Ikki subtitr faylini ikki tilliga birlashtiring yoki trekni stilizatsiya qiling: shrift, rang, kontur va pozitsiya, barchasi WYSIWYG.",
-    "feat": "Ikki tilli birlashtirish va sozlash, ASS / VTT uslub shablonlari, qiymat bo'yicha uslub uyalari, joyida va ommaviy vaqt jadvalini to'g'rilash hamda aynan eksport qilinadigan faylning o'zi bo'lgan jonli ko'rish.",
-    "who": "Ikki tilli yoki stilizatsiyalangan subtitrlar tayyorlovchi ijodkorlar, kodlash guruhlari va qulay subtitrlarga muhtoj jamoalar."
-  },
-  "clean": {
-    "title": "Subtitr tozalagich: Suv belgilari, SDH va HTML teglarini olib tashlash",
-    "desc": "Bepul onlayn subtitr tozalagich: suv belgilari, reklamalar, SDH, HTML teglari, ASS effektlarini olib tashlash; bosh harflar va buzilgan matnlarni to'g'rilash. 13 ta o'tkazib bo'ladigan qoida, har bir o'zgarishni bekor qilish, vaqt jadvali o'zgarishsiz qoladi.",
-    "kw": "subtitr tozalagich,srt faylni tozalash,subtitr suv belgisini olib tashlash,SDH subtitrlarini olib tashlash,subtitrlardan HTML teglarini olib tashlash,bosh harfli subtitrlarni to'g'rilash,buzilgan matnni to'g'rilash,eshitish qobiliyati cheklanganlar subtitrlarini olib tashlash,ASS effektlarini olib tashlash",
-    "intro": "Yuklab olingan subtitrni avval shu yerdan o'tkazing: suv belgilari, reklamalar, SDH kuylari va HTML teglari bir martada yo'qoladi.",
-    "feat": "To'rt guruhdagi 13 ta qoida (9 tasi sukut bo'yicha yoqilgan), suv belgisi va SDH ni olib tashlash, hamma harflari bosh va buzilgan matnlarni to'g'rilash, har bir kui o'zgarishlari ro'yxati va uni yakka tartibda orqaga qaytarish, vaqt esa hech qachon o'zgarmaydi.",
-    "who": "Mavjud subtitrni yuklab olib, undan shunchaki foydalanishni istagan har bir kishi va materiallarni ommaviy tozalovchi guruhlar."
-  },
-  "glossary": {
-    "title": "Ommaviy Subtrit Termini Almashtirish - Bitta Glossariy, Butun Fayl | AI-SRTSub",
-    "desc": "Subtitrlar uchun glossariy almashtirish: \"eski → yangi\" ni bir marta kiriting va butun SRT / VTT / ASS / TXT fayl yangilanadi. Vaqt, uslublar va NOTE bloklari saqlanib qoladi; har bir qator uchun qaytarish mumkin.",
-    "kw": "subtitr glossariysi,srt ni ommaviy almashtirish,subtitrlarni topish va almashtirish,subtitr terminini almashtirish,srt ommaviy tahriri,subtitrlardagi so'zlarni almashtirish,subtitr nomlarini birlashtirish,subtitr terminologiyasi,vtt matnini almashtirish,glossariy srt vositasi,ommaviy terminlarni almashtirish",
-    "intro": "Butun subtitr fayliga bir vaqtning o'zida qo'llaniladigan \"eski term → yangi term\" qoidalari glossariysi, bunda vaqt, ASS uslublari va VTT izoh bloklari baytma-bayt o'zgarmasdan qoladi.",
-    "feat": "Har bir qatorda bitta qoida, -> , => , → yoki sichqoncha belgisi bilan ajratilgan; # bilan boshlanuvchi qatorlar izohlar hisoblanadi. Butun so'z moslashuvi \"start\" ichidan \"art\" ni chiqarib tashlaydi, registr sezgirligi ixtiyoriy va almashtirishni ikki tilli kuylarning 1-qatoriga yoki 2-qatoriga cheklashingiz mumkin. Har bir o'zgartirilgan kui ro'yxatga olinadi va istalgan bittasini qaytarish mumkin.",
-    "who": "Mavsum davomida nomlar va terminologiyani birlashtiruvchi, mashina tarjimasi so'zlarini ommaviy ravishda to'g'rilovchi yoki boshqa birovning subtitrlarini o'z uy uslubiga moslashtiruvchi har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Subtiltr QC - Har Bir Til Uchun Vaqt va Tartibni Tekshirish | AI-SRTSub",
-    "desc": "Bepul onlayn subtitr QC: SRT, VTT yoki ASS yuklang va til qoidalari bo'yicha qoplamalar, davomiylik, o'qish tezligi, qator kengligi, qator uzilishlari, raqamlash va kodlashni tekshiring. 27 ta til, 27 ta chegara to'plami va tilga xos qoidalar.",
-    "kw": "subtitr tekshiruvchisi,subtitr qc,srt validator,subtitr sifatini tekshirish,srt tekshiruvi,subtitr vaqtini tekshirish,subtitr validator,srt faylni tekshirish,subtitrlarni tahrirlash,subtitr linteri",
-    "intro": "Subtitr faylini yuklang va uni o'z tilining qoidalariga muvofiq tekshiring - har bir topilma o'lchangan qiymat va chegara bilan birga keladi. To'liq brauzeringizda ishlaydi, hech narsa yuklanmaydi.",
-    "feat": "Bir-birining ustiga chiqadigan kuiylarni, ekranda juda qisqa yoki juda uzun qolishni, o'qish tezligini, qator kengligini, qator sonini, noqulay qator uzilishlarini, raqamlashni, bo'sh kuiylarni, buzilgan matn va boshqaruv belgilarini tekshiradi. Kenglik va o'qish tezligi yozuv tizimiga amal qiladi: xitoy tili to'liq kenglikdagi belgilar bilan o'lchanadi, tay va arab tillaridagi birlashtiruvchi belgilar nol kenglik sifatida hisoblanadi. Tilga xos qoidalarga ispancha ochilish ¿ belgisi, ? ! ; : dan oldingi fransuzcha ajralmaydigan bo'sh joy, yunoncha so'roq belgisi, xitoy va yapon tillaridagi to'liq kenglikdagi tinish belgilari hamda arabcha so'roq belgisi va vergul kiradi. Avtomatik ravishda tuzatiladigan elementlar alohida keltirilgan va vaqt kodlarini o'zgartiradigan har qanday narsa sukut bo'yicha belgilanmagan.",
-    "who": "Subtitr guruhlari, lokalizatsiya yetkazib beruvchilari, muharrirlar va yetkazib berishdan oldin faylni tekshirishni xohlovchi har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Subtitr Tarjimoni — SRT/VTT/ASS ni Sizning Tilingizga Tarjima Qilish",
-    "desc": "SRT / VTT / ASS faylini tashlang, maqsadli tilni tanlang va vaqt jadvali qulflangan tarjimani oling. 100 ta til, bepul, ro'yxatdan o'tish shart emas."
-  },
-  "convert": {
-    "title": "Subtitr Konverteri - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Bepul onlayn subtitr konverteri: vaqt jadvalini butun saqlagan holda SRT, VTT, ASS, SBV, LRC va TXT o'rtasida o'tkazing, ASS effekt teglari avtomatik ravishda tozalanadi.",
-    "kw": "subtitr konverteri,srt dan vtt ga,vtt dan srt ga,ass dan srt ga,sbv dan srt ga,srt dan lrc ga,subtitrni txt ga,subtitrlarni konvertatsiya qilish,srt konverteri,vtt konverteri",
-    "intro": "Vaqt jadvali buzilmagan holda SRT, VTT, ASS, SBV, LRC va TXT formatlari o'rtasida konvertatsiya qiling.",
-    "feat": "Kirish formati avtomatik ravishda aniqlanadi va vaqt belgilari maqsadli format uchun qayta yoziladi; oddiy formatga eksport qilganingizda ASS effekt teglari va majburiy qator uzilishlari o'qiladigan matnga aylanadi, qo'shiq matni fayllarida soat maydoni yo'q, shuning uchun bir soatdan oshgan har qanday vaqt daqiqalarda hisoblanadi.",
-    "who": "Pleyeri subtitr faylini rad etuvchi har qanday shaxs va materiallarni muharrir va veb-pleyer o'rtasida ko'chiruvchilar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Ikki tilli subtitrlarni ajratuvchi - Faqat bitta tilni saqlash | AI-SRTSub",
-    "desc": "Bepul onlayn ikki tilli subtitrlarni ajratuvchi: ikki tilli subtitr faylini asl trek va tarjima qilingan trekka ajrating yoki faqat bittasini saqlang.",
-    "kw": "ikki tilli subtitrlarni ajratuvchi,ikki tilli srt ni ajratish,ikkinchi til subtitrini olib tashlash,faqat inglizcha subtitrni saqlash,tarjima qilingan subtitrni chiqarib olish,srt ikki tilli ajratish,ass ikki tilli ajratish",
-    "intro": "Ikki tilli subtitr faylini asl trek va tarjima qilingan trekka ajrating yoki ulardan faqat bittasini saqlang.",
-    "feat": "Ikkala keng tarqalgan tartibni ham boshqaradi - har biri ikkita qatordan iborat bitta kui va bir xil vaqt jadvalini ulashuvchi ikkita kui. Treklar tartib va skript turi bo'yicha ajratiladi, vaqt jadvali aynan o'zicha saqlanadi va bir tilli fayl jimjimador tarzda bo'shatilish o'rniga belgilab qo'yiladi.",
-    "who": "Tayyor ikki tilli fayl berilgan va faqat bitta tilni xohlovchi har qanday shaxs hamda asl nusxa va tarjimani alohida arxivlaydigan subtitr guruhlari.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Subtitr vaqtini surish: Ko'chirish, Birlashtirish va Ajratish | AI-SRTSub",
-    "desc": "Bepul onlayn subtitr vaqtini to'g'rilash vositasi: hammasini birdaniga suring, nisbat bo'yicha o'lchamini o'zgartiring yoki ikkita tayanch nuqtasi bilan siljishni tuzating. SRT, VTT, ASS, SBV, LRC va TXT bilan ishlaydi.",
-    "kw": "subtitr vaqtini surish,srt vaqtini surish,subtitr sinxronizatsiyasini sozlash,subtitr vaqtini qayta olchash,subtitr kechikishini tuzatish,srt vaqt siljishi,subtitr siljishini tuzatish,subtitrlarni birlashtirish,subtitrlarni ajratish,srt larni birlashtirish,uzun subtitrni ajratish",
-    "intro": "Subtitrlar sinxronizatsiyadan chiqib ketganda, butun vaqt jadvalini ko'chiring, uni nisbat bo'yicha qayta o'lchamlang yoki ikkita tayanch nuqtasi yordamida tuzating. Shuningdek, u ajratilgan qatorlarni birlashtirishi va juda uzun ishlaydiganlarini ajratishi mumkin.",
-    "feat": "Surish har bir kuining ekranda qolish muddatini o'zgartirmasdan uni ko'chiradi. Qayta o'lchash ikkala uchini ham ko'paytiradi, shuning uchun kui uzunligi u bilan birga o'zgaradi - 24 va 25 kadr/sekund orasida juda qulay. Ikki nuqtali tuzatish ham siljigan, ham noto'g'ri tezlikda ishlaydigan fayllarni boshqaradi. Manfiy bo'lib chiqqan vaqtlar nolga keltiriladi va vosita qanchasi ta'sirlanganini ko'rsatadi. Kirish qaysi formatda bo'lsa, chiqish ham o'sha formatda bo'ladi - konvertatsiyasiz, ASS uslublari, qator bo'yicha uslub va effekt teglari aynan qanday bo'lsa, shunday saqlanadi. Ikki tilli kuiylar birlashtirilganda ikki qatorda qoladi va ajratishda o'tkazib yuboriladi.",
-    "who": "Manba o'zgargandan keyin subtitrlari siljib ketadigan, biroz tez yoki sekin ishlaydigan yoki boshqa kadr tezligida ishlaydigan shaxsdan kelib chiqqan har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Buzilgan subtitrlarni tuzatish: Kodlash xatolarini tiklash | AI-SRTSub",
-    "desc": "Buzilgan subtitrlar uchun bepul onlayn tuzatish: fayl UTF-8, GBK, Big5, Shift_JIS yoki EUC-KR ekanligini aniqlaydi, noto'g'ri o'qilgan matnni tiklaydi, pleyeringiz uchun qayta saqlaydi.",
-    "kw": "buzilgan subtitrlarni tuzatish,subtitr mojibake,srt kodlashni tuzatish,subtitr kodlashini tuzatish,utf8 dan gbk ga subtitr,srt g'alati belgilarni ko'rsatmoqda,subtitr noto'g'ri kodlash,ass buzilgan,vtt buzilgan,subtitr kodlashini aniqlash",
-    "intro": "Tushunarsiz matnlar devori sifatida ochiladigan subtitrlar deyarli har doim noto'g'ri kodlash bilan o'qiladi. Faylni tashlang va u fayl aslida qaysi kodlashda yozilganini aniqlaydi hamda noto'g'ri o'qilgan belgilarni o'z joyiga qaytaradi.",
-    "feat": "Yuklangan fayllar asl baytlardan qayta dekodlanadi, shuning uchun hech narsa yo'qolmaydi: agar fayl GBK bo'lib chiqsa, u buni aytadi va agar uni noto'g'ri o'qiyotgan pleyeringiz bo'lsa, nusxasini \"BOM bilan UTF-8\" sifatida saqlash odatda buni hal qiladi. Joylashtirilgan matn endi asl baytlar emas, shuning uchun ko'p narsani tiklab bo'lmaydi; agar u allaqachon almashtirish belgilarini o'z ichiga olgan bo'lsa, bu tiklanmaydi va vosita shunchaki boshqacha ko'rsatish o'rniga buni ochiq-oydin aytadi. Qator raqamlari va vaqt kodlariga aslo tegilmaydi, ASS uslub teglari esa qanday bo'lsa, shunday qoldiriladi.",
-    "who": "Tushunarsiz gibberish sifatida ochiladigan subtitrlarni yuklab olgan, pleyerda xitoy tilining o'rniga katakchalarni ko'radigan yoki noma'lum kodlashdagi fayl berilgan har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Subtitrlardan Matnni Chiqarib Olish - SRT/ASS/VTT dan Oddiy Matnga | AI-SRTSub",
-    "desc": "Bepul onlayn subtitrdan matnga chiqaruvchi: SRT, VTT, ASS, SBV, LRC va TXT ni o'qiydi, vaqt kodlari va qator raqamlarini olib tashlaydi, toza muloqotni paragraf yoki har bir kui uchun bitta qator sifatida chiqaradi.",
-    "kw": "subtitrlardan matnni chiqarib olish,subtitrdan matnga,srt dan txt ga,srt dan oddiy matnga,ass dan txt ga,vtt dan txt ga,subtitr transkripti,srt dan dialoglarni chiqarib olish,srt vaqt kodlarini olib tashlash,subtitr matnini chiqaruvchi",
-    "intro": "SRT / VTT / ASS / SBV / LRC / TXT subtitrlaridan muloqotni toza oddiy matn sifatida chiqarib oling: vaqt kodlari, kui raqamlari va uslub teglari avtomatik ravishda olib tashlanadi.",
-    "feat": "Ikki xil tartib: pauzalar va gap oxiridagi tinish belgilarida bo'lingan uzluksiz paragraflar yoki muloqot ro'yxatlari uchun har bir kui uchun bitta qator. \"(telefon jiringlayapti)\" kabi tovush kuylari, manba suv belgilari va takrorlanadigan qatorlar sukut bo'yicha olib tashlanadi; \"TOM:\" kabi spiker nomlari va qo'shiq matni qatorlari saqlanishi yoki olib tashlanishi mumkin. Qatorlarni o'rash har bir skript bo'yicha qayta birlashtiriladi — xitoy va yapon tillari to'g'ridan-to'g'ri qo'shiladi, koreys va lotin tillari bo'sh joy qo'shadi — shuning uchun hech narsa yopishib qolmaydi.",
-    "who": "Yuzlab vaqt kodlarini qo'lda o'chirmasdan, eslatmalar, ssenariylar, tarjima amaliyoti yoki boshqa vositaga kiritish uchun subtitr matnini xohlovchi har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "MKV / MP4 dan O'rnatilgan Subtitrlarni SRT ga Chiqarib Olish | AI-SRTSub",
-    "desc": "MKV, WebM, MP4, MOV dan o'rnatilgan subtitrlarni chiqarib olish; SRT / VTT / ASS / TXT sifatida eksport qilish. Yuklab olish yoki qayta kodlash yo'q — fayllar brauzeringizda o'qiladi; ko'p gigabaytli fayllar ham muammosiz ishlaydi.",
-    "kw": "o'rnatilgan subtitrlarni chiqarib olish,mkv dan srt ga,mp4 subtitrini chiqarish,videodan subtitrlarni chiqarib olish,o'rnatilgan subtitr chiqaruvchi,mkv dan srt,mov subtitrini chiqarish,subtitr trekini eksport qilish,mkv dan vtt ga,yumshoq subtitrlarni chiqarib olish,mkv subtitrini olish",
-    "intro": "MKV yoki MP4 ichiga muhrlangan subtitr trekini to'g'ridan-to'g'ri SRT ga tortib oling — yuklash talab etilmaydi, hammasi brauzeringizda sodir bo'ladi.",
-    "feat": "Oddiy matn, ASS, WebVTT va mov_text / tx3g treklarini o'qiydi, asl ASS sarlavhasi va piksellar sonini saqlaydi hamda masofa bo'yicha kichik qismlarda o'qiydi, shuning uchun ulkan fayl hech qachon xotirani to'ldirmaydi.",
-    "who": "Yumshoq subtitrlarga ega bo'lgan filmga ega bo'lgan va matnni chiqarib olishni xohlovchi har qanday shaxs, kodlash guruhlari va asl trekdan boshlaydigan fansub jamoalari.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Xitoycha Subtitr Konverteri - Soddalashtirilgan ⇄ An'anaviy | AI-SRTSub",
-    "desc": "Bepul xitoycha subtitr konverteri: Soddalashtirilgan ⇄ An'anaviy (Tayvan / Gonkong) va aksincha. Faqat muloqot o'zgaradi — vaqt kodlari va ASS teglari o'zgarishsiz qoladi. OpenCC asosida qurilgan.",
-    "kw": "xitoycha subtitr konverteri,soddalashtirilgandan an'anaviyga,an'aviydan soddalashtirilganga,srt an'anaviy xitoycha,subtitrni xitoy tiliga o'tkazish,tayvancha an'anaviy xitoycha,gonkongcha an'anaviy xitoycha,ixon qilish,srt ni an'anaviy xitoy tiliga o'tkazish,soddalashtirilgan xitoycha srt,opencc subtitr",
-    "intro": "Faqat muloqotni o'zgartirgan holda butun subtitr faylini Soddalashtirilgan va An'anaviy o'rtasida konvertatsiya qiling.",
-    "feat": "To'qqizta yo'nalish: umumiy An'anaviy, Tayvan lug'ati, Tayvan shakllari, Gonkong, Soddalashtirilgan va An'anaviy-An'anaviy mintaqaviy shakllarga qaytish. Eng uzun mos keladigan iboralarni aniqlash bilan OpenCC lug'atidan foydalanadi.",
-    "who": "Tayvan yoki Gonkong auditoriyasiga subtitrlar yetkazib beruvchi har qanday shaxs, mintaqaviy versiyalarni tayyorlovchi distribyutorlar va An'anaviy faylni olib, Soddalashtirilganini xohlovchi muharrirlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Subtitr Ajratuvchi va Birlashtiruvchi - SRT / VTT | AI-SRTSub",
-    "desc": "Subtitrlarni davomiyligi yoki soni bo'yicha ajrating yoki ko'p fayllarni tartib bo'yicha yoki vaqt belgisi bo'yicha birlashtiring. Raqamlash avtomatik, muloqotga tegilmaydi. SRT va VTT.",
-    "kw": "subtitr ajratuvchi,subtitrlarni ajratish,srt fayllarini birlashtirish,srt birlashtiruvchi,subtitrlarni birlashtirish,srt ni ajratish,srt fayllarini qo'shish,subtitrlarni kesish,vtt ni ajratish,subtitr birlashtiruvchi",
-    "intro": "Bitta uzun subtitrni qismlarga bo'ling yoki ko'p fayllarni bittaga birlashtiring. To'liq brauzeringizda ishlaydi — hech narsa yuklanmaydi.",
-    "feat": "Har bir qism uchun qayta raqamlash va ixtiyoriy nolga asoslangan vaqt bilan davomiyligi yoki soni bo'yicha ajratish; bo'shliq bilan ketma-ket birlashtirish yoki asl vaqt belgilari bo'yicha aralashtirish. SRT va VTT.",
-    "who": "Yuklash uchun qismlarni bo'luvchi ijodkorlar, qismlarga bo'lib tekshiruvchi jamoalar va ko'p qismli subtitrlarni birlashtiruvchi muharrirlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Subtitrlarni Excel/CSV ga va Qaytarish | AI-SRTSub",
-    "desc": "Ko'rib chiqish va tarjima qilish uchun SRT yoki VTT ni Excel yoki CSV jadvaliga aylantiring, so'ngra uni orqaga qaytaring. Vaqt kodlari aniq qoladi, qator uzilishlari saqlanadi. Hech narsa yuklanmaydi.",
-    "kw": "subtitrdan excel ga,srt dan csv ga,srt dan excel ga,excel dan srt ga,csv dan srt ga,subtitr jadvali,subtitr konverteri jadvali",
-    "intro": "Ko'rib chiqish va tarjima qilish uchun subtitrlarni jadvalga eksport qiling, so'ngra jadvalni qayta import qiling. To'liq brauzeringizda ishlaydi.",
-    "feat": "SRT yoki VTT dan xlsx yoki CSV ga bir marta bosish; jadvalingizdagi vaqtlar, matn va eslatmalarni tahrirlang, so'ngra SRT yoki VTT ga qayta eksport qiling. Vaqt ustunlari to'milisekundli aniqlikni saqlaydi; katakchadagi qator uzilishlari saqlanadi. Xitoy va ingliz sarlavhalari ikkalasi ham ishlaydi.",
-    "who": "Jadvalda subtitrlarni ko'rib chiquvchi, izoh beruvchi yoki ommaviy tuzatuvchi tarjimonlar, fansub jamoalari va muharrirlar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Subtitrlarni SRT/VTT ga Ommaviy Konvertatsiya Qilish | AI-SRTSub",
-    "desc": "O'nlab yoki yuzlab SRT/VTT fayllarini tashlang, ularning hammasini bitta formatga o'tkazing va bitta ZIP ni yuklab oling. Raqamlash va vaqt belgilari normallashtirilgan; o'qib bo'lmaydigan fayllar belgilab qo'yiladi.",
-    "kw": "subtitrlarni ommaviy konvertatsiya qilish,srt dan vtt ga,ommaviy subtitr konverteri,ommaviy srt,bir nechta subtitrlarni konvertatsiya qilish,subtitr zip",
-    "intro": "Yuzlab subtitr fayllarini sudrab olib keling, ularning hammasini konvertatsiya qiling, bitta ZIP ni olib keting. To'liq brauzeringizda ishlaydi.",
-    "feat": "SRT dan VTT ga va aksincha ommaviy tarzda; ketma-ketlik raqamlari qayta tartibga solinadi va vaqt belgilari maqsadli format bo'yicha normallashtiriladi. Tahlil qilib bo'lmaydigan fayllar belgilanadi va ZIP dan chetda qoldiriladi. Asl fayl nomlari yangi kengaytma bilan saqlanadi; to'qnashuvlar uchun qo'shimcha qo'shiladi.",
-    "who": "Butun serial papkalarini konvertatsiya qiluvchi muharrirlar va subtitrovchilar, shuningdek, pleyerlarga yagona formatni taqdim etuvchi sayt egalari.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "LRC Qo'shiq Matni Muharriri - Tinglayotganda Vaqtni Bosish | AI-SRTSub",
-    "desc": "Qo'shiqni yuklang, qo'shiq matnini joylashtiring va tinglayotganda har bir qator vaqtini bosing; LRC yoki SRT ni eksport qiling. Nozik sozlash uchun mavjud LRC ni import qiling. Klaviatura yordamida boshqariladi, to'liq brauzerda ishlaydi.",
-    "kw": "lrc muharriri onlayn,lrc yaratish,qo'shiq matni vaqti,lrc yaratuvchi,lrc yaratish,qo'shiq matnini sinxronizator,lrc dan srt ga",
-    "intro": "Musiqani yuklang, qo'shiq matnini joylashtiring, tinglayotganingizda qatorma-qator vaqtni bosing va LRC yoki SRT ni eksport qiling. Hech narsa yuklanmaydi.",
-    "feat": "MP3, M4A, FLAC, WAV va OGG bilan ishlaydi. Har bir qator uchun bitta qator; mavjud LRC fayllari import qilinishi va sozlanishi mumkin. Bo'sh joy ijro etadi/pauzaga qo'yadi, Enter joriy qatorni belgilaydi, Z orqaga qaytaradi — qo'llar klaviaturada qoladi.",
-    "who": "Kaverlarni sinxronizatsiya qiluvchi musiqachilar, videolarga qo'shiq qo'shuvchi ijodkorlar va pleyer uchun qo'shiq matni subtitrlarini yaratuvchi har qanday shaxs.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "YouTube subtitrlarini to‘g‘rilash - Uzilgan gaplarni qayta tiklash | AI-SRTSub",
-    "desc": "YouTube avto-subtitrlari gapni 3-4 soniyada bo‘ladi. Bu vosita so‘zlarni o‘zgartirmasdan chegaralarni to‘g‘rilaydi. Bepul va 100 ta tilda ishlaydi.",
-    "kw": "youtube subtitrlarini tuzatish,youtube avto-subtitrlari,subtitrlarni moslash,gaplarni tekislash,uzilgan subtitrlarni tuzatish,srt gaplarini tekislash,subtitrlarni qayta segmentlash,youtube subtitrlarini ta’mirlash,gapga asoslangan subtitrlar",
-    "intro": "YouTube avto-subtitr faylini yuklang, tilni tanlang, shunda vosita gaplarni birlashtirib, ularni qayta kesib chiqadi. Birorta ham so‘z o‘zgarmaydi va vaqt belgilari asl nusxaga imkon qadar yaqin qoladi.",
-    "feat": "YouTube avto-subtitrlari gapning tugashiga qaramasdan 3-4 soniyalik bo‘laklarga bo‘linadi. Vosita dastlabki vaqt belgilarini asos qilib oladi, tinish belgilari orqali gapning oxirini aniqlaydi va dinamik dasturlash orqali eng qulay tanaffus nuqtasini tanlaydi. 100 tilning har birining o‘z qoidalari bor: xitoy va yapon tillarida so‘zlar orasida bo‘sh joy yo‘q, tay tilida so‘z chegarasi noaniq, xindi tilida gaplar । belgisi bilan, arab tilida ؟, arman tilida ։ belgisi bilan tugaydi. Qator eni va o‘qish tezligi yozuv tizimiga bog‘liq: xitoy tili uchun 16 to‘liq enli belgi, lotin alifbosi uchun 42 belgi. Eksport qilishdan oldin matn belgi-belgi solishtiriladi.",
-    "who": "YouTube, podkast va kurs avto-subtitrlarini tayyor subtitrga aylantiruvchi jamoalar hamda gaplarning o‘rtasida uzilishidan charchagan mualliflar uchun.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio to Subtitles — SRT yaratish | AI-SRTSub",
-    "desc": "Audio yoki videodan SRT/VTT subtitrlarini brauzerda bepul yarating. ASR texnologiyasi yordamida nutqni matnga o‘tkazing va avtomatik vaqtlang.",
-    "kw": "audio to srt,nutqdan subtitr,avtomatik subtitr generatori,audio transkripsiya,whisper subtitr,brauzer nutq tanish,onlayn subtitr yaratish",
-    "intro": "Audio yoki video faylni yuklang, til va modelni tanlang, qolganini brauzeringiz bajaradi. Natijada vaqt bo‘yicha to‘g‘rilangan va qatorlarga bo‘lingan subtitr loyihasini olasiz.",
-    "feat": "Ushbu vosita nutqni aniq vaqt belgilari bilan matnga o‘giradi, jumlalarni grammatik qoidalarga muvofiq qismlarga ajratadi va o‘qish tezligiga moslab vaqtlaydi.",
-    "who": "O‘z videolariga subtitr qo‘shmoqchi bo‘lgan ijodkorlar, podkast va kurslarni matnga o‘giruvchi jamoalar hamda tahrirlash uchun tayyor loyihaga muhtoj foydalanuvchilar."
-  },
-  "ocrsub": {
-    "title": "Hardcoded Subtitle OCR — videodan matn olish | AI-SRTSub",
-    "desc": "Videoga yopishtirilgan subtitrlarni OCR yordamida SRT/VTT formatiga o‘tkazing. Hududni belgilang va brauzerda matnni avtomatik aniqlang.",
-    "kw": "hardcoded subtitr,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles,video to srt,subtitr chiqarish,video matn ocr",
-    "intro": "Videoni yuklang, subtitr joylashgan hududni belgilang va vosita kadrma-kadr o‘qib, bir xil matnlarni vaqt bo‘yicha birlashtiradi.",
-    "feat": "Videoga yopishtirilgan subtitrlarni aniqlash uchun vosita tasvirning eng yorqin qismlarini tahlil qiladi, fonni olib tashlaydi va matn shakllarini o‘qiydi.",
-    "who": "Xorijiy videolarni mahalliylashtiruvchi jamoalar, eski videolarni qayta subtitrlovchi mutaxassislar va asl subtitr fayliga ega bo‘lmagan montajchilar."
-  }
+ "index": {
+  "htmlLang": "uz",
+  "ogLocale": "uz_UZ",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Global Movies & Series, Subtitrlar Sizning Tilingizda",
+  "desc": "Bepul sun'iy intellekt subtitr tarjimoni — ro'yxatdan o'tishsiz, cheklovlarsiz, suv belgisiz. Chet tilidagi film, serial va hujjatli filmlar subtitrlarini bir marta bosish bilan o'z tilingizga o'giring.",
+  "kw": "AI subtitr tarjimoni,subtitrlarni tarjima qilish,bepul subtitr tarjimoni,SRT faylni tarjima qilish,VTT tarjima qilish,ASS tarjima qilish,kino subtitrlarini tarjima qilish,serial subtitrlari,Netflix subtitrlari,dorama subtitrlari,anime subtitrlari,ikki tilli subtitrlar,chet tilidagi film subtitrlari,subtitrlarni onlayn tarjima qilish,YouTube subtitrlari,bepul subtitr tarjima vositasi,subtitrlarni bepul tarjima qilish,bepul SRT tarjimoni",
+  "ogTitle": "AI-SRTSub - Global Movies & Series, Subtitrlar Sizning Tilingizda",
+  "ogDesc": "Kino ixlosmandlari uchun 100% bepul sun'iy intellekt subtitr tarjimoni: bir marta bosish orqali chet tilidagi film, serial va hujjatli filmlar subtitrlarini avtomatik vaqt jadvali moslashuvi bilan ona tilingizga o'giring. Global kontentdan to'siqlarsiz bahramand bo'ling.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Kino ixlosmandlari uchun 100% bepul sun'iy intellekt subtitr tarjimoni: bir marta bosish orqali chet tilidagi film, serial va hujjatli filmlar subtitrlarini avtomatik vaqt jadvali moslashuvi bilan ona tilingizga o'giring. Global kontentdan to'siqlarsiz bahramand bo'ling.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Bu vosita haqida\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Bepul AI Avtomatik Subtitr Tarjimoni</h2>\n    <p data-i18n-html=\"seoIntro\">Bu yirik til modellari bilan ishlaydigan <strong>bepul onlayn subtitr tarjima vositasi</strong>. SRT, VTT yoki ASS fayllarini yuklang va subtitrlarni ingliz, xitoy, yapon, koreys, ispan, fransuz va 15+ boshqa tillar o'rtasida tarjima qiling. Ro'yxatdan o'tish, o'rnatish, suv belgisi yo'q — brauzerda oching va tarjimani boshlang. Bulutli tarjimani yoqmaguningizcha subtitr ma'lumotlari brauzeringizda qoladi.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Asosiy xususiyatlar:</strong> SRT, VTT va ASS tahlili va sun'iy intellekt yordamida tarjima, aqlli gaplarni birlashtirish (bir gap bir nechta kuiga bo'linganda, kuylar birlashtiriladi, tarjima qilinadi va keyin asl vaqt jadvali bo'ylab qayta bo'linadi), vaqt jadvalini moslashtirish, CJK va G'arb matnlari uchun avtomatik qatorni o'rash, to'ldiruvchi so'zlarni olib tashlash, maxsus terminologiya bilan ishlash va tanlanadigan tarjima uslublari. Videoga ulashga tayyor standard SRT, VTT, ASS yoki TXT fayllarini eksport qiling.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kimlar foydalanadi:</strong> video tarjimonlar, YouTube ijodkorlari va lokalizatorlar, til o'rganuvchilar, subtitr guruhlari va video kontentni tezda lokalizatsiya qilish kerak bo'lgan jamoalar.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Bu vosita JavaScript'ni talab qiladi. Iltimos, brauzeringizda JavaScript'ni yoqing, so'ngra subtitrlarni AI yordamida bepul tarjima qilish uchun subtitr faylini (SRT / VTT / ASS) yuklang.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Stilizatsiyalangan Subtitr Yaratuvchi - Ikki Tilli, ASS va VTT Effektlarini Birlashtirish",
+  "desc": "Stilizatsiyalangan subtitrlar uchun bepul vosita: ikki faylni ikki tilliga birlashtirish, ikki tilli trekni qayta stilizatsiya qilish yoki effektlar qo'shish. 5 ta ASS / 6 ta VTT shablonlari; SRT / VTT / ASS sifatida eksport qilish.",
+  "kw": "subtitrlarni birlashtirish,ikki tilli subtitrlar,subtitr fayllarini qo'shish,stilizatsiyalangan subtitrlar,ASS subtitr uslublari,VTT subtitr uslublari,subtitr effektlari,ikki tilli subtitr yaratuvchi,ASS shablonlari,subtitr qolipi,bepul subtitr vositasi",
+  "intro": "Ikki subtitr faylini ikki tilliga birlashtiring yoki trekni stilizatsiya qiling: shrift, rang, kontur va pozitsiya, barchasi WYSIWYG.",
+  "feat": "Ikki tilli birlashtirish va sozlash, ASS / VTT uslub shablonlari, qiymat bo'yicha uslub uyalari, joyida va ommaviy vaqt jadvalini to'g'rilash hamda aynan eksport qilinadigan faylning o'zi bo'lgan jonli ko'rish.",
+  "who": "Ikki tilli yoki stilizatsiyalangan subtitrlar tayyorlovchi ijodkorlar, kodlash guruhlari va qulay subtitrlarga muhtoj jamoalar."
+ },
+ "clean": {
+  "title": "Subtitr tozalagich: Suv belgilari, SDH va HTML teglarini olib tashlash",
+  "desc": "Bepul onlayn subtitr tozalagich: suv belgilari, reklamalar, SDH, HTML teglari, ASS effektlarini olib tashlash; bosh harflar va buzilgan matnlarni to'g'rilash. 13 ta o'tkazib bo'ladigan qoida, har bir o'zgarishni bekor qilish, vaqt jadvali o'zgarishsiz qoladi.",
+  "kw": "subtitr tozalagich,srt faylni tozalash,subtitr suv belgisini olib tashlash,SDH subtitrlarini olib tashlash,subtitrlardan HTML teglarini olib tashlash,bosh harfli subtitrlarni to'g'rilash,buzilgan matnni to'g'rilash,eshitish qobiliyati cheklanganlar subtitrlarini olib tashlash,ASS effektlarini olib tashlash",
+  "intro": "Yuklab olingan subtitrni avval shu yerdan o'tkazing: suv belgilari, reklamalar, SDH kuylari va HTML teglari bir martada yo'qoladi.",
+  "feat": "To'rt guruhdagi 13 ta qoida (9 tasi sukut bo'yicha yoqilgan), suv belgisi va SDH ni olib tashlash, hamma harflari bosh va buzilgan matnlarni to'g'rilash, har bir kui o'zgarishlari ro'yxati va uni yakka tartibda orqaga qaytarish, vaqt esa hech qachon o'zgarmaydi.",
+  "who": "Mavjud subtitrni yuklab olib, undan shunchaki foydalanishni istagan har bir kishi va materiallarni ommaviy tozalovchi guruhlar."
+ },
+ "glossary": {
+  "title": "Ommaviy Subtrit Termini Almashtirish - Bitta Glossariy, Butun Fayl | AI-SRTSub",
+  "desc": "Subtitrlar uchun glossariy almashtirish: \"eski → yangi\" ni bir marta kiriting va butun SRT / VTT / ASS / TXT fayl yangilanadi. Vaqt, uslublar va NOTE bloklari saqlanib qoladi; har bir qator uchun qaytarish mumkin.",
+  "kw": "subtitr glossariysi,srt ni ommaviy almashtirish,subtitrlarni topish va almashtirish,subtitr terminini almashtirish,srt ommaviy tahriri,subtitrlardagi so'zlarni almashtirish,subtitr nomlarini birlashtirish,subtitr terminologiyasi,vtt matnini almashtirish,glossariy srt vositasi,ommaviy terminlarni almashtirish",
+  "intro": "Butun subtitr fayliga bir vaqtning o'zida qo'llaniladigan \"eski term → yangi term\" qoidalari glossariysi, bunda vaqt, ASS uslublari va VTT izoh bloklari baytma-bayt o'zgarmasdan qoladi.",
+  "feat": "Har bir qatorda bitta qoida, -> , => , → yoki sichqoncha belgisi bilan ajratilgan; # bilan boshlanuvchi qatorlar izohlar hisoblanadi. Butun so'z moslashuvi \"start\" ichidan \"art\" ni chiqarib tashlaydi, registr sezgirligi ixtiyoriy va almashtirishni ikki tilli kuylarning 1-qatoriga yoki 2-qatoriga cheklashingiz mumkin. Har bir o'zgartirilgan kui ro'yxatga olinadi va istalgan bittasini qaytarish mumkin.",
+  "who": "Mavsum davomida nomlar va terminologiyani birlashtiruvchi, mashina tarjimasi so'zlarini ommaviy ravishda to'g'rilovchi yoki boshqa birovning subtitrlarini o'z uy uslubiga moslashtiruvchi har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Subtiltr QC - Har Bir Til Uchun Vaqt va Tartibni Tekshirish | AI-SRTSub",
+  "desc": "Bepul onlayn subtitr QC: SRT, VTT yoki ASS yuklang va til qoidalari bo'yicha qoplamalar, davomiylik, o'qish tezligi, qator kengligi, qator uzilishlari, raqamlash va kodlashni tekshiring. 27 ta til, 27 ta chegara to'plami va tilga xos qoidalar.",
+  "kw": "subtitr tekshiruvchisi,subtitr qc,srt validator,subtitr sifatini tekshirish,srt tekshiruvi,subtitr vaqtini tekshirish,subtitr validator,srt faylni tekshirish,subtitrlarni tahrirlash,subtitr linteri",
+  "intro": "Subtitr faylini yuklang va uni o'z tilining qoidalariga muvofiq tekshiring - har bir topilma o'lchangan qiymat va chegara bilan birga keladi. To'liq brauzeringizda ishlaydi, hech narsa yuklanmaydi.",
+  "feat": "Bir-birining ustiga chiqadigan kuiylarni, ekranda juda qisqa yoki juda uzun qolishni, o'qish tezligini, qator kengligini, qator sonini, noqulay qator uzilishlarini, raqamlashni, bo'sh kuiylarni, buzilgan matn va boshqaruv belgilarini tekshiradi. Kenglik va o'qish tezligi yozuv tizimiga amal qiladi: xitoy tili to'liq kenglikdagi belgilar bilan o'lchanadi, tay va arab tillaridagi birlashtiruvchi belgilar nol kenglik sifatida hisoblanadi. Tilga xos qoidalarga ispancha ochilish ¿ belgisi, ? ! ; : dan oldingi fransuzcha ajralmaydigan bo'sh joy, yunoncha so'roq belgisi, xitoy va yapon tillaridagi to'liq kenglikdagi tinish belgilari hamda arabcha so'roq belgisi va vergul kiradi. Avtomatik ravishda tuzatiladigan elementlar alohida keltirilgan va vaqt kodlarini o'zgartiradigan har qanday narsa sukut bo'yicha belgilanmagan.",
+  "who": "Subtitr guruhlari, lokalizatsiya yetkazib beruvchilari, muharrirlar va yetkazib berishdan oldin faylni tekshirishni xohlovchi har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Subtitr Tarjimoni — SRT/VTT/ASS ni Sizning Tilingizga Tarjima Qilish",
+  "desc": "SRT / VTT / ASS faylini tashlang, maqsadli tilni tanlang va vaqt jadvali qulflangan tarjimani oling. 100 ta til, bepul, ro'yxatdan o'tish shart emas."
+ },
+ "convert": {
+  "title": "Subtitr Konverteri - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Bepul onlayn subtitr konverteri: vaqt jadvalini butun saqlagan holda SRT, VTT, ASS, SBV, LRC va TXT o'rtasida o'tkazing, ASS effekt teglari avtomatik ravishda tozalanadi.",
+  "kw": "subtitr konverteri,srt dan vtt ga,vtt dan srt ga,ass dan srt ga,sbv dan srt ga,srt dan lrc ga,subtitrni txt ga,subtitrlarni konvertatsiya qilish,srt konverteri,vtt konverteri",
+  "intro": "Vaqt jadvali buzilmagan holda SRT, VTT, ASS, SBV, LRC va TXT formatlari o'rtasida konvertatsiya qiling.",
+  "feat": "Kirish formati avtomatik ravishda aniqlanadi va vaqt belgilari maqsadli format uchun qayta yoziladi; oddiy formatga eksport qilganingizda ASS effekt teglari va majburiy qator uzilishlari o'qiladigan matnga aylanadi, qo'shiq matni fayllarida soat maydoni yo'q, shuning uchun bir soatdan oshgan har qanday vaqt daqiqalarda hisoblanadi.",
+  "who": "Pleyeri subtitr faylini rad etuvchi har qanday shaxs va materiallarni muharrir va veb-pleyer o'rtasida ko'chiruvchilar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Ikki tilli subtitrlarni ajratuvchi - Faqat bitta tilni saqlash | AI-SRTSub",
+  "desc": "Bepul onlayn ikki tilli subtitrlarni ajratuvchi: ikki tilli subtitr faylini asl trek va tarjima qilingan trekka ajrating yoki faqat bittasini saqlang.",
+  "kw": "ikki tilli subtitrlarni ajratuvchi,ikki tilli srt ni ajratish,ikkinchi til subtitrini olib tashlash,faqat inglizcha subtitrni saqlash,tarjima qilingan subtitrni chiqarib olish,srt ikki tilli ajratish,ass ikki tilli ajratish",
+  "intro": "Ikki tilli subtitr faylini asl trek va tarjima qilingan trekka ajrating yoki ulardan faqat bittasini saqlang.",
+  "feat": "Ikkala keng tarqalgan tartibni ham boshqaradi - har biri ikkita qatordan iborat bitta kui va bir xil vaqt jadvalini ulashuvchi ikkita kui. Treklar tartib va skript turi bo'yicha ajratiladi, vaqt jadvali aynan o'zicha saqlanadi va bir tilli fayl jimjimador tarzda bo'shatilish o'rniga belgilab qo'yiladi.",
+  "who": "Tayyor ikki tilli fayl berilgan va faqat bitta tilni xohlovchi har qanday shaxs hamda asl nusxa va tarjimani alohida arxivlaydigan subtitr guruhlari.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Subtitr vaqtini surish: Ko'chirish, Birlashtirish va Ajratish | AI-SRTSub",
+  "desc": "Bepul onlayn subtitr vaqtini to'g'rilash vositasi: hammasini birdaniga suring, nisbat bo'yicha o'lchamini o'zgartiring yoki ikkita tayanch nuqtasi bilan siljishni tuzating. SRT, VTT, ASS, SBV, LRC va TXT bilan ishlaydi.",
+  "kw": "subtitr vaqtini surish,srt vaqtini surish,subtitr sinxronizatsiyasini sozlash,subtitr vaqtini qayta olchash,subtitr kechikishini tuzatish,srt vaqt siljishi,subtitr siljishini tuzatish,subtitrlarni birlashtirish,subtitrlarni ajratish,srt larni birlashtirish,uzun subtitrni ajratish",
+  "intro": "Subtitrlar sinxronizatsiyadan chiqib ketganda, butun vaqt jadvalini ko'chiring, uni nisbat bo'yicha qayta o'lchamlang yoki ikkita tayanch nuqtasi yordamida tuzating. Shuningdek, u ajratilgan qatorlarni birlashtirishi va juda uzun ishlaydiganlarini ajratishi mumkin.",
+  "feat": "Surish har bir kuining ekranda qolish muddatini o'zgartirmasdan uni ko'chiradi. Qayta o'lchash ikkala uchini ham ko'paytiradi, shuning uchun kui uzunligi u bilan birga o'zgaradi - 24 va 25 kadr/sekund orasida juda qulay. Ikki nuqtali tuzatish ham siljigan, ham noto'g'ri tezlikda ishlaydigan fayllarni boshqaradi. Manfiy bo'lib chiqqan vaqtlar nolga keltiriladi va vosita qanchasi ta'sirlanganini ko'rsatadi. Kirish qaysi formatda bo'lsa, chiqish ham o'sha formatda bo'ladi - konvertatsiyasiz, ASS uslublari, qator bo'yicha uslub va effekt teglari aynan qanday bo'lsa, shunday saqlanadi. Ikki tilli kuiylar birlashtirilganda ikki qatorda qoladi va ajratishda o'tkazib yuboriladi.",
+  "who": "Manba o'zgargandan keyin subtitrlari siljib ketadigan, biroz tez yoki sekin ishlaydigan yoki boshqa kadr tezligida ishlaydigan shaxsdan kelib chiqqan har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Buzilgan subtitrlarni tuzatish: Kodlash xatolarini tiklash | AI-SRTSub",
+  "desc": "Buzilgan subtitrlar uchun bepul onlayn tuzatish: fayl UTF-8, GBK, Big5, Shift_JIS yoki EUC-KR ekanligini aniqlaydi, noto'g'ri o'qilgan matnni tiklaydi, pleyeringiz uchun qayta saqlaydi.",
+  "kw": "buzilgan subtitrlarni tuzatish,subtitr mojibake,srt kodlashni tuzatish,subtitr kodlashini tuzatish,utf8 dan gbk ga subtitr,srt g'alati belgilarni ko'rsatmoqda,subtitr noto'g'ri kodlash,ass buzilgan,vtt buzilgan,subtitr kodlashini aniqlash",
+  "intro": "Tushunarsiz matnlar devori sifatida ochiladigan subtitrlar deyarli har doim noto'g'ri kodlash bilan o'qiladi. Faylni tashlang va u fayl aslida qaysi kodlashda yozilganini aniqlaydi hamda noto'g'ri o'qilgan belgilarni o'z joyiga qaytaradi.",
+  "feat": "Yuklangan fayllar asl baytlardan qayta dekodlanadi, shuning uchun hech narsa yo'qolmaydi: agar fayl GBK bo'lib chiqsa, u buni aytadi va agar uni noto'g'ri o'qiyotgan pleyeringiz bo'lsa, nusxasini \"BOM bilan UTF-8\" sifatida saqlash odatda buni hal qiladi. Joylashtirilgan matn endi asl baytlar emas, shuning uchun ko'p narsani tiklab bo'lmaydi; agar u allaqachon almashtirish belgilarini o'z ichiga olgan bo'lsa, bu tiklanmaydi va vosita shunchaki boshqacha ko'rsatish o'rniga buni ochiq-oydin aytadi. Qator raqamlari va vaqt kodlariga aslo tegilmaydi, ASS uslub teglari esa qanday bo'lsa, shunday qoldiriladi.",
+  "who": "Tushunarsiz gibberish sifatida ochiladigan subtitrlarni yuklab olgan, pleyerda xitoy tilining o'rniga katakchalarni ko'radigan yoki noma'lum kodlashdagi fayl berilgan har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Subtitrlardan Matnni Chiqarib Olish - SRT/ASS/VTT dan Oddiy Matnga | AI-SRTSub",
+  "desc": "Bepul onlayn subtitrdan matnga chiqaruvchi: SRT, VTT, ASS, SBV, LRC va TXT ni o'qiydi, vaqt kodlari va qator raqamlarini olib tashlaydi, toza muloqotni paragraf yoki har bir kui uchun bitta qator sifatida chiqaradi.",
+  "kw": "subtitrlardan matnni chiqarib olish,subtitrdan matnga,srt dan txt ga,srt dan oddiy matnga,ass dan txt ga,vtt dan txt ga,subtitr transkripti,srt dan dialoglarni chiqarib olish,srt vaqt kodlarini olib tashlash,subtitr matnini chiqaruvchi",
+  "intro": "SRT / VTT / ASS / SBV / LRC / TXT subtitrlaridan muloqotni toza oddiy matn sifatida chiqarib oling: vaqt kodlari, kui raqamlari va uslub teglari avtomatik ravishda olib tashlanadi.",
+  "feat": "Ikki xil tartib: pauzalar va gap oxiridagi tinish belgilarida bo'lingan uzluksiz paragraflar yoki muloqot ro'yxatlari uchun har bir kui uchun bitta qator. \"(telefon jiringlayapti)\" kabi tovush kuylari, manba suv belgilari va takrorlanadigan qatorlar sukut bo'yicha olib tashlanadi; \"TOM:\" kabi spiker nomlari va qo'shiq matni qatorlari saqlanishi yoki olib tashlanishi mumkin. Qatorlarni o'rash har bir skript bo'yicha qayta birlashtiriladi — xitoy va yapon tillari to'g'ridan-to'g'ri qo'shiladi, koreys va lotin tillari bo'sh joy qo'shadi — shuning uchun hech narsa yopishib qolmaydi.",
+  "who": "Yuzlab vaqt kodlarini qo'lda o'chirmasdan, eslatmalar, ssenariylar, tarjima amaliyoti yoki boshqa vositaga kiritish uchun subtitr matnini xohlovchi har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "MKV / MP4 dan O'rnatilgan Subtitrlarni SRT ga Chiqarib Olish | AI-SRTSub",
+  "desc": "MKV, WebM, MP4, MOV dan o'rnatilgan subtitrlarni chiqarib olish; SRT / VTT / ASS / TXT sifatida eksport qilish. Yuklab olish yoki qayta kodlash yo'q — fayllar brauzeringizda o'qiladi; ko'p gigabaytli fayllar ham muammosiz ishlaydi.",
+  "kw": "o'rnatilgan subtitrlarni chiqarib olish,mkv dan srt ga,mp4 subtitrini chiqarish,videodan subtitrlarni chiqarib olish,o'rnatilgan subtitr chiqaruvchi,mkv dan srt,mov subtitrini chiqarish,subtitr trekini eksport qilish,mkv dan vtt ga,yumshoq subtitrlarni chiqarib olish,mkv subtitrini olish",
+  "intro": "MKV yoki MP4 ichiga muhrlangan subtitr trekini to'g'ridan-to'g'ri SRT ga tortib oling — yuklash talab etilmaydi, hammasi brauzeringizda sodir bo'ladi.",
+  "feat": "Oddiy matn, ASS, WebVTT va mov_text / tx3g treklarini o'qiydi, asl ASS sarlavhasi va piksellar sonini saqlaydi hamda masofa bo'yicha kichik qismlarda o'qiydi, shuning uchun ulkan fayl hech qachon xotirani to'ldirmaydi.",
+  "who": "Yumshoq subtitrlarga ega bo'lgan filmga ega bo'lgan va matnni chiqarib olishni xohlovchi har qanday shaxs, kodlash guruhlari va asl trekdan boshlaydigan fansub jamoalari.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Xitoycha Subtitr Konverteri - Soddalashtirilgan ⇄ An'anaviy | AI-SRTSub",
+  "desc": "Bepul xitoycha subtitr konverteri: Soddalashtirilgan ⇄ An'anaviy (Tayvan / Gonkong) va aksincha. Faqat muloqot o'zgaradi — vaqt kodlari va ASS teglari o'zgarishsiz qoladi. OpenCC asosida qurilgan.",
+  "kw": "xitoycha subtitr konverteri,soddalashtirilgandan an'anaviyga,an'aviydan soddalashtirilganga,srt an'anaviy xitoycha,subtitrni xitoy tiliga o'tkazish,tayvancha an'anaviy xitoycha,gonkongcha an'anaviy xitoycha,ixon qilish,srt ni an'anaviy xitoy tiliga o'tkazish,soddalashtirilgan xitoycha srt,opencc subtitr",
+  "intro": "Faqat muloqotni o'zgartirgan holda butun subtitr faylini Soddalashtirilgan va An'anaviy o'rtasida konvertatsiya qiling.",
+  "feat": "To'qqizta yo'nalish: umumiy An'anaviy, Tayvan lug'ati, Tayvan shakllari, Gonkong, Soddalashtirilgan va An'anaviy-An'anaviy mintaqaviy shakllarga qaytish. Eng uzun mos keladigan iboralarni aniqlash bilan OpenCC lug'atidan foydalanadi.",
+  "who": "Tayvan yoki Gonkong auditoriyasiga subtitrlar yetkazib beruvchi har qanday shaxs, mintaqaviy versiyalarni tayyorlovchi distribyutorlar va An'anaviy faylni olib, Soddalashtirilganini xohlovchi muharrirlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Subtitr Ajratuvchi va Birlashtiruvchi - SRT / VTT | AI-SRTSub",
+  "desc": "Subtitrlarni davomiyligi yoki soni bo'yicha ajrating yoki ko'p fayllarni tartib bo'yicha yoki vaqt belgisi bo'yicha birlashtiring. Raqamlash avtomatik, muloqotga tegilmaydi. SRT va VTT.",
+  "kw": "subtitr ajratuvchi,subtitrlarni ajratish,srt fayllarini birlashtirish,srt birlashtiruvchi,subtitrlarni birlashtirish,srt ni ajratish,srt fayllarini qo'shish,subtitrlarni kesish,vtt ni ajratish,subtitr birlashtiruvchi",
+  "intro": "Bitta uzun subtitrni qismlarga bo'ling yoki ko'p fayllarni bittaga birlashtiring. To'liq brauzeringizda ishlaydi — hech narsa yuklanmaydi.",
+  "feat": "Har bir qism uchun qayta raqamlash va ixtiyoriy nolga asoslangan vaqt bilan davomiyligi yoki soni bo'yicha ajratish; bo'shliq bilan ketma-ket birlashtirish yoki asl vaqt belgilari bo'yicha aralashtirish. SRT va VTT.",
+  "who": "Yuklash uchun qismlarni bo'luvchi ijodkorlar, qismlarga bo'lib tekshiruvchi jamoalar va ko'p qismli subtitrlarni birlashtiruvchi muharrirlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Subtitrlarni Excel/CSV ga va Qaytarish | AI-SRTSub",
+  "desc": "Ko'rib chiqish va tarjima qilish uchun SRT yoki VTT ni Excel yoki CSV jadvaliga aylantiring, so'ngra uni orqaga qaytaring. Vaqt kodlari aniq qoladi, qator uzilishlari saqlanadi. Hech narsa yuklanmaydi.",
+  "kw": "subtitrdan excel ga,srt dan csv ga,srt dan excel ga,excel dan srt ga,csv dan srt ga,subtitr jadvali,subtitr konverteri jadvali",
+  "intro": "Ko'rib chiqish va tarjima qilish uchun subtitrlarni jadvalga eksport qiling, so'ngra jadvalni qayta import qiling. To'liq brauzeringizda ishlaydi.",
+  "feat": "SRT yoki VTT dan xlsx yoki CSV ga bir marta bosish; jadvalingizdagi vaqtlar, matn va eslatmalarni tahrirlang, so'ngra SRT yoki VTT ga qayta eksport qiling. Vaqt ustunlari to'milisekundli aniqlikni saqlaydi; katakchadagi qator uzilishlari saqlanadi. Xitoy va ingliz sarlavhalari ikkalasi ham ishlaydi.",
+  "who": "Jadvalda subtitrlarni ko'rib chiquvchi, izoh beruvchi yoki ommaviy tuzatuvchi tarjimonlar, fansub jamoalari va muharrirlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Subtitrlarni SRT/VTT ga Ommaviy Konvertatsiya Qilish | AI-SRTSub",
+  "desc": "O'nlab yoki yuzlab SRT/VTT fayllarini tashlang, ularning hammasini bitta formatga o'tkazing va bitta ZIP ni yuklab oling. Raqamlash va vaqt belgilari normallashtirilgan; o'qib bo'lmaydigan fayllar belgilab qo'yiladi.",
+  "kw": "subtitrlarni ommaviy konvertatsiya qilish,srt dan vtt ga,ommaviy subtitr konverteri,ommaviy srt,bir nechta subtitrlarni konvertatsiya qilish,subtitr zip",
+  "intro": "Yuzlab subtitr fayllarini sudrab olib keling, ularning hammasini konvertatsiya qiling, bitta ZIP ni olib keting. To'liq brauzeringizda ishlaydi.",
+  "feat": "SRT dan VTT ga va aksincha ommaviy tarzda; ketma-ketlik raqamlari qayta tartibga solinadi va vaqt belgilari maqsadli format bo'yicha normallashtiriladi. Tahlil qilib bo'lmaydigan fayllar belgilanadi va ZIP dan chetda qoldiriladi. Asl fayl nomlari yangi kengaytma bilan saqlanadi; to'qnashuvlar uchun qo'shimcha qo'shiladi.",
+  "who": "Butun serial papkalarini konvertatsiya qiluvchi muharrirlar va subtitrovchilar, shuningdek, pleyerlarga yagona formatni taqdim etuvchi sayt egalari.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "LRC Qo'shiq Matni Muharriri - Tinglayotganda Vaqtni Bosish | AI-SRTSub",
+  "desc": "Qo'shiqni yuklang, qo'shiq matnini joylashtiring va tinglayotganda har bir qator vaqtini bosing; LRC yoki SRT ni eksport qiling. Nozik sozlash uchun mavjud LRC ni import qiling. Klaviatura yordamida boshqariladi, to'liq brauzerda ishlaydi.",
+  "kw": "lrc muharriri onlayn,lrc yaratish,qo'shiq matni vaqti,lrc yaratuvchi,lrc yaratish,qo'shiq matnini sinxronizator,lrc dan srt ga",
+  "intro": "Musiqani yuklang, qo'shiq matnini joylashtiring, tinglayotganingizda qatorma-qator vaqtni bosing va LRC yoki SRT ni eksport qiling. Hech narsa yuklanmaydi.",
+  "feat": "MP3, M4A, FLAC, WAV va OGG bilan ishlaydi. Har bir qator uchun bitta qator; mavjud LRC fayllari import qilinishi va sozlanishi mumkin. Bo'sh joy ijro etadi/pauzaga qo'yadi, Enter joriy qatorni belgilaydi, Z orqaga qaytaradi — qo'llar klaviaturada qoladi.",
+  "who": "Kaverlarni sinxronizatsiya qiluvchi musiqachilar, videolarga qo'shiq qo'shuvchi ijodkorlar va pleyer uchun qo'shiq matni subtitrlarini yaratuvchi har qanday shaxs.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "YouTube subtitrlarini to‘g‘rilash - Uzilgan gaplarni qayta tiklash | AI-SRTSub",
+  "desc": "YouTube avto-subtitrlari gapni 3-4 soniyada bo‘ladi. Bu vosita so‘zlarni o‘zgartirmasdan chegaralarni to‘g‘rilaydi. Bepul va 100 ta tilda ishlaydi.",
+  "kw": "youtube subtitrlarini tuzatish,youtube avto-subtitrlari,subtitrlarni moslash,gaplarni tekislash,uzilgan subtitrlarni tuzatish,srt gaplarini tekislash,subtitrlarni qayta segmentlash,youtube subtitrlarini ta’mirlash,gapga asoslangan subtitrlar",
+  "intro": "YouTube avto-subtitr faylini yuklang, tilni tanlang, shunda vosita gaplarni birlashtirib, ularni qayta kesib chiqadi. Birorta ham so‘z o‘zgarmaydi va vaqt belgilari asl nusxaga imkon qadar yaqin qoladi.",
+  "feat": "YouTube avto-subtitrlari gapning tugashiga qaramasdan 3-4 soniyalik bo‘laklarga bo‘linadi. Vosita dastlabki vaqt belgilarini asos qilib oladi, tinish belgilari orqali gapning oxirini aniqlaydi va dinamik dasturlash orqali eng qulay tanaffus nuqtasini tanlaydi. 100 tilning har birining o‘z qoidalari bor: xitoy va yapon tillarida so‘zlar orasida bo‘sh joy yo‘q, tay tilida so‘z chegarasi noaniq, xindi tilida gaplar । belgisi bilan, arab tilida ؟, arman tilida ։ belgisi bilan tugaydi. Qator eni va o‘qish tezligi yozuv tizimiga bog‘liq: xitoy tili uchun 16 to‘liq enli belgi, lotin alifbosi uchun 42 belgi. Eksport qilishdan oldin matn belgi-belgi solishtiriladi.",
+  "who": "YouTube, podkast va kurs avto-subtitrlarini tayyor subtitrga aylantiruvchi jamoalar hamda gaplarning o‘rtasida uzilishidan charchagan mualliflar uchun.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio to Subtitles — SRT yaratish | AI-SRTSub",
+  "desc": "Audio yoki videodan SRT/VTT subtitrlarini brauzerda bepul yarating. ASR texnologiyasi yordamida nutqni matnga o‘tkazing va avtomatik vaqtlang.",
+  "kw": "audio to srt,nutqdan subtitr,avtomatik subtitr generatori,audio transkripsiya,whisper subtitr,brauzer nutq tanish,onlayn subtitr yaratish",
+  "intro": "Audio yoki video faylni yuklang, til va modelni tanlang, qolganini brauzeringiz bajaradi. Natijada vaqt bo‘yicha to‘g‘rilangan va qatorlarga bo‘lingan subtitr loyihasini olasiz.",
+  "feat": "Ushbu vosita nutqni aniq vaqt belgilari bilan matnga o‘giradi, jumlalarni grammatik qoidalarga muvofiq qismlarga ajratadi va o‘qish tezligiga moslab vaqtlaydi.",
+  "who": "O‘z videolariga subtitr qo‘shmoqchi bo‘lgan ijodkorlar, podkast va kurslarni matnga o‘giruvchi jamoalar hamda tahrirlash uchun tayyor loyihaga muhtoj foydalanuvchilar."
+ },
+ "ocrsub": {
+  "title": "Hardcoded Subtitle OCR — videodan matn olish | AI-SRTSub",
+  "desc": "Videoga yopishtirilgan subtitrlarni OCR yordamida SRT/VTT formatiga o‘tkazing. Hududni belgilang va brauzerda matnni avtomatik aniqlang.",
+  "kw": "hardcoded subtitr,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles,video to srt,subtitr chiqarish,video matn ocr",
+  "intro": "Videoni yuklang, subtitr joylashgan hududni belgilang va vosita kadrma-kadr o‘qib, bir xil matnlarni vaqt bo‘yicha birlashtiradi.",
+  "feat": "Videoga yopishtirilgan subtitrlarni aniqlash uchun vosita tasvirning eng yorqin qismlarini tahlil qiladi, fonni olib tashlaydi va matn shakllarini o‘qiydi.",
+  "who": "Xorijiy videolarni mahalliylashtiruvchi jamoalar, eski videolarni qayta subtitrlovchi mutaxassislar va asl subtitr fayliga ega bo‘lmagan montajchilar."
+ },
+ "multilang": {
+  "title": "Ko‘p tillarga bir vaqtda tarjima qiling | AI-SRTSub",
+  "desc": "Butun mavsumni yuklang, kerakli tillarni belgilang va bitta tugmani bosing. Qismlar va tillar yagona navbatga yig‘ilib, ketma-ket ishlaydi; natijalar bitta zip arxivda tayyor bo‘ladi.",
+  "kw": "batch subtitle translation,translate subtitles multiple languages,multi language subtitles,whole season subtitles,subtitle batch export,translate srt to many languages,one season many languages,srt tarjima,ko‘p tilli subtitr",
+  "intro": "Butun mavsumni bir vaqtning o'zida tashlang, kerakli tillarni belgilang va boshlash tugmasini bosing. Qismlar va tillar bitta navbatga birlashadi: har bir til oxirigacha ishlaydi va hammasi bitta zip arxivga joylanadi.",
+  "feat": "Ommaviy tarjimada eng ko'p uchraydigan muammo bu barqarorlikdir. Bir vaqtning o'zida yuborilgan yigirmata qism va beshta til server navbatini ortiqcha yuklaydi — so'rovlar aralashib ketadi va qaysi qism tugaganini aniqlash qiyinlashadi. Shuning uchun bu sahifa ataylab bitta navbat sifatida ishlaydi: bir vaqtning o'zida bitta to'plam, keyingisiga o'tishdan oldin har bir til oxirigacha bajariladi. Jarayon kompyuteringizda har bir qism va til bo'yicha saqlanadi, shuning uchun agar u uchinchi qismda to'xtab qolsa, sahifani qayta ochasiz va u tayyor bo'lgan joydan davom etadi. Mavsum tarjimasidagi asosiy xato — ismlar chalkashishi: yigirmata qismni alohida tarjima qilsangiz, bitta qahramon uch xil yozilishi mumkin. Shuning uchun lug'at bu yerda alohida panelga ega — bir marta yuklaysiz, butun mavsum uchun umumiy bo'ladi va boshlashdan oldin nechta so'z mos kelganini ko'rsatadi. Tabni yopsangiz, vazifa fonda kvota sarflamasdan darhol to'xtaydi.",
+  "who": "Butun mavsumni bir nechta tillarga tarjima qiluvchi subtitr guruhlari, bir xil qismlarni turli bozorlarga tarqatuvchi kanallar va boshlash tugmasini bir marta bosib, keyinroq qaytishni afzal ko'radigan tarjimonlar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - ASS eksport | AI-SRTSub",
+  "desc": "Bepul onlayn karaoke subtitr yaratuvchisi: qo'shiqni yuklang, matnni qo'shing, har bir qatorni belgilang va ularni avtomatik ravishda belgilarga bo'ling. CapCut va Premiere uchun ASS formatida eksport qiling.",
+  "kw": "karaoke subtitle maker,ass karaoke,word level lyrics,kf tags,karaoke lrc,lyric sweep,ass karaoke maker,ai srtsub,karaoke subtitr,ass format",
+  "intro": "Qo'shiqni yuklang, matnni joylashtiring, har bir qatorni bosing va har bir qatorni uning belgilari bo'ylab taqsimlang — avtomatik ravishda, musiqa ostida yoki chegaralarni sudrash orqali. So'zlar kuylanganda yonishini kuzating.",
+  "feat": "Xitoycha belgilar bo'yicha, inglizcha so'zlar bo'yicha bo'linadi, tinish belgilari birga qatnashadi. Oxirgi belgining ovozdan o'tib ketishining oldini olish uchun sozlanadigan oraliq mavjud. CapCut / Premiere / Aegisub uchun \\\\kf teglari bilan ASS, so'z darajasidagi pleerlar uchun yaxshilangan LRC yoki zaxira sifatida butun qatorli SRT eksport qiling. Hammasi brauzeringizda ishlaydi — fayllar serverga yuklanmaydi.",
+  "who": "Kover videolari va konsertlarga matn qo'shuvchi ijodkorlar, musiqa kliplari mualliflari va karaoke subtitrlarini tayyorlovchi har qanday foydalanuvchi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

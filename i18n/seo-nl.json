@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio naar ondertiteling — SRT maken in de browser | AI-SRTSub",
-    "desc": "Audio of video naar SRT of VTT in de browser. Automatische spraakherkenning zet spraak om in ondertitels zonder uploads. Gratis en volledig lokaal.",
-    "kw": "audio naar srt,spraak naar ondertiteling,ondertitels genereren,automatische ondertitel generator,audio transcriberen naar srt,whisper ondertitels,browser spraakherkenning,offline ondertitels maken",
-    "intro": "Sleep een audio- of videobestand in de browser, kies een taal en een model om de herkenning direct te starten. Het resultaat is een ondertitelbestand met tijdscodes, automatisch gesegmenteerd en opgemaakt.",
-    "feat": "Deze tool zet spraak om in tekst en verdeelt deze in ondertitelblokken die voldoen aan leesbaarheidseisen, zoals regelbreedte en minimale leestijd, zonder dat audio wordt geüpload.",
-    "who": "Contentmakers die hun video's willen ondertitelen, teams die podcasts omzetten naar tekst en iedereen die snel een concept-ondertitelbestand nodig heeft."
-  },
-  "ocrsub": {
-    "title": "Hardcoded ondertiteling OCR — lees ingebrande tekst | AI-SRTSub",
-    "desc": "Extraheer ingebrande ondertitels uit video's met OCR. Markeer het tekstgebied, de tool leest frame voor frame en exporteert naar SRT of VTT. Gratis.",
-    "kw": "hardcoded ondertitels extraheren,ondertitel ocr,video ondertitel extractie,ingebrande ondertitels,ocr ondertitels uit video,video naar srt,ondertiteling uit video,hardcoded caption ocr",
-    "intro": "Sleep een video in de tool, markeer het gebied waar de ondertitels staan en de tool leest frame voor frame om identieke tekstblokken samen te voegen tot één tijdcode.",
-    "feat": "De tool isoleert de ondertitelstrook, past binarisatie toe op basis van helderheid en herkent tekst die over meerdere frames wordt weergegeven als één enkel ondertitelblok.",
-    "who": "Ondertitelteams die buitenlandse video's lokaliseren, editors die oude releases opnieuw ondertitelen en iedereen zonder toegang tot het originele ondertitelbestand."
-  }
+ "autosub": {
+  "title": "Audio naar ondertiteling — SRT maken in de browser | AI-SRTSub",
+  "desc": "Audio of video naar SRT of VTT in de browser. Automatische spraakherkenning zet spraak om in ondertitels zonder uploads. Gratis en volledig lokaal.",
+  "kw": "audio naar srt,spraak naar ondertiteling,ondertitels genereren,automatische ondertitel generator,audio transcriberen naar srt,whisper ondertitels,browser spraakherkenning,offline ondertitels maken",
+  "intro": "Sleep een audio- of videobestand in de browser, kies een taal en een model om de herkenning direct te starten. Het resultaat is een ondertitelbestand met tijdscodes, automatisch gesegmenteerd en opgemaakt.",
+  "feat": "Deze tool zet spraak om in tekst en verdeelt deze in ondertitelblokken die voldoen aan leesbaarheidseisen, zoals regelbreedte en minimale leestijd, zonder dat audio wordt geüpload.",
+  "who": "Contentmakers die hun video's willen ondertitelen, teams die podcasts omzetten naar tekst en iedereen die snel een concept-ondertitelbestand nodig heeft."
+ },
+ "ocrsub": {
+  "title": "Hardcoded ondertiteling OCR — lees ingebrande tekst | AI-SRTSub",
+  "desc": "Extraheer ingebrande ondertitels uit video's met OCR. Markeer het tekstgebied, de tool leest frame voor frame en exporteert naar SRT of VTT. Gratis.",
+  "kw": "hardcoded ondertitels extraheren,ondertitel ocr,video ondertitel extractie,ingebrande ondertitels,ocr ondertitels uit video,video naar srt,ondertiteling uit video,hardcoded caption ocr",
+  "intro": "Sleep een video in de tool, markeer het gebied waar de ondertitels staan en de tool leest frame voor frame om identieke tekstblokken samen te voegen tot één tijdcode.",
+  "feat": "De tool isoleert de ondertitelstrook, past binarisatie toe op basis van helderheid en herkent tekst die over meerdere frames wordt weergegeven als één enkel ondertitelblok.",
+  "who": "Ondertitelteams die buitenlandse video's lokaliseren, editors die oude releases opnieuw ondertitelen en iedereen zonder toegang tot het originele ondertitelbestand."
+ },
+ "multilang": {
+  "title": "Veel talen tegelijk — upload een heel seizoen | AI-SRTSub",
+  "desc": "Sleep een heel seizoen erin, selecteer de gewone talen en start één keer. Afleveringen en talen vormen één wachtrij en draaien achter elkaar; resultaten komen als één zip. Gaat verder waar het stopte, stopt bij het sluiten van het tabblad.",
+  "kw": "batch ondertitels vertalen,ondertitels vertalen meerdere talen,meertalige ondertitels,ondertitels hele seizoen,ondertitel batch export,srt vertalen naar vele talen,één seizoen veel talen",
+  "intro": "Sleep een heel seizoen tegelijk in het programma, vink de doeltalen aan en druk op start. Afleveringen × talen worden één wachtrij: elke taal loopt tot het einde voordat de volgende begint, en alles wordt ingepakt in een enkele zip.",
+  "feat": "Wat er misgaat bij batchvertaling is gelijktijdigheid. Twintig afleveringen maal vijf talen die tegelijk worden afgevuurd, zijn honderden verzoeken die samen landen, wat de wachtrij aan serverzijde stillekens ondermijnt — vroege en late verzoeken lopen door elkaar en niemand kan zeggen welke cel daadwerkelijk klaar is. Daarom draait deze pagina bewust als één wachtrij: één batch per keer, één taal tot voltooiing voordat de volgende begint. De voortgang wordt per aflevering en per taal op je machine opgeslagen, dus als het bij aflevering drie misgaat, heropen je de pagina, laad je dezelfde bestanden, en gaat het verder bij die batch zonder opnieuw te versturen wat al klaar is. Wat een seizoen verraadt zijn namen: vertaal twintig afleveringen apart en dezelfde persoon krijgt drie verschillende spellingswijzen. Daarom is de woordenlijst hier een apart paneel — upload één keer, gedeeld door het hele seizoen — en vertelt het je hoeveel items er daadwerkelijk overeenkwamen voordat je begint. Sluit het tabblad en de taak stopt onmiddellijk in plaats van je tegoed op te branden op de achtergrond.",
+  "who": "Ondertitelteams die een heel seizoen naar verschillende talen vertellen, kanalen die dezelfde batch afleveringen herverdelen naar verschillende markten, en solovertalers die liever één keer op start drukken en later terugkeren.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Meertalige Ondertitelvertaalt tool"
+ }
 }

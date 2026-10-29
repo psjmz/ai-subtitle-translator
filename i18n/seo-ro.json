@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio în subtitrări — generează SRT în browser | AI-SRTSub",
-    "desc": "Transformă audio sau video în subtitrări SRT / VTT direct în browser prin recunoaștere vocală locală. Fără încărcări, gratuit și privat.",
-    "kw": "audio în srt,vorbire în subtitrare,generare automată subtitrări,transcriere audio srt,recunoaștere vocală browser,generare subtitrări offline,ASR browser",
-    "intro": "Încarcă un fișier audio sau video, alege limba și modelul, iar recunoașterea va rula direct în browserul tău. Rezultatul este o schiță de subtitrare sincronizată, segmentată corect pe propoziții.",
-    "feat": "Acest instrument procesează fluxul ASR pentru a segmenta textul în indicii de subtitrare optimizate, respectând limitele de caractere și viteza de citire fără suprapuneri.",
-    "who": "Creatori de conținut, echipe care transcriu podcasturi sau cursuri și oricine are nevoie de o schiță de subtitrare editabilă pentru materiale video."
-  },
-  "ocrsub": {
-    "title": "OCR pentru subtitrări hardcoded — extrage text video | AI-SRTSub",
-    "desc": "Extrage subtitrările arse în imagine folosind OCR. Marchează zona, iar instrumentul citește cadrul cu cadru pentru a genera fișiere SRT / VTT gratuit.",
-    "kw": "extragere subtitrări hardcoded,ocr subtitrări,subtitrări arse în video,ocr video în srt,extragere text din video,subtitrări din video,ocr subtitrări",
-    "intro": "Încarcă un video, selectează zona unde apar subtitrările, iar instrumentul va citi cadrul cu cadru, unind secvențele identice într-un singur indiciu temporizat.",
-    "feat": "Instrumentul izolează zona subtitrărilor, aplică binarizarea pentru a elimina fundalul și utilizează OCR pentru a converti textul ars în fișiere SRT sau VTT editabile.",
-    "who": "Echipe de traducători, editori video care lucrează cu materiale vechi și profesioniști care au nevoie de text din fișiere video fără subtitrări separate."
-  }
+ "autosub": {
+  "title": "Audio în subtitrări — generează SRT în browser | AI-SRTSub",
+  "desc": "Transformă audio sau video în subtitrări SRT / VTT direct în browser prin recunoaștere vocală locală. Fără încărcări, gratuit și privat.",
+  "kw": "audio în srt,vorbire în subtitrare,generare automată subtitrări,transcriere audio srt,recunoaștere vocală browser,generare subtitrări offline,ASR browser",
+  "intro": "Încarcă un fișier audio sau video, alege limba și modelul, iar recunoașterea va rula direct în browserul tău. Rezultatul este o schiță de subtitrare sincronizată, segmentată corect pe propoziții.",
+  "feat": "Acest instrument procesează fluxul ASR pentru a segmenta textul în indicii de subtitrare optimizate, respectând limitele de caractere și viteza de citire fără suprapuneri.",
+  "who": "Creatori de conținut, echipe care transcriu podcasturi sau cursuri și oricine are nevoie de o schiță de subtitrare editabilă pentru materiale video."
+ },
+ "ocrsub": {
+  "title": "OCR pentru subtitrări hardcoded — extrage text video | AI-SRTSub",
+  "desc": "Extrage subtitrările arse în imagine folosind OCR. Marchează zona, iar instrumentul citește cadrul cu cadru pentru a genera fișiere SRT / VTT gratuit.",
+  "kw": "extragere subtitrări hardcoded,ocr subtitrări,subtitrări arse în video,ocr video în srt,extragere text din video,subtitrări din video,ocr subtitrări",
+  "intro": "Încarcă un video, selectează zona unde apar subtitrările, iar instrumentul va citi cadrul cu cadru, unind secvențele identice într-un singur indiciu temporizat.",
+  "feat": "Instrumentul izolează zona subtitrărilor, aplică binarizarea pentru a elimina fundalul și utilizează OCR pentru a converti textul ars în fișiere SRT sau VTT editabile.",
+  "who": "Echipe de traducători, editori video care lucrează cu materiale vechi și profesioniști care au nevoie de text din fișiere video fără subtitrări separate."
+ },
+ "multilang": {
+  "title": "Traducere subtitrări în masă în mai multe limbi | AI-SRTSub",
+  "desc": "Încarcă un sezon întreg, bifează limbile dorite și pornește procesul. Episoadele și limbile formează o singură coadă de așteptare, iar rezultatele sunt descărcate într-un singur zip. Se reia de unde s-a oprit.",
+  "kw": "traducere subtitrări în masă,traduce subtitrări în mai multe limbi,subtitrări multilingve,subtitrări sezon întreg,export subtitrări în masă,traducere srt în mai multe limbi,un sezon multe limbi,traducere batch srt",
+  "intro": "Încarcă un sezon întreg dintr-o dată, bifează limbile țintă și apasă start. Episoadele și limbile devin o singură coadă: fiecare limbă rulează până la capăt înainte ca următoarea să înceapă, iar totul este împachetat într-un singur zip.",
+  "feat": "Partea care dă greș în traducerea în masă este concurența. Douăzeci de episoade înmulțite cu cinci limbi lansate simultan înseamnă sute de cereri care sosesc deodată, ceea ce blochează silențios coada de pe server — cererile timpurii și târzii se întrepătrund și nimeni nu poate spune care celulă s-a terminat efectiv. Așadar, această pagină rulează în mod deliberat ca o singură coadă: un singur lot pe rând, o limbă dusă la bun sfârșit înainte de următoarea. Progresul este stocat per episod și per limba pe dispozitivul tău, așa că, dacă se întrerupe la episodul trei, redeschise pagina, încarci aceleași fișiere și procesul continuă de unde a rămas, fără a retrimite ce este deja gata. Lucrul care dă de gol o traducere sezonieră sunt numele: tradu douăzeci de episoade separat și același personaj ajunge să fie scris în trei feluri. De aceea glosarul are propriul său panou aici — îl încarci o singură dată, este partajat de întregul sezon și îți arată câte intrări s-au potrivit efectiv înainte de a începe. Închide tabul și sarcina se oprește imediat, în loc să consume quota în fundal.",
+  "who": "Echipe de subtitrări care adaptează un sezon complet în mai multe limbi, canale care redistribuie același lot de episoade către diferite piețe și traducători independenți care preferă să apese start o singură dată și să revină mai târziu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ }
 }

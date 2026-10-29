@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "zu",
-    "ogLocale": "zu_ZA",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Amafilimu Womhlaba Wonke, Imibhalo engezansi ngolimi lwakho",
-    "desc": "Umhumushi wemibhalo engezansi wamahhala we-AI — akukho ukubhalisa, akukho mkhawulo, akukho uphawu lwamanzi. Guqula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho ngokuchofoza okukodwa.",
-    "kw": "umhumushi wemibhalo engezansi we-AI,humusha imibhalo engezansi,umhumushi wemibhalo engezansi wamahhala,humusha ifayela le-SRT,humusha i-VTT,humusha i-ASS,ukuhunyushwa kwemibhalo engezansi yamafilimu,imibhalo engezansi yochungechunge lwe-TV,imibhalo engezansi yeNetflix,imibhalo engezansi yeKDrama,imibhalo engezansi ye-anime,imibhalo engezansi yezilimi ezimbili,imibhalo engezansi yamafilimu angaphandle,humusha imibhalo engezansi ku-inthanethi,imibhalo engezansi yeYouTube,ithuluzi lokuhumusha imibhalo engezansi lamahhala,humusha imibhalo engezansi mahhala,umhumushi we-SRT wamahhala",
-    "ogTitle": "AI-SRTSub - Amafilimu Womhlaba Wonke, Imibhalo engezansi ngolimi lwakho",
-    "ogDesc": "Umhumushi wemibhalo engezansi we-AI wamahhala angu-100% wabalandeli bamafilimu: ukuchofoza okukodwa kuphendula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho lwendabuko, ngokuhlelwa kwezikhathi okuzenzakalelayo. Jabulela okuqukethwe komhlaba wonke ngaphandle kwezithiyo.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Umhumushi wemibhalo engezansi we-AI wamahhala angu-100% wabalandeli bamafilimu: ukuchofoza okukodwa kuphendula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho lwendabuko, ngokuhlelwa kwezikhathi okuzenzakalelayo. Jabulela okuqukethwe komhlaba wonke ngaphandle kwezithiyo.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Mayelana naleli thuluzi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Umhumushi Wemibhalo Enezansi We-AI Wamahhala Womzamo</h2>\n    <p data-i18n-html=\"seoIntro\">Leli <strong>ithuluzi lokuhumusha imibhalo engezansi ku-inthanethi elamahhala elinamandla amamodeli ezilimi ezinkulu</strong>. Layisha amafayela e-SRT, VTT noma e-ASS bese uhumusha imibhalo engezansi phakathi kwesiNgisi, isiShayina, isiJapane, isiKoria, isiPanishi, isiFulentshi nezinye izilimi ezingu-15+. Akukho ukubhalisa, akukho ukufakwa, akukho uphawu lwamanzi — livule kusiphequluli bese uqala ukuhumusha. Idatha yemibhalo engezansi ihlala kusiphequluli sakho ngaphandle uma unika amandla ukuhumusha kwamafu.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Izici ezibalulekile:</strong> ukuhlaziywa nokuhunyushwa kwe-AI kwe-SRT, VTT ne-ASS, ukuhlanganiswa kwemisho ehlakaniphile (lapho umusho owodwa ubandakanya imithetho eminingi, imithetho ihlanganiswa, ihunyushwe, bese ihlukaniswa futhi phezu komugqa wesikhathi wokuqala), ukuvumelanisa komugqa wesikhathi, ukugoqwa kwemigqa okuzenzakalelayo kombhalo we-CJK kanye nowaseNtshonalanga, ukususwa kwamagama agcwalisayo, ukusingathwa kwetemu yangokwezifiso, nezitayela zokuhumusha ezikhethekayo. Khipha amafayela ajwayelekile e-SRT, VTT, ASS noma TXT alungele ukubethela kanzima kuvidiyo yakho.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ubani owusebenzisayo:</strong> abahumushi bamavidiyo, abadali beYouTube nabasebenzi bokuqondanisa, abafundi bezilimi, amaqembu emibhalo engezansi namaqembu adinga ukuqondanisa okuqukethwe kwevidiyo ngokushesha.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Leli thuluzi lidinga iJavaScript. Sicela unike amandla iJavaScript kusiphequluli sakho, bese ulayisha ifayela lemibhalo engezansi (SRT / VTT / ASS) ukuze uhumushe imibhalo engezansi nge-AI mahhala.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Umenzi Wemibhalo Enezansi - Hlanganisa Ulimi Olubili, ASS & VTT",
-    "desc": "Ithuluzi lamahhala lemibhalo engezansi onesitayela: hlanganisa amafayela amabili abe ulimi olubili, phinda ufake isitayela sethrekhi yezilimi ezimbili, noma engeza imiphumela. Izilungiselelo zangaphambili ezingu-5 ze-ASS / ezingu-6 ze-VTT; khipha njenge-SRT / VTT / ASS.",
-    "kw": "hlanganisa imibhalo engezansi,imibhalo engezansi yezilimi ezimbili,hlanganisa amafayela emibhalo engezansi,imibhalo engezansi onesitayela,isitayela semibhalo engezansi se-ASS,isitayela semibhalo engezansi se-VTT,imiphumela yemibhalo engezansi,umenzi wemibhalo engezansi emibili,izilungiselelo zangaphambili ze-ASS,isibonelo semibhalo engezansi,ithuluzi lemibhalo engezansi lamahhala",
-    "intro": "Hlanganisa amafayela amabili emibhalo engezansi abe ulimi olubili, noma ufake isitayela sethrekhi: ifonti, umbala, umugqa ongaphandle nendawo, konke ku-WYSIWYG.",
-    "feat": "Ukuhlanganiswa kwezilimi ezimbili nokulungiswa, izilungiselelo zesitayela zangaphambili ze-ASS / VTT, izikhala zesitayela ngenani ngalinye, ukulungiswa komugqa wesikhathi endaweni nangobuningi, nokubuka kuqala bukhoma okuyifayela elikhishiwe ngokoqobo.",
-    "who": "Abadali abenza imibhalo engezansi yezilimi ezimbili noma enesitayela, amaqembu abethela, namaqembu adinga amagama acashunwe afinyeleleka kalula."
-  },
-  "clean": {
-    "title": "Isihlanzi Semibhalo Enezansi - Susa Amathegi, Izimpawu & SDH",
-    "desc": "Umhlanzisi wemibhalo engezansi ku-inthanethi wamahhala: susa izimpawu zamanzi, izikhangiso, i-SDH, amathegi e-HTML, imiphumela ye-ASS; lungisa izinhlamvu ezinkulu, i-mojibake. Imithetho engu-13 eshintshekayo, hlehlisa ngoguquko ngalunye, umugqa wesikhathi awuthintwanga.",
-    "kw": "umhlanzisi wemibhalo engezansi,hlanzisa ifayela le-srt,susa uphawu lwamanzi lwemibhalo engezansi,susa imibhalo engezansi ye-SDH,susa amathegi e-HTML emibhalweni engezansi,lungisa imibhalo engezansi yezinhlamvu ezinkulu zonke,lungisa i-mojibake,susa imibhalo engezansi enezinkinga zokuzwa,khipha imiphumela ye-ASS",
-    "intro": "Sebenzisa imibhalo engezansi elandiwe lapha kuqala: izimpawu zamanzi, izikhangiso, izimpawu ze-SDH namathegi e-HTML, sekuphumile ngemizamo eyodwa.",
-    "feat": "Imithetho engu-13 emaqenjini amane (engu-9 ivuliwe ngokuzenzakalelayo), ukususwa kophawu lwamanzi kanye ne-SDH, ukulungiswa kwezinhlamvu ezinkulu zonke ne-mojibake, uhlu lwezinguquko ngokuqondene nesigaba ngasinye sokwaziswa kanye nokubuyiselwa komuntu ngamunye, futhi isikhathi asithintwanga nhlobo.",
-    "who": "Noma ubani othathe umbhalo engezansi okhona futhi owufuna usebenziseke nje, namaqembu ahlanza impahla ngezitaki."
-  },
-  "glossary": {
-    "title": "Ukushintsha Amagama Esihlokwana - Glossary Eyodwa, Ifayela Lonke | AI-SRTSub",
-    "desc": "Ukushintshwa kwesichazamazwi semibhalo engezansi: bhala \"okudala → okusha\" kanye bese ifayela lonke le-SRT / VTT / ASS / TXT liyabuyekezwa. Isikhathi, izitayela namabhulokhi e-NOTE ahlala; hlehlisa ngomugqa ngamunye.",
-    "kw": "isichazamazwi semibhalo engezansi,shintsha i-srt ngobuningi,thola futhi ushintshe umbhalo engezansi,ukushintshwa kwamagama emibhalo engezansi,ukuhlelwa kwe-srt ngobuningi,shintsha amagama emibhalweni engezansi,hlanganisa amagama emibhalo engezansi,itemu yemibhalo engezansi,shintsha umbhalo ku-vtt,ithuluzi lesichazamazwi se-srt,ukushintshwa kwamagama ngobuningi",
-    "intro": "Isichazamazwi semithetho \"kwegama elidala → igama elisha\" esetshenziswe efayeleni lonke lemibhalo engezansi ngesikhathi esisodwa, nesikhathi, izitayela ze-ASS namabhulokhi amanothi e-VTT ashiywe efana ncamashi nge-byte.",
-    "feat": "Umthetho owodwa ngomugqa ngamunye, ohlukaniswe ngo- -> , => , → noma ithebhu; imigqa eqala ngo-# ingamazwana. Ukufana kwamagama agcwele kugcina \"ubuciko\" kungekho \"kokuqala\", ukuzwela kwezinhlamvu ezinkulu kuyazikhethela, futhi unganciphisa ukushintshwa kumugqa 1 noma umugqa 2 wemibhalo engezansi yezilimi ezimbili. Zonke izigaba ezishintshiwe ziyabhaliwe, futhi noma iyiphi eyodwa ingabuyiselwa emuva.",
-    "who": "Noma ubani ohlanganisa amagama namagama kuyo yonke inkathi, alungise ukwakheka kokuhumusha komshini ngobuningi, noma avumelane nemibhalo engezansi yomunye umuntu esitayeleni sakhe sendlu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "I-QC Yesihlokwana - Hlola Isikhathi Nokwakheka Ngolimi ngalunye | AI-SRTSub",
-    "desc": "I-QC yemibhalo engezansi ku-inthanethi yamahhala: layisha i-SRT, VTT noma i-ASS bese uhlola ukugqagqana, ubude besikhathi, isivinini sokufunda, ububanzi bomugqa, ukwehliswa kwemigqa, izinombolo kanye nokufakwa ikhodi ngokuhambisana mithetho yalolu limi. Izilimi ezingu-27, amasethi angu-27 emikhawulo, kanye nemithetho eqondene nolimi.",
-    "kw": "umhloli wemibhalo engezansi,i-qc yemibhalo engezansi,isivumelisi se-srt,ukuhlolwa kwekhwalithi yemibhalo engezansi,ukuhlolwa kwe-srt,ukuhlolwa kwesikhathi semibhalo engezansi,isivumelisi semibhalo engezansi,hlola ifayela le-srt,ukufunda ubufakazi bemibhalo engezansi,i-linter yemibhalo engezansi",
-    "intro": "Layisha ifayela lemibhalo engezansi bese ulihlola ngokuhambisana nemithetho yolimi lalo — konke okutholakele kuza nenani elilinganiswe kanye nomkhawulo. Isebenza ngokuphelele kusiphequluli sakho, akukho okulayishwacho.",
-    "feat": "Ihlola izigaba ezigqagqanayo, ezimfushane kakhulu noma ezinde kakhulu esikrinini, isivinini sokufunda, ububanzi bomugqa, ukubala kwemigqa, ukwehliswa kwemigqa okungcolile, izinombolo, izigaba ezingenalutho, i-mojibake nezinhlamvu zokulawula. Ububanzi nesivinini sokufunda kulandela uhlelo lokubhala: isiShayina silinganiswa ngezinhlamvu ezigcwele ububanzi, izimpawu zokuhlanganisa zesiThailand nesi-Arabhu zibala njengobubanzi obunguziro. Imithetho eqondene nolimi ihlanganisa uphawu lokuvula lwesiPanishi u-¿, isikhala esingaphuli sesiFulentshi ngaphambi kuka-? ! ; :, uphawu lombuzo wesiGreki, izimpawu zokuthintana ezigcwele ububanzi ngesiShayina nesiJapane, kanye nophawu lombuzo wesi-Arabhu no-comma. Izinto ezilungiseka ngokuzenzakalelayo zibhalwe ngokwehlukile, futhi noma yini ehambisa amakhodi wesikhathi ayihlolwanga ngokuzenzakalelayo.",
-    "who": "Amaqembu emibhalo engezansi, abathengisi bezindawo, abahleli kanye nanoma ubani ofuna ukuhlola ifayela ngaphambi kokulethwa.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Umhumushi Wemibhalo Enezansi — I-SRT/VTT/ASS IbenguLimi Lwakho",
-    "desc": "Faka ifayela le-SRT / VTT / ASS, khetha ulimi oluyi-target, bese uthola ukuhumusha okukhiqiwe ngomugqa wesikhathi. Izilimi ezingu-100, kumahhala, akukho ukubhalisa."
-  },
-  "convert": {
-    "title": "Umguquli Wemibhalo Enezansi - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Umguquli wemibhalo engezansi ku-inthanethi wamahhala: guquula phakathi kwe-SRT, VTT, ASS, SBV, LRC kanye ne-TXT nomugqa wesikhathi ugcinwe ungaphazamisekile, amathegi emiphumela ye-ASS ahlanzwe ngokuzenzakalelayo.",
-    "kw": "umguquli wemibhalo engezansi,srt ukuya ku-vtt,vtt ukuya ku-srt,ass ukuya ku-srt,sbv ukuya ku-srt,srt ukuya ku-lrc,umbhalo engezansi ukuya ku-txt,guquula imibhalo engezansi,umguquli we-srt,umguquli we-vtt",
-    "intro": "Guquula phakathi kwe-SRT, VTT, ASS, SBV, LRC kanye ne-TXT nomugqa wesikhathi ugcinwe ungaphazamisekile.",
-    "feat": "Ifomethi yokufaka itholwa ngokuzenzakalelayo futhi izitembu zesikhathi zibhalwa kabusha zibe yifomethi ye-target; amathegi emiphumela ye-ASS nokwehliswa kwemigqa okuphoqelelwe kuba umbhalo ofundekayo lapho ukhiphela kwifomethi elula; amafayela ezingoma awenasizinda sehora, ngakho noma yini edlula ihora elilodwa ibalwa ngemizuzu.",
-    "who": "Noma ubani omdlali wakhe enqaba ifayela lemibhalo engezansi, nanoma ubani ohambisa impahla phakathi komhleli kanye nomdlali wewebhu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Isihlukanisi Semibhalo Enezili Ezimbili - Gcina Ulimi Olulodwa | AI-SRTSub",
-    "desc": "Isihlukanisi semibhalo engezansi yezilimi ezimbili ku-inthanethi wamahhala: hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa nje.",
-    "kw": "isihlukanisi semibhalo engezansi yezilimi ezimbili,hlukanisa i-srt yezilimi ezimbili,susa umbhalo engezansi wesibili,gcina umbhalo engezansi wesiNgisi kuphela,khipha umbhalo engezansi ohunyshiwe,ukuhlukana kwe-srt yezilimi ezimbili,ukuhlukana kwe-ass yezilimi ezimbili",
-    "intro": "Hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa yazo.",
-    "feat": "Iphatha zombili izakhiwo ezivamile - isigaba esisodwa esiphethe imigqa emibili, nezigaba ezimbili ezihlanganyela umugqa wesikhathi ofanayo. Amathrekhi ahlukaniswa ngokulandelana kanye nohlobo lombhalo, umugqa wesikhathi ugcinwe njengoba unjalo, futhi ifayela lelimi elilodwa liyaboniswa esikhundleni sokuthuliswa buthule.",
-    "who": "Noma ubani onikezwe ifayela lezilimi ezimbili elenziwe ngaphambilini odinga ulimi olulodwa nje, namaqembu emibhalo engezansi alondoloza okokuqala kanye nokuhunyushwa ngokwehlukana.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Ukushintsha Isikhathi Semibhalo Enezansi - Hambisa & Linganisa | AI-SRTSub",
-    "desc": "Ithuluzi lesikhathi semibhalo engezansi ku-inthanethi wamahhala: hambisa konke ngesikhathi esisodwa, linganisela kabusha ngesilinganiso, noma ulungise ukukhanya ngamaphuzu amabili. Lisebenza nge-SRT, VTT, ASS, SBV, LRC kanye ne-TXT.",
-    "kw": "ukushintshwa kwesikhathi semibhalo engezansi,hambisa isikhathi se-srt,ukuchibiyela ukuvumelanisa kwemibhalo engezansi,linganisela kabusha isikhathi semibhalo engezansi,lungisa ukubambezeleka kwemibhalo engezansi,isikhala sesikhathi se-srt,ukucaca kokukhanya kwemibhalo engezansi,hlanganisa imibhalo engezansi,hlukanisa imibhalo engezansi,hlanganisa i-srt,hlukanisa umbhalo engezansi omude",
-    "intro": "Lapho imibhalo engezansi ingasebenzi ngokuvumelanisa, hambisa wonke umugqa wesikhathi, ulinganisele kabusha ngesilinganiso, noma ulungise ngamaphuzu amabili ayisisekelo. Kuhlanganisa nemigqa ehlukanisiwe, futhi kuhlukanise leyo ehamba isikhathi eside kakhulu.",
-    "feat": "Ukushintsha kuhambisa zonke izigaba ngaphandle kokuqondisa ukuthi ngayinye ihlala isikhathi esingakanani esikrinini. Ukulinganisela kabusha kuphindaphinda zombili iziphetho, ngakho ubude besigaba sishintsha nakho - kulula phakathi kwe-24 ne-25 fps. Ukulungiswa kwamaphuzu amabili kuphatha amafayela anesikhala futhi asebenza ngesivinini esingalungile. Izikhathi eziphuma zibe ezingezinhle ziboshwa ku-zero, futhi ithuluzi likutshela ukuthi zingaki ezithintekile. Ifayela elifanayo lingena, elifanayo liyaphuma - akukho ukuguqulwa, futhi izitayela ze-ASS, isitayela sesigaba ngasinye kanye namathegi emiphumela kugcinwa njengoba bekunjalo. Izigaba zezilimi ezimbili zihlala emigqeni emibili uma zihlanganisiwe futhi zeqiwa lapho zihlukaniswa.",
-    "who": "Noma ubani imibhalo yakhe engezansi ekhanya ngemva kokuvela kwesishintsho somthombo, esebenza ngokushesha noma kancane, noma evela kumuntu osebenza ngezinga elihlukile lamafreyimu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Lungisa Imibhalo Enezansi Ehlanganisiwe - Lungisa Ikhodi | AI-SRTSub",
-    "desc": "Ukulungisa ku-inthanethi wamahhala kwemibhalo engezansi ehlanganisiwe: kuthola ukuthi ifayela lingabe liyi-UTF-8, GBK, Big5, Shift_JIS noma i-EUC-KR, kubuyisela umbhalo ofundwe kabi, kuwulondoloza kabusha ukuze kusetshenziswe umdlali wakho.",
-    "kw": "lungisa imibhalo engezansi ehlanganisiwe,mojibake yemibhalo engezansi,ukuchibiyela ukufakwa ikhodi kwe-srt,lungisa ukufakwa ikhodi kwemibhalo engezansi,utf8 ukuya ku-gbk wesibili,i-srt ibonisa izinhlamvu ezingajwayelekile,ukufakwa ikhodi okungalungile kwemibhalo engezansi,i-ass ehlanganisiwe,i-vtt ehlanganisiwe,thola ukufakwa ikhodi kwemibhalo engezansi",
-    "intro": "Imibhalo engezansi evuleka njengodonga lwezinto ezingenamqondo cishe ihlezi ifundwa ngokufakwa ikhodi okungalungile. Faka ifayela phakathi, bese kutholakala ukuthi ifayela lalibhalwe ngaluphi uflani lokufakwa ikhodi futhi kubuyiselwa izinhlamvu ezifundwe kabi.",
-    "feat": "Amafayela alayishiwe aphinde aqothulwe kusuka kuma-byte wokuqala, ngakho akukho lutho olulahlekile: uma ifayela liphenduka libe i-GBK, liyasho, futhi uma umdlali wakho nguye owufunda kabi, ukulondologa ikhophi njenge-\"UTF-8 with BOM\" kuvame ukukuxazulula. Umbhalo onamathiselwe awuseyona ama-byte wokuqala, ngakho kuncane kakhulu okungabuyiselwa; uma usuvele unezinhlamvu ezikhonza esikhundleni, lokho akubuyiseki futhi ithuluzi liyakusho ngokucacile esikhundleni sokuzenza sengathi akunjalo. Izinombolo zemigqa namakhodi wesikhathi awasoke athintwe, futhi amathegi esitayela se-ASS ashiyilwe njengoba ayebunjwa.",
-    "who": "Noma ubani olande imibhalo engezansi evuleka njengendawo engasho lutho, obona amabhokisi esikhundleni sesiShayina kumdlali, noma owanikezwe ifayela elokufakwa ikhodi okungaziwayo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Khipha Umbhalo Ezihlokwaneni - I-SRT/ASS/VTT ku-Plain Text | AI-SRTSub",
-    "desc": "Umkhiphi wemibhalo engezansi-kuya-ku-mbhalo ku-inthanethi wamahhala: ufunda i-SRT, VTT, ASS, SBV, LRC kanye ne-TXT, ususa amakhodi wesikhathi nezinombolo zemigqa, futhi akhipha ingxoxo ehlanzekile njengezigaba noma umugqa owodwa ngesigaba ngasinye.",
-    "kw": "khipha umbhalo emibhalweni engezansi,umbhalo engezansi kuya kumbhalo,srt kuya ku-txt,srt kuya kumbhalo ojwayelekile,ass kuya ku-txt,vtt kuya ku-txt,umbhalo wemibhalo engezansi,khipha ingxoxo ku-srt,i-srt susa amakhodi wesikhathi,umkhiphi wombhalo wemibhalo engezansi",
-    "intro": "Khipha ingxoxo emibhalweni engezansi ye-SRT / VTT / ASS / SBV / LRC / TXT nj Umbhalo ojwayelekile ohlanzekile: amakhodi wesikhathi, izinombolo zesigaba namathegi esitayela asuswa ngokuzenzakalelayo.",
-    "feat": "Izakhiwo ezimbili: izigaba eziqhubekayo ezehlukene kumamefu kanye nezimpawu zokuphela komusho, noma umugqa owodwa ngesigaba ngasinye samalogo wezingxoxo. Izimpawu zemisindo ezifana na-(\"(phone ringing)\"), izimpawu zamanzi zomthombo kanye nemigqa ephindaphindwayo emuva-nakude zísuswa ngokuzenzakalelayo; amagama ezikhulumi afana no-\"TOM:\" kanye nemigqa yezingoma angagcinwa noma asuswe. Ukugoqwa kwemigqa kuhlangatshaniswa futhi ngombhalo ngamunye — isiShayina sihlangana ngqo, isiKoria nesiLatin zingeza izikhala — ngakho akukho okunamathiselwa ndawonye.",
-    "who": "Noma ubani ofuna umbhalo wemibhalo engezansi wamanothi, imibhalo, ukuzivocavoca ukuhumusha noma ukondla elinye ithuluzi, ngaphandle kokususa amakhodi wesikhathi angamakhulu ngesandla.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Khipha Imibhalo Enezansi Ekhishiwe Ku-MKV / MP4 kuya ku-SRT | AI-SRTSub",
-    "desc": "Khipha imibhalo engezansi eshumekiwe kusuka ku-MKV, WebM, MP4, MOV; khipha njenge-SRT / VTT / ASS / TXT. Akukho ukulayisha noma ukuqopha kabusha — amafayela afundwa kusiphequluli sakho; ama-GB amaningi kulungile.",
-    "kw": "khipha imibhalo engezansi ekhishiwe,mkv kuya ku-srt,ukukhishwa kwemibhalo engezansi ye-mp4,khipha imibhalo engezansi kuvidiyo,umkhiphi wemibhalo engezansi eshumekiwe,srt kusuka ku-mkv,ukukhishwa kwemibhalo engezansi ye-mov,ukuthunyelwa kwethrekhi yemibhalo engezansi,vtt kusuka ku-mkv,khipha imibhalo engezansi ethambile,i-mkv subtitle rip",
-    "intro": "Khipha ithrekhi yemibhalo engezansi evaliwe ngaphakathi kwe-MKV noma i-MP4 iqonde ngqo ku-SRT — akukho ukulayisha, konke kwenzeka kusiphequluli sakho.",
-    "feat": "Ifunda umbhalo ojulile, i-ASS, i-WebVTT kanye namathrekhi we-mov_text / tx3g, igcina ikhanda le-ASS langempela nokulungiswa, futhi ifunda izingcezu ezincane ngo-offset ukuze ifayela elikhulu lingaze ligcwalise inkumbulo.",
-    "who": "Noma ubani onethebula elinesiphakamiso semibhalo engezansi ethambile ofuna umbhalo uphume, amaqembu amabhayisikobho, namaqembu efansub aqala kuthrekhi yasekuqaleni.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Isiguquli Sesihlokwana sesiShayina - Okwenziwe Lula ⇄ Okwesiko | AI-SRTSub",
-    "desc": "Umguquli wemibhalo engezansi wesiShayina wamahhala: Okwenziwe Lula ⇄ Okwendabuko (Taiwan / Hong Kong) nakubuyela emuva. Izingxoxo kuphela ezishintshayo — amakhodi wesikhathi namathegi e-ASS ayaqhubeka. Yakhelwe ku-OpenCC.",
-    "kw": "umguquli wemibhalo engezansi wesiShayina,okwenziwe lula kuya okwendabuko,okwendabuko kuya okwenziwe lula,i-srt yesiShayina sendabuko,guquula umbhalo engezansi wesiShayina,isiShayina sendabuko saseTaiwan,isiShayina sendabuko saseHong Kong,ukuguqulwa kwe-han,guquula i-srt iye kwesiShayina sendabuko,i-srt yesiShayina eyenziwe lula,i-opencc subtitle",
-    "intro": "Guquula ifayela lonke lemibhalo engezansi phakathi kwe-Simplified ne-Traditional, ungashintshi lutho ngaphandle kwengxoxo.",
-    "feat": "Izikhombisi-ndlela eziyisishiyagalolunye: Traditional jikelele, ulwazi lwaseTaiwan, amafomu aseTaiwan, i-Hong Kong, ukubuya ku-Simplified, kanye namafomu esifunda se-Traditional-to-Traditional. Isebenzisa isichazamazwi se-OpenCC esixazulula imishwana ngendlela yokufana kuqala okude kakhulu.",
-    "who": "Noma ubani oletha imibhalo engezansi kubalaleli baseTaiwan noma baseHong Kong, abasabalalisi abalungiselela izinguqulo zesifunda, nabahleli abamukele ifayela LesiShayina Sendabuko abafuna i-Simplified.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Isihlukanisi Nezihlanganisi Zemibhalo Enezansi - SRT / VTT | AI-SRTSub",
-    "desc": "Hlukanisa imibhalo engezansi ngobude besikhathi noma ukubala, noma uhlanganise amafayela amaningi ngokulandelana noma ngesikhathi. Ukubuyiselwa kwezininombolo kuyazenzakalelayo, ingxoxo ayithintwanga. I-SRT & VTT.",
-    "kw": "isihlukanisi semibhalo engezansi,hlukanisa imibhalo engezansi,hlanganisa amafayela e-srt,isihlanganisi se-srt,hlanganisa imibhalo engezansi,hlukanisa i-srt,hlanganisa amafayela e-srt,sika imibhalo engezansi,hlukanisa i-vtt,isihlanganisi semibhalo engezansi",
-    "intro": "Sika umbhalo engezansi owodwa omude ube izingxenye, noma uhlanganise amafayela amaningi abe munye. Isebenza ngokuphelele kusiphequluli sakho — akukho okulayishwacho.",
-    "feat": "Hlukanisa ngobude besikhathi noma ukubala ngokubuyiselwa kwezininombolo kwesigaba ngasinye kanye nesikhathi sokubala esingenalutho esikhethekayo; hlanganisa ngokulandelana nesikhala noma xuba ngezitembu zesikhathi zangempela. I-SRT ne-VTT.",
-    "who": "Abadali abahlukanisa iziqephu zokulayisha, amaqembu abuyekeza izingxenye, nabahleli abahlanganisa imibhalo engezansi eyingxenye eminingi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Imibhalo Enezansi kuya ku-Excel/CSV kanye Emuva | AI-SRTSub",
-    "desc": "Guqula i-SRT noma i-VTT ibe ishidi le-Excel noma le-CSV ukuze ubuyekeze futhi uhumushe, bese uyibuyisela emuva. Amakhodi wesikhathi ahlala eqinisile, ukwehliswa kwemigqa kuyasinda. Akukho okulayishwacho.",
-    "kw": "umbhalo engezansi kuya ku-excel,srt kuya ku-csv,srt kuya ku-excel,excel kuya ku-srt,csv kuya ku-srt,ishidi lemibhalo engezansi,umguquli wemibhalo engezansi wethebula",
-    "intro": "Khipha imibhalo engezansi iye eshidini lezibalo ukuze ubuyekeze futhi uhumushe, bese ungenisa ishidi libuyele emuva. Isebenza ngokuphelele kusiphequluli sakho.",
-    "feat": "Ukuchofoza okukodwa kusuka ku-SRT noma i-VTT ukuya ku-xlsx noma ku-CSV; hlela izikhathi, umbhalo kanye namanothi eshidini lakho lezibalo, bese uthumela emuva ku-SRT noma i-VTT. Amakholomu esikhathi agcina ukunemba okugcwele kwamamilisekondi; ukwehliswa kwemigqa ngaphakathi kweseli kuyagcinwa. Izihloko zesiShayina nesiNgisi ziyasebenza zombili.",
-    "who": "Abahumushi, amaqembu amabhayisikobho nabahleli ababuyekeza, ababhala amanothi noma abalungisa imibhalo engezansi ngobuningi eshidini lezibalo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Guquula Imibhalo Enezansi Ngobuningi iye ku-SRT/VTT | AI-SRTSub",
-    "desc": "Faka amashumi noma amakhulu amafayela e-SRT/VTT, guquula wonke abe yifomethi eyodwa bese ulanda i-ZIP eyodwa. Ukubuyiselwa kwezininombolo nezitembu zesikhathi zenzelwe indlela ejwayelekile; amafayela angathembekiyo ayamenyezelwa.",
-    "kw": "guquula imibhalo engezansi ngobuningi,srt kuya ku-vtt,umguquli wemibhalo engezansi ngobuningi,srt ngobuningi,guquula imibhalo engezansi eminingi,i-zip yemibhalo engezansi",
-    "intro": "Hudula amakhulu amafayela emibhalo engezansi, guquula wonke, thatha i-ZIP eyodwa. Isebenza ngokuphelele kusiphequluli sakho — akukho okulayishwacho.",
-    "feat": "I-SRT ukuya ku-VTT nasekuqaleni ngobuningi; izinombolo zokulandelana zihlelwe kabusha nezitembu zesikhathi zenziwe zajwayelekile ngokomgomo wefomethi. Amafayela angenakuhlaziywa ayamenyezelwa futhi ashiywe ngaphandle kwe-ZIP. Amagama amafayela wokuqalo agcinwe anesandiso esisha; ukushayisana kuthola isijobelelo.",
-    "who": "Abahleli nabasebenzisi bemibhalo engezansi abaguquula amafolda ochungechunge lonke, nabanikazi bamasayithi abanikeza abadlali ifomethi eyodwa.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Umhleli Wezingoma ze-LRC - Thepha Isikhathi Ngenkathi Ulalele | AI-SRTSub",
-    "desc": "Layisha ingoma, namathisela izingoma, bese uthepha isikhathi somugqa ngamunye ngenkathi ulalele; khipha i-LRC noma i-SRT. Engenisa i-LRC ekhona ukuze ulungise kahle. Kuqhutshwa ikhibhodi, ngokuphelele kusiphequluli.",
-    "kw": "umhleli we-lrc ku-inthanethi,yenza i-lrc,isikhathi sengoma,umenzi we-lrc,dala i-lrc,umvumelanisi wezingoma,lrc kuya ku-srt",
-    "intro": "Layisha umculo, namathisela izingoma, thepha isikhathi umugqa ngamunye njengoba ulalele, bese ukhipha i-LRC noma i-SRT. Akukho okulayishwacho.",
-    "feat": "Isebenza nge-MP3, M4A, FLAC, WAV kanye ne-OGG. Umugqa owodwa ngomugqa ngamunye; amafayela e-LRC akhona angeniswa futhi alungiswe. Isikhala siyadlala/siyameka, u-Enter unyathelisa umugqa wamanje, u-Z uyahlehlisa — izandla zihlala kukhibhodi.",
-    "who": "Abaculi abavumelanisa amakhava, abadali abangeza izingoma kumavidiyo, nanoma ubani owakha imibhalo engezansi yezingoma zomdlali.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "Umhleli Wemiqulu ye-YouTube | Hlanganisa Imisho Ehlukanisiwe | AI-SRTSub",
-    "desc": "Ama-YouTube auto-captions aphula imisho ngemizuzwana ewu 3-4. Leli thuluzi alishintshi amagama, lithutha imingcele ibuyele lapho imisho iphela khona. Kumahhala, izilimi eziyi-100.",
-    "kw": "ukulungiswa kwemibhalo ye-youtube,imibhalo ezenzakalelayo ye-youtube,ukuhlelwa kabusha kwemibhalo,ukuhlelwa kwemisho yemibhalo,ukulungisa imibhalo ephukile,ukuhlelwa kwemisho ye-srt,ukuhlukaniswa kabusha kwemibhalo,ukukhanda imibhalo ye-youtube,imibhalo eqaphela imisho",
-    "intro": "Faka ifayela lemibhalo ye-YouTube eyenziwe ngokuzenzakalelayo, khetha ulimi, futhi ithuluzi lizohlanganisa imisho ndawonye kulo lonke uhlaka, bese liyisika kabusha ifayela umusho ngomusho. Alikho igama elishintshiwe, futhi izikhathi zezingxenye zihlala ziseduze nezikhathi zangempela ngangokunokwenzeka.",
-    "feat": "Imibhalo ye-YouTube ezenzakalelayo isikwa ibe yizingxenye eziyimizuzwana engu-3-4 kungakhathaliseki ukuthi imisho iphela kuphi, ngakho ingxenye eyodwa ivame ukuthwala isiphetho somusho owedlule kanye nesiqalo somusho olandelayo. Ithuluzi lisebenzisa izikhathi zangempela njengezisekelo - lezo zikhathi yimikhawulo yamagama yangempela eyenziwe ngumshini wokuqaphela inkulumo - linquma lapho umusho ngamunye uphela khona ngokusebenzisa izimpawu zokuloba, futhi lisebenzisa uhlelo olunamandla ukukhetha indawo engcono kakhulu yokuphumula phakathi kokuphela komusho, ukhefana, isihlanganisi nokusika okukhulu, bese linweba isikhathi sokubuka ukuze sihambisane nesivinini sokufunda. Ulimi ngalunye lwezingu-100 lunemithetho yalo yemisho: isiShayina nesiJapane azinazikhala phakathi kwamagama, isiThai asibonisi kahle imikhawulo yamagama, isiHindi siphetha imisho ngo-।, isi-Arabhu ngo-؟, isi-Armenia ngo-։. Ububanzi bomugqa nesivinini sokufunda kulandela uhlelo lokubhala - izinhlamvu ezingu-16 ezigcwele umugqa ngamunye wesiShayina, nezingu-42 zezinhlamvu zesiLatin. Ngaphambi kokuthumela, umbhalo uqhathaniswa uhlamvu ngalunye, futhi noma yiliphi igama elilahlekile noma elingeziwe liyabikwa khona manjalo.",
-    "who": "Amaqembu emibhalo engezansi aguqula imibhalo ye-YouTube, ama-podcast nezifundo ibe yimibhalo eqediwe, nabadali abahlela amavidiyo abo abakhathele imisho emisa phakathi nendawo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Umsindo ube ama-subtitle — guqula inkulumo ibe yi-SRT | AI-SRTSub",
-    "desc": "Faka umsindo noma ividiyo, uthole ama-subtitle. Ukubona inkulumo kwenzeka esipheqululini sakho, kuhlanganise ama-SRT / VTT mahhala.",
-    "kw": "umsindo ube srt,inkulumo ibe ama-subtitle,khiqiza ama-subtitle,isikhiqizi sama-subtitle,bhala umsindo ube srt,whisper subtitles,ukubona inkulumo esipheqululini,ukukhiqiza ama-subtitle ungaxhumekile",
-    "intro": "Faka ifayela lomsindo noma ividiyo, khetha ulimi nemodeli, bese ukubona inkulumo kwenzeka esipheqululini sakho. Lokhu kukhipha ama-subtitle anesikhathi esifanele.",
-    "feat": "Leli thuluzi lisebenzisa i-ASR ukuguqula inkulumo ibe ama-subtitle, lisike imisho ngokwezimpawu zokuloba futhi lilungise ububanzi bomugqa ngokuzenzakalelayo.",
-    "who": "Abadali bokuqukethwe, amaqembu enza ama-podcast, nanoma ubani odinga ama-subtitle wamavidiyo angawona."
-  },
-  "ocrsub": {
-    "title": "I-OCR yama-subtitle — funda ama-subtitle akwi-video | AI-SRTSub",
-    "desc": "Ama-subtitle ashunqiselwe esithombeni awanawo umkhondo ongakhishwa. Leli thuluzi liwafunda uhlaka ngohlaka bese likhipha ama-SRT / VTT mahhala.",
-    "kw": "khipha ama-subtitle,subtitle ocr,ukukhipha ama-subtitle kuvidiyo,ama-subtitle ashunqiselwe,ocr subtitles,ividiyo ibe srt,subtitle kuvidiyo,hardcoded caption ocr",
-    "intro": "Faka ividiyo, maka indawo lapho ama-subtitle ekhona, bese ithuluzi liwafunda uhlaka ngohlaka ukuze likhiphe ama-subtitle anesikhathi.",
-    "feat": "Leli thuluzi lisebenzisa i-OCR ukufunda ama-subtitle ashunqiselwe esithombeni, lihlanganise amahlaka afanayo abe yisikhathi esisodwa esifanele.",
-    "who": "Amaqembu ahumusha amavidiyo, nanoma ubani odinga ama-subtitle wamavidiyo angenayo ifayela lokuqala."
-  }
+ "index": {
+  "htmlLang": "zu",
+  "ogLocale": "zu_ZA",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Amafilimu Womhlaba Wonke, Imibhalo engezansi ngolimi lwakho",
+  "desc": "Umhumushi wemibhalo engezansi wamahhala we-AI — akukho ukubhalisa, akukho mkhawulo, akukho uphawu lwamanzi. Guqula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho ngokuchofoza okukodwa.",
+  "kw": "umhumushi wemibhalo engezansi we-AI,humusha imibhalo engezansi,umhumushi wemibhalo engezansi wamahhala,humusha ifayela le-SRT,humusha i-VTT,humusha i-ASS,ukuhunyushwa kwemibhalo engezansi yamafilimu,imibhalo engezansi yochungechunge lwe-TV,imibhalo engezansi yeNetflix,imibhalo engezansi yeKDrama,imibhalo engezansi ye-anime,imibhalo engezansi yezilimi ezimbili,imibhalo engezansi yamafilimu angaphandle,humusha imibhalo engezansi ku-inthanethi,imibhalo engezansi yeYouTube,ithuluzi lokuhumusha imibhalo engezansi lamahhala,humusha imibhalo engezansi mahhala,umhumushi we-SRT wamahhala",
+  "ogTitle": "AI-SRTSub - Amafilimu Womhlaba Wonke, Imibhalo engezansi ngolimi lwakho",
+  "ogDesc": "Umhumushi wemibhalo engezansi we-AI wamahhala angu-100% wabalandeli bamafilimu: ukuchofoza okukodwa kuphendula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho lwendabuko, ngokuhlelwa kwezikhathi okuzenzakalelayo. Jabulela okuqukethwe komhlaba wonke ngaphandle kwezithiyo.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Umhumushi wemibhalo engezansi we-AI wamahhala angu-100% wabalandeli bamafilimu: ukuchofoza okukodwa kuphendula imibhalo engezansi yamafilimu angaphandle, uchungechunge namadokhumentari abe ulimi lwakho lwendabuko, ngokuhlelwa kwezikhathi okuzenzakalelayo. Jabulela okuqukethwe komhlaba wonke ngaphandle kwezithiyo.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Mayelana naleli thuluzi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Umhumushi Wemibhalo Enezansi We-AI Wamahhala Womzamo</h2>\n    <p data-i18n-html=\"seoIntro\">Leli <strong>ithuluzi lokuhumusha imibhalo engezansi ku-inthanethi elamahhala elinamandla amamodeli ezilimi ezinkulu</strong>. Layisha amafayela e-SRT, VTT noma e-ASS bese uhumusha imibhalo engezansi phakathi kwesiNgisi, isiShayina, isiJapane, isiKoria, isiPanishi, isiFulentshi nezinye izilimi ezingu-15+. Akukho ukubhalisa, akukho ukufakwa, akukho uphawu lwamanzi — livule kusiphequluli bese uqala ukuhumusha. Idatha yemibhalo engezansi ihlala kusiphequluli sakho ngaphandle uma unika amandla ukuhumusha kwamafu.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Izici ezibalulekile:</strong> ukuhlaziywa nokuhunyushwa kwe-AI kwe-SRT, VTT ne-ASS, ukuhlanganiswa kwemisho ehlakaniphile (lapho umusho owodwa ubandakanya imithetho eminingi, imithetho ihlanganiswa, ihunyushwe, bese ihlukaniswa futhi phezu komugqa wesikhathi wokuqala), ukuvumelanisa komugqa wesikhathi, ukugoqwa kwemigqa okuzenzakalelayo kombhalo we-CJK kanye nowaseNtshonalanga, ukususwa kwamagama agcwalisayo, ukusingathwa kwetemu yangokwezifiso, nezitayela zokuhumusha ezikhethekayo. Khipha amafayela ajwayelekile e-SRT, VTT, ASS noma TXT alungele ukubethela kanzima kuvidiyo yakho.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ubani owusebenzisayo:</strong> abahumushi bamavidiyo, abadali beYouTube nabasebenzi bokuqondanisa, abafundi bezilimi, amaqembu emibhalo engezansi namaqembu adinga ukuqondanisa okuqukethwe kwevidiyo ngokushesha.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Leli thuluzi lidinga iJavaScript. Sicela unike amandla iJavaScript kusiphequluli sakho, bese ulayisha ifayela lemibhalo engezansi (SRT / VTT / ASS) ukuze uhumushe imibhalo engezansi nge-AI mahhala.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Umenzi Wemibhalo Enezansi - Hlanganisa Ulimi Olubili, ASS & VTT",
+  "desc": "Ithuluzi lamahhala lemibhalo engezansi onesitayela: hlanganisa amafayela amabili abe ulimi olubili, phinda ufake isitayela sethrekhi yezilimi ezimbili, noma engeza imiphumela. Izilungiselelo zangaphambili ezingu-5 ze-ASS / ezingu-6 ze-VTT; khipha njenge-SRT / VTT / ASS.",
+  "kw": "hlanganisa imibhalo engezansi,imibhalo engezansi yezilimi ezimbili,hlanganisa amafayela emibhalo engezansi,imibhalo engezansi onesitayela,isitayela semibhalo engezansi se-ASS,isitayela semibhalo engezansi se-VTT,imiphumela yemibhalo engezansi,umenzi wemibhalo engezansi emibili,izilungiselelo zangaphambili ze-ASS,isibonelo semibhalo engezansi,ithuluzi lemibhalo engezansi lamahhala",
+  "intro": "Hlanganisa amafayela amabili emibhalo engezansi abe ulimi olubili, noma ufake isitayela sethrekhi: ifonti, umbala, umugqa ongaphandle nendawo, konke ku-WYSIWYG.",
+  "feat": "Ukuhlanganiswa kwezilimi ezimbili nokulungiswa, izilungiselelo zesitayela zangaphambili ze-ASS / VTT, izikhala zesitayela ngenani ngalinye, ukulungiswa komugqa wesikhathi endaweni nangobuningi, nokubuka kuqala bukhoma okuyifayela elikhishiwe ngokoqobo.",
+  "who": "Abadali abenza imibhalo engezansi yezilimi ezimbili noma enesitayela, amaqembu abethela, namaqembu adinga amagama acashunwe afinyeleleka kalula."
+ },
+ "clean": {
+  "title": "Isihlanzi Semibhalo Enezansi - Susa Amathegi, Izimpawu & SDH",
+  "desc": "Umhlanzisi wemibhalo engezansi ku-inthanethi wamahhala: susa izimpawu zamanzi, izikhangiso, i-SDH, amathegi e-HTML, imiphumela ye-ASS; lungisa izinhlamvu ezinkulu, i-mojibake. Imithetho engu-13 eshintshekayo, hlehlisa ngoguquko ngalunye, umugqa wesikhathi awuthintwanga.",
+  "kw": "umhlanzisi wemibhalo engezansi,hlanzisa ifayela le-srt,susa uphawu lwamanzi lwemibhalo engezansi,susa imibhalo engezansi ye-SDH,susa amathegi e-HTML emibhalweni engezansi,lungisa imibhalo engezansi yezinhlamvu ezinkulu zonke,lungisa i-mojibake,susa imibhalo engezansi enezinkinga zokuzwa,khipha imiphumela ye-ASS",
+  "intro": "Sebenzisa imibhalo engezansi elandiwe lapha kuqala: izimpawu zamanzi, izikhangiso, izimpawu ze-SDH namathegi e-HTML, sekuphumile ngemizamo eyodwa.",
+  "feat": "Imithetho engu-13 emaqenjini amane (engu-9 ivuliwe ngokuzenzakalelayo), ukususwa kophawu lwamanzi kanye ne-SDH, ukulungiswa kwezinhlamvu ezinkulu zonke ne-mojibake, uhlu lwezinguquko ngokuqondene nesigaba ngasinye sokwaziswa kanye nokubuyiselwa komuntu ngamunye, futhi isikhathi asithintwanga nhlobo.",
+  "who": "Noma ubani othathe umbhalo engezansi okhona futhi owufuna usebenziseke nje, namaqembu ahlanza impahla ngezitaki."
+ },
+ "glossary": {
+  "title": "Ukushintsha Amagama Esihlokwana - Glossary Eyodwa, Ifayela Lonke | AI-SRTSub",
+  "desc": "Ukushintshwa kwesichazamazwi semibhalo engezansi: bhala \"okudala → okusha\" kanye bese ifayela lonke le-SRT / VTT / ASS / TXT liyabuyekezwa. Isikhathi, izitayela namabhulokhi e-NOTE ahlala; hlehlisa ngomugqa ngamunye.",
+  "kw": "isichazamazwi semibhalo engezansi,shintsha i-srt ngobuningi,thola futhi ushintshe umbhalo engezansi,ukushintshwa kwamagama emibhalo engezansi,ukuhlelwa kwe-srt ngobuningi,shintsha amagama emibhalweni engezansi,hlanganisa amagama emibhalo engezansi,itemu yemibhalo engezansi,shintsha umbhalo ku-vtt,ithuluzi lesichazamazwi se-srt,ukushintshwa kwamagama ngobuningi",
+  "intro": "Isichazamazwi semithetho \"kwegama elidala → igama elisha\" esetshenziswe efayeleni lonke lemibhalo engezansi ngesikhathi esisodwa, nesikhathi, izitayela ze-ASS namabhulokhi amanothi e-VTT ashiywe efana ncamashi nge-byte.",
+  "feat": "Umthetho owodwa ngomugqa ngamunye, ohlukaniswe ngo- -> , => , → noma ithebhu; imigqa eqala ngo-# ingamazwana. Ukufana kwamagama agcwele kugcina \"ubuciko\" kungekho \"kokuqala\", ukuzwela kwezinhlamvu ezinkulu kuyazikhethela, futhi unganciphisa ukushintshwa kumugqa 1 noma umugqa 2 wemibhalo engezansi yezilimi ezimbili. Zonke izigaba ezishintshiwe ziyabhaliwe, futhi noma iyiphi eyodwa ingabuyiselwa emuva.",
+  "who": "Noma ubani ohlanganisa amagama namagama kuyo yonke inkathi, alungise ukwakheka kokuhumusha komshini ngobuningi, noma avumelane nemibhalo engezansi yomunye umuntu esitayeleni sakhe sendlu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "I-QC Yesihlokwana - Hlola Isikhathi Nokwakheka Ngolimi ngalunye | AI-SRTSub",
+  "desc": "I-QC yemibhalo engezansi ku-inthanethi yamahhala: layisha i-SRT, VTT noma i-ASS bese uhlola ukugqagqana, ubude besikhathi, isivinini sokufunda, ububanzi bomugqa, ukwehliswa kwemigqa, izinombolo kanye nokufakwa ikhodi ngokuhambisana mithetho yalolu limi. Izilimi ezingu-27, amasethi angu-27 emikhawulo, kanye nemithetho eqondene nolimi.",
+  "kw": "umhloli wemibhalo engezansi,i-qc yemibhalo engezansi,isivumelisi se-srt,ukuhlolwa kwekhwalithi yemibhalo engezansi,ukuhlolwa kwe-srt,ukuhlolwa kwesikhathi semibhalo engezansi,isivumelisi semibhalo engezansi,hlola ifayela le-srt,ukufunda ubufakazi bemibhalo engezansi,i-linter yemibhalo engezansi",
+  "intro": "Layisha ifayela lemibhalo engezansi bese ulihlola ngokuhambisana nemithetho yolimi lalo — konke okutholakele kuza nenani elilinganiswe kanye nomkhawulo. Isebenza ngokuphelele kusiphequluli sakho, akukho okulayishwacho.",
+  "feat": "Ihlola izigaba ezigqagqanayo, ezimfushane kakhulu noma ezinde kakhulu esikrinini, isivinini sokufunda, ububanzi bomugqa, ukubala kwemigqa, ukwehliswa kwemigqa okungcolile, izinombolo, izigaba ezingenalutho, i-mojibake nezinhlamvu zokulawula. Ububanzi nesivinini sokufunda kulandela uhlelo lokubhala: isiShayina silinganiswa ngezinhlamvu ezigcwele ububanzi, izimpawu zokuhlanganisa zesiThailand nesi-Arabhu zibala njengobubanzi obunguziro. Imithetho eqondene nolimi ihlanganisa uphawu lokuvula lwesiPanishi u-¿, isikhala esingaphuli sesiFulentshi ngaphambi kuka-? ! ; :, uphawu lombuzo wesiGreki, izimpawu zokuthintana ezigcwele ububanzi ngesiShayina nesiJapane, kanye nophawu lombuzo wesi-Arabhu no-comma. Izinto ezilungiseka ngokuzenzakalelayo zibhalwe ngokwehlukile, futhi noma yini ehambisa amakhodi wesikhathi ayihlolwanga ngokuzenzakalelayo.",
+  "who": "Amaqembu emibhalo engezansi, abathengisi bezindawo, abahleli kanye nanoma ubani ofuna ukuhlola ifayela ngaphambi kokulethwa.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Umhumushi Wemibhalo Enezansi — I-SRT/VTT/ASS IbenguLimi Lwakho",
+  "desc": "Faka ifayela le-SRT / VTT / ASS, khetha ulimi oluyi-target, bese uthola ukuhumusha okukhiqiwe ngomugqa wesikhathi. Izilimi ezingu-100, kumahhala, akukho ukubhalisa."
+ },
+ "convert": {
+  "title": "Umguquli Wemibhalo Enezansi - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Umguquli wemibhalo engezansi ku-inthanethi wamahhala: guquula phakathi kwe-SRT, VTT, ASS, SBV, LRC kanye ne-TXT nomugqa wesikhathi ugcinwe ungaphazamisekile, amathegi emiphumela ye-ASS ahlanzwe ngokuzenzakalelayo.",
+  "kw": "umguquli wemibhalo engezansi,srt ukuya ku-vtt,vtt ukuya ku-srt,ass ukuya ku-srt,sbv ukuya ku-srt,srt ukuya ku-lrc,umbhalo engezansi ukuya ku-txt,guquula imibhalo engezansi,umguquli we-srt,umguquli we-vtt",
+  "intro": "Guquula phakathi kwe-SRT, VTT, ASS, SBV, LRC kanye ne-TXT nomugqa wesikhathi ugcinwe ungaphazamisekile.",
+  "feat": "Ifomethi yokufaka itholwa ngokuzenzakalelayo futhi izitembu zesikhathi zibhalwa kabusha zibe yifomethi ye-target; amathegi emiphumela ye-ASS nokwehliswa kwemigqa okuphoqelelwe kuba umbhalo ofundekayo lapho ukhiphela kwifomethi elula; amafayela ezingoma awenasizinda sehora, ngakho noma yini edlula ihora elilodwa ibalwa ngemizuzu.",
+  "who": "Noma ubani omdlali wakhe enqaba ifayela lemibhalo engezansi, nanoma ubani ohambisa impahla phakathi komhleli kanye nomdlali wewebhu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Isihlukanisi Semibhalo Enezili Ezimbili - Gcina Ulimi Olulodwa | AI-SRTSub",
+  "desc": "Isihlukanisi semibhalo engezansi yezilimi ezimbili ku-inthanethi wamahhala: hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa nje.",
+  "kw": "isihlukanisi semibhalo engezansi yezilimi ezimbili,hlukanisa i-srt yezilimi ezimbili,susa umbhalo engezansi wesibili,gcina umbhalo engezansi wesiNgisi kuphela,khipha umbhalo engezansi ohunyshiwe,ukuhlukana kwe-srt yezilimi ezimbili,ukuhlukana kwe-ass yezilimi ezimbili",
+  "intro": "Hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa yazo.",
+  "feat": "Iphatha zombili izakhiwo ezivamile - isigaba esisodwa esiphethe imigqa emibili, nezigaba ezimbili ezihlanganyela umugqa wesikhathi ofanayo. Amathrekhi ahlukaniswa ngokulandelana kanye nohlobo lombhalo, umugqa wesikhathi ugcinwe njengoba unjalo, futhi ifayela lelimi elilodwa liyaboniswa esikhundleni sokuthuliswa buthule.",
+  "who": "Noma ubani onikezwe ifayela lezilimi ezimbili elenziwe ngaphambilini odinga ulimi olulodwa nje, namaqembu emibhalo engezansi alondoloza okokuqala kanye nokuhunyushwa ngokwehlukana.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Ukushintsha Isikhathi Semibhalo Enezansi - Hambisa & Linganisa | AI-SRTSub",
+  "desc": "Ithuluzi lesikhathi semibhalo engezansi ku-inthanethi wamahhala: hambisa konke ngesikhathi esisodwa, linganisela kabusha ngesilinganiso, noma ulungise ukukhanya ngamaphuzu amabili. Lisebenza nge-SRT, VTT, ASS, SBV, LRC kanye ne-TXT.",
+  "kw": "ukushintshwa kwesikhathi semibhalo engezansi,hambisa isikhathi se-srt,ukuchibiyela ukuvumelanisa kwemibhalo engezansi,linganisela kabusha isikhathi semibhalo engezansi,lungisa ukubambezeleka kwemibhalo engezansi,isikhala sesikhathi se-srt,ukucaca kokukhanya kwemibhalo engezansi,hlanganisa imibhalo engezansi,hlukanisa imibhalo engezansi,hlanganisa i-srt,hlukanisa umbhalo engezansi omude",
+  "intro": "Lapho imibhalo engezansi ingasebenzi ngokuvumelanisa, hambisa wonke umugqa wesikhathi, ulinganisele kabusha ngesilinganiso, noma ulungise ngamaphuzu amabili ayisisekelo. Kuhlanganisa nemigqa ehlukanisiwe, futhi kuhlukanise leyo ehamba isikhathi eside kakhulu.",
+  "feat": "Ukushintsha kuhambisa zonke izigaba ngaphandle kokuqondisa ukuthi ngayinye ihlala isikhathi esingakanani esikrinini. Ukulinganisela kabusha kuphindaphinda zombili iziphetho, ngakho ubude besigaba sishintsha nakho - kulula phakathi kwe-24 ne-25 fps. Ukulungiswa kwamaphuzu amabili kuphatha amafayela anesikhala futhi asebenza ngesivinini esingalungile. Izikhathi eziphuma zibe ezingezinhle ziboshwa ku-zero, futhi ithuluzi likutshela ukuthi zingaki ezithintekile. Ifayela elifanayo lingena, elifanayo liyaphuma - akukho ukuguqulwa, futhi izitayela ze-ASS, isitayela sesigaba ngasinye kanye namathegi emiphumela kugcinwa njengoba bekunjalo. Izigaba zezilimi ezimbili zihlala emigqeni emibili uma zihlanganisiwe futhi zeqiwa lapho zihlukaniswa.",
+  "who": "Noma ubani imibhalo yakhe engezansi ekhanya ngemva kokuvela kwesishintsho somthombo, esebenza ngokushesha noma kancane, noma evela kumuntu osebenza ngezinga elihlukile lamafreyimu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Lungisa Imibhalo Enezansi Ehlanganisiwe - Lungisa Ikhodi | AI-SRTSub",
+  "desc": "Ukulungisa ku-inthanethi wamahhala kwemibhalo engezansi ehlanganisiwe: kuthola ukuthi ifayela lingabe liyi-UTF-8, GBK, Big5, Shift_JIS noma i-EUC-KR, kubuyisela umbhalo ofundwe kabi, kuwulondoloza kabusha ukuze kusetshenziswe umdlali wakho.",
+  "kw": "lungisa imibhalo engezansi ehlanganisiwe,mojibake yemibhalo engezansi,ukuchibiyela ukufakwa ikhodi kwe-srt,lungisa ukufakwa ikhodi kwemibhalo engezansi,utf8 ukuya ku-gbk wesibili,i-srt ibonisa izinhlamvu ezingajwayelekile,ukufakwa ikhodi okungalungile kwemibhalo engezansi,i-ass ehlanganisiwe,i-vtt ehlanganisiwe,thola ukufakwa ikhodi kwemibhalo engezansi",
+  "intro": "Imibhalo engezansi evuleka njengodonga lwezinto ezingenamqondo cishe ihlezi ifundwa ngokufakwa ikhodi okungalungile. Faka ifayela phakathi, bese kutholakala ukuthi ifayela lalibhalwe ngaluphi uflani lokufakwa ikhodi futhi kubuyiselwa izinhlamvu ezifundwe kabi.",
+  "feat": "Amafayela alayishiwe aphinde aqothulwe kusuka kuma-byte wokuqala, ngakho akukho lutho olulahlekile: uma ifayela liphenduka libe i-GBK, liyasho, futhi uma umdlali wakho nguye owufunda kabi, ukulondologa ikhophi njenge-\"UTF-8 with BOM\" kuvame ukukuxazulula. Umbhalo onamathiselwe awuseyona ama-byte wokuqala, ngakho kuncane kakhulu okungabuyiselwa; uma usuvele unezinhlamvu ezikhonza esikhundleni, lokho akubuyiseki futhi ithuluzi liyakusho ngokucacile esikhundleni sokuzenza sengathi akunjalo. Izinombolo zemigqa namakhodi wesikhathi awasoke athintwe, futhi amathegi esitayela se-ASS ashiyilwe njengoba ayebunjwa.",
+  "who": "Noma ubani olande imibhalo engezansi evuleka njengendawo engasho lutho, obona amabhokisi esikhundleni sesiShayina kumdlali, noma owanikezwe ifayela elokufakwa ikhodi okungaziwayo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Khipha Umbhalo Ezihlokwaneni - I-SRT/ASS/VTT ku-Plain Text | AI-SRTSub",
+  "desc": "Umkhiphi wemibhalo engezansi-kuya-ku-mbhalo ku-inthanethi wamahhala: ufunda i-SRT, VTT, ASS, SBV, LRC kanye ne-TXT, ususa amakhodi wesikhathi nezinombolo zemigqa, futhi akhipha ingxoxo ehlanzekile njengezigaba noma umugqa owodwa ngesigaba ngasinye.",
+  "kw": "khipha umbhalo emibhalweni engezansi,umbhalo engezansi kuya kumbhalo,srt kuya ku-txt,srt kuya kumbhalo ojwayelekile,ass kuya ku-txt,vtt kuya ku-txt,umbhalo wemibhalo engezansi,khipha ingxoxo ku-srt,i-srt susa amakhodi wesikhathi,umkhiphi wombhalo wemibhalo engezansi",
+  "intro": "Khipha ingxoxo emibhalweni engezansi ye-SRT / VTT / ASS / SBV / LRC / TXT nj Umbhalo ojwayelekile ohlanzekile: amakhodi wesikhathi, izinombolo zesigaba namathegi esitayela asuswa ngokuzenzakalelayo.",
+  "feat": "Izakhiwo ezimbili: izigaba eziqhubekayo ezehlukene kumamefu kanye nezimpawu zokuphela komusho, noma umugqa owodwa ngesigaba ngasinye samalogo wezingxoxo. Izimpawu zemisindo ezifana na-(\"(phone ringing)\"), izimpawu zamanzi zomthombo kanye nemigqa ephindaphindwayo emuva-nakude zísuswa ngokuzenzakalelayo; amagama ezikhulumi afana no-\"TOM:\" kanye nemigqa yezingoma angagcinwa noma asuswe. Ukugoqwa kwemigqa kuhlangatshaniswa futhi ngombhalo ngamunye — isiShayina sihlangana ngqo, isiKoria nesiLatin zingeza izikhala — ngakho akukho okunamathiselwa ndawonye.",
+  "who": "Noma ubani ofuna umbhalo wemibhalo engezansi wamanothi, imibhalo, ukuzivocavoca ukuhumusha noma ukondla elinye ithuluzi, ngaphandle kokususa amakhodi wesikhathi angamakhulu ngesandla.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Khipha Imibhalo Enezansi Ekhishiwe Ku-MKV / MP4 kuya ku-SRT | AI-SRTSub",
+  "desc": "Khipha imibhalo engezansi eshumekiwe kusuka ku-MKV, WebM, MP4, MOV; khipha njenge-SRT / VTT / ASS / TXT. Akukho ukulayisha noma ukuqopha kabusha — amafayela afundwa kusiphequluli sakho; ama-GB amaningi kulungile.",
+  "kw": "khipha imibhalo engezansi ekhishiwe,mkv kuya ku-srt,ukukhishwa kwemibhalo engezansi ye-mp4,khipha imibhalo engezansi kuvidiyo,umkhiphi wemibhalo engezansi eshumekiwe,srt kusuka ku-mkv,ukukhishwa kwemibhalo engezansi ye-mov,ukuthunyelwa kwethrekhi yemibhalo engezansi,vtt kusuka ku-mkv,khipha imibhalo engezansi ethambile,i-mkv subtitle rip",
+  "intro": "Khipha ithrekhi yemibhalo engezansi evaliwe ngaphakathi kwe-MKV noma i-MP4 iqonde ngqo ku-SRT — akukho ukulayisha, konke kwenzeka kusiphequluli sakho.",
+  "feat": "Ifunda umbhalo ojulile, i-ASS, i-WebVTT kanye namathrekhi we-mov_text / tx3g, igcina ikhanda le-ASS langempela nokulungiswa, futhi ifunda izingcezu ezincane ngo-offset ukuze ifayela elikhulu lingaze ligcwalise inkumbulo.",
+  "who": "Noma ubani onethebula elinesiphakamiso semibhalo engezansi ethambile ofuna umbhalo uphume, amaqembu amabhayisikobho, namaqembu efansub aqala kuthrekhi yasekuqaleni.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Isiguquli Sesihlokwana sesiShayina - Okwenziwe Lula ⇄ Okwesiko | AI-SRTSub",
+  "desc": "Umguquli wemibhalo engezansi wesiShayina wamahhala: Okwenziwe Lula ⇄ Okwendabuko (Taiwan / Hong Kong) nakubuyela emuva. Izingxoxo kuphela ezishintshayo — amakhodi wesikhathi namathegi e-ASS ayaqhubeka. Yakhelwe ku-OpenCC.",
+  "kw": "umguquli wemibhalo engezansi wesiShayina,okwenziwe lula kuya okwendabuko,okwendabuko kuya okwenziwe lula,i-srt yesiShayina sendabuko,guquula umbhalo engezansi wesiShayina,isiShayina sendabuko saseTaiwan,isiShayina sendabuko saseHong Kong,ukuguqulwa kwe-han,guquula i-srt iye kwesiShayina sendabuko,i-srt yesiShayina eyenziwe lula,i-opencc subtitle",
+  "intro": "Guquula ifayela lonke lemibhalo engezansi phakathi kwe-Simplified ne-Traditional, ungashintshi lutho ngaphandle kwengxoxo.",
+  "feat": "Izikhombisi-ndlela eziyisishiyagalolunye: Traditional jikelele, ulwazi lwaseTaiwan, amafomu aseTaiwan, i-Hong Kong, ukubuya ku-Simplified, kanye namafomu esifunda se-Traditional-to-Traditional. Isebenzisa isichazamazwi se-OpenCC esixazulula imishwana ngendlela yokufana kuqala okude kakhulu.",
+  "who": "Noma ubani oletha imibhalo engezansi kubalaleli baseTaiwan noma baseHong Kong, abasabalalisi abalungiselela izinguqulo zesifunda, nabahleli abamukele ifayela LesiShayina Sendabuko abafuna i-Simplified.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Isihlukanisi Nezihlanganisi Zemibhalo Enezansi - SRT / VTT | AI-SRTSub",
+  "desc": "Hlukanisa imibhalo engezansi ngobude besikhathi noma ukubala, noma uhlanganise amafayela amaningi ngokulandelana noma ngesikhathi. Ukubuyiselwa kwezininombolo kuyazenzakalelayo, ingxoxo ayithintwanga. I-SRT & VTT.",
+  "kw": "isihlukanisi semibhalo engezansi,hlukanisa imibhalo engezansi,hlanganisa amafayela e-srt,isihlanganisi se-srt,hlanganisa imibhalo engezansi,hlukanisa i-srt,hlanganisa amafayela e-srt,sika imibhalo engezansi,hlukanisa i-vtt,isihlanganisi semibhalo engezansi",
+  "intro": "Sika umbhalo engezansi owodwa omude ube izingxenye, noma uhlanganise amafayela amaningi abe munye. Isebenza ngokuphelele kusiphequluli sakho — akukho okulayishwacho.",
+  "feat": "Hlukanisa ngobude besikhathi noma ukubala ngokubuyiselwa kwezininombolo kwesigaba ngasinye kanye nesikhathi sokubala esingenalutho esikhethekayo; hlanganisa ngokulandelana nesikhala noma xuba ngezitembu zesikhathi zangempela. I-SRT ne-VTT.",
+  "who": "Abadali abahlukanisa iziqephu zokulayisha, amaqembu abuyekeza izingxenye, nabahleli abahlanganisa imibhalo engezansi eyingxenye eminingi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Imibhalo Enezansi kuya ku-Excel/CSV kanye Emuva | AI-SRTSub",
+  "desc": "Guqula i-SRT noma i-VTT ibe ishidi le-Excel noma le-CSV ukuze ubuyekeze futhi uhumushe, bese uyibuyisela emuva. Amakhodi wesikhathi ahlala eqinisile, ukwehliswa kwemigqa kuyasinda. Akukho okulayishwacho.",
+  "kw": "umbhalo engezansi kuya ku-excel,srt kuya ku-csv,srt kuya ku-excel,excel kuya ku-srt,csv kuya ku-srt,ishidi lemibhalo engezansi,umguquli wemibhalo engezansi wethebula",
+  "intro": "Khipha imibhalo engezansi iye eshidini lezibalo ukuze ubuyekeze futhi uhumushe, bese ungenisa ishidi libuyele emuva. Isebenza ngokuphelele kusiphequluli sakho.",
+  "feat": "Ukuchofoza okukodwa kusuka ku-SRT noma i-VTT ukuya ku-xlsx noma ku-CSV; hlela izikhathi, umbhalo kanye namanothi eshidini lakho lezibalo, bese uthumela emuva ku-SRT noma i-VTT. Amakholomu esikhathi agcina ukunemba okugcwele kwamamilisekondi; ukwehliswa kwemigqa ngaphakathi kweseli kuyagcinwa. Izihloko zesiShayina nesiNgisi ziyasebenza zombili.",
+  "who": "Abahumushi, amaqembu amabhayisikobho nabahleli ababuyekeza, ababhala amanothi noma abalungisa imibhalo engezansi ngobuningi eshidini lezibalo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Guquula Imibhalo Enezansi Ngobuningi iye ku-SRT/VTT | AI-SRTSub",
+  "desc": "Faka amashumi noma amakhulu amafayela e-SRT/VTT, guquula wonke abe yifomethi eyodwa bese ulanda i-ZIP eyodwa. Ukubuyiselwa kwezininombolo nezitembu zesikhathi zenzelwe indlela ejwayelekile; amafayela angathembekiyo ayamenyezelwa.",
+  "kw": "guquula imibhalo engezansi ngobuningi,srt kuya ku-vtt,umguquli wemibhalo engezansi ngobuningi,srt ngobuningi,guquula imibhalo engezansi eminingi,i-zip yemibhalo engezansi",
+  "intro": "Hudula amakhulu amafayela emibhalo engezansi, guquula wonke, thatha i-ZIP eyodwa. Isebenza ngokuphelele kusiphequluli sakho — akukho okulayishwacho.",
+  "feat": "I-SRT ukuya ku-VTT nasekuqaleni ngobuningi; izinombolo zokulandelana zihlelwe kabusha nezitembu zesikhathi zenziwe zajwayelekile ngokomgomo wefomethi. Amafayela angenakuhlaziywa ayamenyezelwa futhi ashiywe ngaphandle kwe-ZIP. Amagama amafayela wokuqalo agcinwe anesandiso esisha; ukushayisana kuthola isijobelelo.",
+  "who": "Abahleli nabasebenzisi bemibhalo engezansi abaguquula amafolda ochungechunge lonke, nabanikazi bamasayithi abanikeza abadlali ifomethi eyodwa.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Umhleli Wezingoma ze-LRC - Thepha Isikhathi Ngenkathi Ulalele | AI-SRTSub",
+  "desc": "Layisha ingoma, namathisela izingoma, bese uthepha isikhathi somugqa ngamunye ngenkathi ulalele; khipha i-LRC noma i-SRT. Engenisa i-LRC ekhona ukuze ulungise kahle. Kuqhutshwa ikhibhodi, ngokuphelele kusiphequluli.",
+  "kw": "umhleli we-lrc ku-inthanethi,yenza i-lrc,isikhathi sengoma,umenzi we-lrc,dala i-lrc,umvumelanisi wezingoma,lrc kuya ku-srt",
+  "intro": "Layisha umculo, namathisela izingoma, thepha isikhathi umugqa ngamunye njengoba ulalele, bese ukhipha i-LRC noma i-SRT. Akukho okulayishwacho.",
+  "feat": "Isebenza nge-MP3, M4A, FLAC, WAV kanye ne-OGG. Umugqa owodwa ngomugqa ngamunye; amafayela e-LRC akhona angeniswa futhi alungiswe. Isikhala siyadlala/siyameka, u-Enter unyathelisa umugqa wamanje, u-Z uyahlehlisa — izandla zihlala kukhibhodi.",
+  "who": "Abaculi abavumelanisa amakhava, abadali abangeza izingoma kumavidiyo, nanoma ubani owakha imibhalo engezansi yezingoma zomdlali.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "Umhleli Wemiqulu ye-YouTube | Hlanganisa Imisho Ehlukanisiwe | AI-SRTSub",
+  "desc": "Ama-YouTube auto-captions aphula imisho ngemizuzwana ewu 3-4. Leli thuluzi alishintshi amagama, lithutha imingcele ibuyele lapho imisho iphela khona. Kumahhala, izilimi eziyi-100.",
+  "kw": "ukulungiswa kwemibhalo ye-youtube,imibhalo ezenzakalelayo ye-youtube,ukuhlelwa kabusha kwemibhalo,ukuhlelwa kwemisho yemibhalo,ukulungisa imibhalo ephukile,ukuhlelwa kwemisho ye-srt,ukuhlukaniswa kabusha kwemibhalo,ukukhanda imibhalo ye-youtube,imibhalo eqaphela imisho",
+  "intro": "Faka ifayela lemibhalo ye-YouTube eyenziwe ngokuzenzakalelayo, khetha ulimi, futhi ithuluzi lizohlanganisa imisho ndawonye kulo lonke uhlaka, bese liyisika kabusha ifayela umusho ngomusho. Alikho igama elishintshiwe, futhi izikhathi zezingxenye zihlala ziseduze nezikhathi zangempela ngangokunokwenzeka.",
+  "feat": "Imibhalo ye-YouTube ezenzakalelayo isikwa ibe yizingxenye eziyimizuzwana engu-3-4 kungakhathaliseki ukuthi imisho iphela kuphi, ngakho ingxenye eyodwa ivame ukuthwala isiphetho somusho owedlule kanye nesiqalo somusho olandelayo. Ithuluzi lisebenzisa izikhathi zangempela njengezisekelo - lezo zikhathi yimikhawulo yamagama yangempela eyenziwe ngumshini wokuqaphela inkulumo - linquma lapho umusho ngamunye uphela khona ngokusebenzisa izimpawu zokuloba, futhi lisebenzisa uhlelo olunamandla ukukhetha indawo engcono kakhulu yokuphumula phakathi kokuphela komusho, ukhefana, isihlanganisi nokusika okukhulu, bese linweba isikhathi sokubuka ukuze sihambisane nesivinini sokufunda. Ulimi ngalunye lwezingu-100 lunemithetho yalo yemisho: isiShayina nesiJapane azinazikhala phakathi kwamagama, isiThai asibonisi kahle imikhawulo yamagama, isiHindi siphetha imisho ngo-।, isi-Arabhu ngo-؟, isi-Armenia ngo-։. Ububanzi bomugqa nesivinini sokufunda kulandela uhlelo lokubhala - izinhlamvu ezingu-16 ezigcwele umugqa ngamunye wesiShayina, nezingu-42 zezinhlamvu zesiLatin. Ngaphambi kokuthumela, umbhalo uqhathaniswa uhlamvu ngalunye, futhi noma yiliphi igama elilahlekile noma elingeziwe liyabikwa khona manjalo.",
+  "who": "Amaqembu emibhalo engezansi aguqula imibhalo ye-YouTube, ama-podcast nezifundo ibe yimibhalo eqediwe, nabadali abahlela amavidiyo abo abakhathele imisho emisa phakathi nendawo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Umsindo ube ama-subtitle — guqula inkulumo ibe yi-SRT | AI-SRTSub",
+  "desc": "Faka umsindo noma ividiyo, uthole ama-subtitle. Ukubona inkulumo kwenzeka esipheqululini sakho, kuhlanganise ama-SRT / VTT mahhala.",
+  "kw": "umsindo ube srt,inkulumo ibe ama-subtitle,khiqiza ama-subtitle,isikhiqizi sama-subtitle,bhala umsindo ube srt,whisper subtitles,ukubona inkulumo esipheqululini,ukukhiqiza ama-subtitle ungaxhumekile",
+  "intro": "Faka ifayela lomsindo noma ividiyo, khetha ulimi nemodeli, bese ukubona inkulumo kwenzeka esipheqululini sakho. Lokhu kukhipha ama-subtitle anesikhathi esifanele.",
+  "feat": "Leli thuluzi lisebenzisa i-ASR ukuguqula inkulumo ibe ama-subtitle, lisike imisho ngokwezimpawu zokuloba futhi lilungise ububanzi bomugqa ngokuzenzakalelayo.",
+  "who": "Abadali bokuqukethwe, amaqembu enza ama-podcast, nanoma ubani odinga ama-subtitle wamavidiyo angawona."
+ },
+ "ocrsub": {
+  "title": "I-OCR yama-subtitle — funda ama-subtitle akwi-video | AI-SRTSub",
+  "desc": "Ama-subtitle ashunqiselwe esithombeni awanawo umkhondo ongakhishwa. Leli thuluzi liwafunda uhlaka ngohlaka bese likhipha ama-SRT / VTT mahhala.",
+  "kw": "khipha ama-subtitle,subtitle ocr,ukukhipha ama-subtitle kuvidiyo,ama-subtitle ashunqiselwe,ocr subtitles,ividiyo ibe srt,subtitle kuvidiyo,hardcoded caption ocr",
+  "intro": "Faka ividiyo, maka indawo lapho ama-subtitle ekhona, bese ithuluzi liwafunda uhlaka ngohlaka ukuze likhiphe ama-subtitle anesikhathi.",
+  "feat": "Leli thuluzi lisebenzisa i-OCR ukufunda ama-subtitle ashunqiselwe esithombeni, lihlanganise amahlaka afanayo abe yisikhathi esisodwa esifanele.",
+  "who": "Amaqembu ahumusha amavidiyo, nanoma ubani odinga ama-subtitle wamavidiyo angenayo ifayela lokuqala."
+ },
+ "multilang": {
+  "title": "Izilimi eziningi ngesikhathi esisodwa | AI-SRTSub",
+  "desc": "Faka isizini yonke, khetha izilimi ozidingayo, bese ucindezela ukuqala kanye. Iziqephu ziba umugqa owodwa futhi ziphume njengezefa elilodwa. Kuqhubeka lapho kumise khona.",
+  "kw": "ukuhumusha ama-subtitle ngobuningi,uhumusha ama-subtitle ngezilimi eziningi,ama-subtitle esizini yonke,ukhipha ama-subtitle ngobuningi,humusha srt ngezilimi eziningi,izilimi eziningi zesizini",
+  "intro": "Faka isizini yonke kanye, khetha izilimi ozifunayo, bese ucindezela ukuqala. Iziqephu kanye nezilimi ziba umugqa owodwa: ulimi ngalunye luqeda ngaphambi kokuba luqale olulandelayo, futhi konke kupakishwa kufayela elilodwa le-zip.",
+  "feat": "Okungalungile ekuhumusheni ngobuningi wukuphazamiseka kwezicelo eziningi ngesikhathi esisodwa. Yingakho leli khasi lisebenza ngomugqa owodwa: ulimi lunye luze luqedwe ngaphambi kolunye. Inqubekelaphambili igcinwa ngokwesqephu nangolimi kumshini wakho, ngakho-ke uma kuphazamiseka esiqeshini sesithathu, uvula ikhasi futhi, ulayishe amafayela afanayo, bese kuqhubeka lapho kugcine khona ngaphandle kokuphinda uthumele okwenzivele kwenziwe. Isichazamazwi silapha njengephaneli eyodwa — ulayisha kanye, kwabelwana ngakho yisizini yonke — futhi sikutshela ukuthi mangaki amagama afanele ngaphambi kokuba uqale. Vala ithebhu futhi umsebenzi umi ngokushesha esikhundleni sokusebenzisa isilinganiso sakho sangemuva.",
+  "who": "Amathimba ama-subtitle ahumusha isizini ephelele ibe izilimi eziningi, iziteshi ezisabalalisa iziqqephu ezifanayo ezimakethe ezihlukene, kanye nabahumusi ababodwa abancamela ukucindezela ukuqala kanye bese babuya kamuva.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Isikhathi Somlingiswa Ngamunye | AI-SRTSub",
+  "desc": "Umenzi wama-subtitle e-karaoke wamahhala: layisha ingoma, namathisela amagama, cindezela umugqa ngamunye, bese uhlukanisa ube ngabalingiswa ngokuzenzakalelayo noma ngokucindezela ngomculo. Khipha i-ASS enamathegi e-\\\\kf.",
+  "kw": "umenzi wama-subtitle e-karaoke,ass karaoke,amazwi ezingoma ngezinga lamagama,amathegi e kf,karaoke lrc,ukushintsha kwezingoma,umenzi we-ass karaoke,ai srtsub",
+  "intro": "Layisha ingoma, namathisela amagama, cindezela umugqa ngamunye, bese usabalalisa umugqa ngamunye kubalingiswa bawo - ngokuzenzakalelayo ngobubanzi, ngokulandela umculo, noma ngokuhudula imingcele. Bukela amagama ekhanya njengoba ahlatshwa.",
+  "feat": "isiShqina saseShayina sihlukana ngohlamvu ngalunye, isiNgisi ngegazi ngalinye, uphawu lokuqondisa luhamba nalo. Isikhala samaphutha esilungisekayo sigcina uhlamvu lokugcina lungadluli kwezwi. Khipha i-ASS ye-CapCut / Premiere / Aegisub enamathegi ka-\\kf, i-LRC ethuthukisiwe yabadlali basezingeni lamagama, noma i-SRT yomugqa wonke njengento yokusekela. Konke kusebenza kusiphequluli sakho - akukho ukulayishwa.",
+  "who": "Abadali abanezela amagama ezingoma kumavidiyo okucula nakumavidiyo wamakhonsathi, abenzi bama-MV omculo, nanoma ubani odala ama-subtitle e-karaoke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

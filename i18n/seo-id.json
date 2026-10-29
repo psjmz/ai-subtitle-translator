@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio ke Subtitle — ubah ucapan ke SRT di browser | AI-SRTSub",
-    "desc": "Ubah audio atau video menjadi subtitle. Pengenalan ucapan berjalan di browser, memotong teks menjadi cue, dan ekspor ke SRT / VTT. Gratis dan privat.",
-    "kw": "audio ke srt,ucapan ke subtitle,buat subtitle dari audio,generator subtitle otomatis,transkrip audio ke srt,subtitle whisper,pengenalan ucapan browser,generasi subtitle offline",
-    "intro": "Masukkan file audio atau video, pilih bahasa dan model, lalu proses pengenalan berjalan langsung di browser Anda. Hasilnya adalah draf subtitle dengan pengaturan waktu yang sudah dipotong sesuai kalimat.",
-    "feat": "Alat ini memproses aliran kata menjadi cue subtitle yang rapi dengan memotong kalimat berdasarkan tanda baca, menyesuaikan lebar baris, serta mengatur durasi tampilan agar sesuai dengan kecepatan membaca tanpa tumpang tindih.",
-    "who": "Pembuat konten yang ingin memberi teks pada video, tim yang mengubah podcast menjadi teks, dan siapa saja yang membutuhkan draf subtitle untuk diedit."
-  },
-  "ocrsub": {
-    "title": "OCR Subtitle Hardcoded — baca subtitle di video | AI-SRTSub",
-    "desc": "Subtitle yang menyatu dalam video tidak bisa diekstrak secara langsung. Tandai area subtitle dan alat ini akan membacanya frame demi frame ke SRT / VTT.",
-    "kw": "ekstrak subtitle hardcoded,ocr subtitle,ekstraksi subtitle video,subtitle burned in,ocr subtitle dari video,video ke srt,subtitle dari video,ocr caption hardcoded",
-    "intro": "Masukkan video, tandai area tempat subtitle berada, dan alat ini akan membaca frame demi frame untuk menggabungkan frame identik menjadi satu cue dengan pengaturan waktu.",
-    "feat": "Alat ini memotong area subtitle, melakukan binerisasi berdasarkan kecerahan untuk menghilangkan latar belakang, dan mengenali teks yang muncul di beberapa frame sebagai satu cue tunggal dengan durasi yang akurat.",
-    "who": "Tim subtitle yang melokalisasi video asing, editor yang melakukan re-subtitling pada rilis lama, dan siapa saja yang hanya memiliki video tanpa file subtitle asli."
-  }
+ "autosub": {
+  "title": "Audio ke Subtitle — ubah ucapan ke SRT di browser | AI-SRTSub",
+  "desc": "Ubah audio atau video menjadi subtitle. Pengenalan ucapan berjalan di browser, memotong teks menjadi cue, dan ekspor ke SRT / VTT. Gratis dan privat.",
+  "kw": "audio ke srt,ucapan ke subtitle,buat subtitle dari audio,generator subtitle otomatis,transkrip audio ke srt,subtitle whisper,pengenalan ucapan browser,generasi subtitle offline",
+  "intro": "Masukkan file audio atau video, pilih bahasa dan model, lalu proses pengenalan berjalan langsung di browser Anda. Hasilnya adalah draf subtitle dengan pengaturan waktu yang sudah dipotong sesuai kalimat.",
+  "feat": "Alat ini memproses aliran kata menjadi cue subtitle yang rapi dengan memotong kalimat berdasarkan tanda baca, menyesuaikan lebar baris, serta mengatur durasi tampilan agar sesuai dengan kecepatan membaca tanpa tumpang tindih.",
+  "who": "Pembuat konten yang ingin memberi teks pada video, tim yang mengubah podcast menjadi teks, dan siapa saja yang membutuhkan draf subtitle untuk diedit."
+ },
+ "ocrsub": {
+  "title": "OCR Subtitle Hardcoded — baca subtitle di video | AI-SRTSub",
+  "desc": "Subtitle yang menyatu dalam video tidak bisa diekstrak secara langsung. Tandai area subtitle dan alat ini akan membacanya frame demi frame ke SRT / VTT.",
+  "kw": "ekstrak subtitle hardcoded,ocr subtitle,ekstraksi subtitle video,subtitle burned in,ocr subtitle dari video,video ke srt,subtitle dari video,ocr caption hardcoded",
+  "intro": "Masukkan video, tandai area tempat subtitle berada, dan alat ini akan membaca frame demi frame untuk menggabungkan frame identik menjadi satu cue dengan pengaturan waktu.",
+  "feat": "Alat ini memotong area subtitle, melakukan binerisasi berdasarkan kecerahan untuk menghilangkan latar belakang, dan mengenali teks yang muncul di beberapa frame sebagai satu cue tunggal dengan durasi yang akurat.",
+  "who": "Tim subtitle yang melokalisasi video asing, editor yang melakukan re-subtitling pada rilis lama, dan siapa saja yang hanya memiliki video tanpa file subtitle asli."
+ },
+ "multilang": {
+  "title": "Banyak bahasa sekaligus — unggah satu musim, antrekan target | AI-SRTSub",
+  "desc": "Masukkan satu musim penuh, centang bahasa yang diperlukan, lalu tekan mulai. Episode dan bahasa membentuk satu antrean yang berjalan berurutan, dan hasilnya dikemas dalam satu zip. Melanjutkan dari titik henti, dan berhenti saat tab ditutup.",
+  "kw": "terjemahan subtitle batch,terjemah subtitle banyak bahasa,subtitle multibahasa,subtitle satu musim,ekspor batch subtitle,terjemah srt ke banyak bahasa,satu musim banyak bahasa",
+  "intro": "Masukkan satu musim penuh sekaligus, centang bahasa target, lalu tekan mulai. Episode dan bahasa menjadi satu antrean: setiap bahasa berjalan hingga selesai sebelum bahasa berikutnya dimulai, dan semuanya dikemas menjadi satu file zip.",
+  "feat": "Bagian yang sering gagal dalam terjemahan batch adalah konkurensi. Dua puluh episode dikali lima bahasa yang dijalankan bersamaan menghasilkan ratusan permintaan sekaligus, yang secara perlahan mengacaukan antrean sisi server—permintaan awal dan akhir saling tumpang tindih sehingga tidak jelas sel mana yang benar-benar selesai. Oleh karena itu, halaman ini sengaja berjalan sebagai satu antrean: satu batch dalam satu waktu, menyelesaikan satu bahasa hingga tuntas sebelum beralih ke berikutnya. Progres disimpan per episode dan per bahasa di perangkat Anda, jadi jika terhenti di episode tiga, Anda cukup membuka kembali halaman, memuat file yang sama, dan proses akan dilanjutkan tanpa mengirim ulang data yang sudah selesai. Masalah umum dalam terjemahan satu musim adalah nama tokoh: menerjemahkan dua puluh episode secara terpisah sering membuat nama karakter yang sama ejaannya berbeda-beda. Itulah sebabnya panel glosarium disediakan khusus di sini—unggah sekali untuk dibagikan ke seluruh musim—dan sistem akan memberi tahu berapa banyak entri yang cocok sebelum Anda mulai. Tutup tab dan tugas langsung berhenti seketika tanpa menghabiskan kuota di latar belakang.",
+  "who": "Tim pembuat subtitle yang menerjemahkan satu musim penuh ke dalam beberapa bahasa, kanal yang mendistribusikan batch episode yang sama ke berbagai pasar, dan penerjemah mandiri yang ingin menekan tombol mulai sekali lalu kembali nanti.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Penerjemah Subtitle Multibahasa Batch"
+ }
 }

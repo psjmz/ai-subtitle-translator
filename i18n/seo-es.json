@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio a subtítulos — convierte voz a SRT en tu navegador | AI-SRTSub",
-    "desc": "Convierte audio o video a subtítulos: el reconocimiento de voz se ejecuta en tu navegador, segmenta el resultado y exporta SRT / VTT. Gratis y local.",
-    "kw": "audio a srt,voz a subtítulo,generar subtítulos desde audio,generador de subtítulos automático,transcribir audio a srt,subtítulos whisper,reconocimiento de voz en navegador,generación de subtítulos offline",
-    "intro": "Arrastra un archivo de audio o video, elige un idioma y un modelo para iniciar el reconocimiento en tu navegador. Obtendrás un borrador de subtítulos con tiempos, segmentado por frases y ajustado a la longitud de línea.",
-    "feat": "Esta herramienta procesa el flujo de palabras del reconocimiento de voz, segmentando las frases según la puntuación, ajustando la longitud de línea según el sistema de escritura y optimizando los tiempos de lectura para evitar solapamientos. El modelo se descarga y almacena en caché localmente, garantizando que el audio nunca se suba a un servidor.",
-    "who": "Creadores que subtitulan sus videos, equipos que transcriben podcasts o cursos, y cualquier persona que necesite un borrador de subtítulos editable."
-  },
-  "ocrsub": {
-    "title": "OCR de subtítulos incrustados — extrae subtítulos de video | AI-SRTSub",
-    "desc": "Los subtítulos quemados en la imagen no tienen pista extraíble. Marca el área y la herramienta lee cuadro a cuadro, fusionando frames en un SRT / VTT.",
-    "kw": "extraer subtítulos incrustados,ocr de subtítulos,extracción de subtítulos de video,subtítulos quemados,ocr subtítulos desde video,video a srt,subtítulo desde video,ocr de subtítulos hardcoded",
-    "intro": "Sube un video, marca la franja donde aparecen los subtítulos y la herramienta leerá cuadro a cuadro, fusionando los frames idénticos en un solo bloque con su tiempo.",
-    "feat": "La herramienta recorta la franja de subtítulos y utiliza binarización por brillo para aislar el texto del fondo, convirtiendo los frames consecutivos en un único cue con su duración exacta. Al procesar el video localmente, se obtienen los tiempos de inicio y fin, permitiendo una edición posterior para corregir posibles errores de lectura de caracteres.",
-    "who": "Equipos de subtitulado que localizan videos extranjeros, personas que re-subtitulan lanzamientos antiguos y editores que solo poseen el video final sin el archivo original."
-  }
+ "autosub": {
+  "title": "Audio a subtítulos — convierte voz a SRT en tu navegador | AI-SRTSub",
+  "desc": "Convierte audio o video a subtítulos: el reconocimiento de voz se ejecuta en tu navegador, segmenta el resultado y exporta SRT / VTT. Gratis y local.",
+  "kw": "audio a srt,voz a subtítulo,generar subtítulos desde audio,generador de subtítulos automático,transcribir audio a srt,subtítulos whisper,reconocimiento de voz en navegador,generación de subtítulos offline",
+  "intro": "Arrastra un archivo de audio o video, elige un idioma y un modelo para iniciar el reconocimiento en tu navegador. Obtendrás un borrador de subtítulos con tiempos, segmentado por frases y ajustado a la longitud de línea.",
+  "feat": "Esta herramienta procesa el flujo de palabras del reconocimiento de voz, segmentando las frases según la puntuación, ajustando la longitud de línea según el sistema de escritura y optimizando los tiempos de lectura para evitar solapamientos. El modelo se descarga y almacena en caché localmente, garantizando que el audio nunca se suba a un servidor.",
+  "who": "Creadores que subtitulan sus videos, equipos que transcriben podcasts o cursos, y cualquier persona que necesite un borrador de subtítulos editable."
+ },
+ "ocrsub": {
+  "title": "OCR de subtítulos incrustados — extrae subtítulos de video | AI-SRTSub",
+  "desc": "Los subtítulos quemados en la imagen no tienen pista extraíble. Marca el área y la herramienta lee cuadro a cuadro, fusionando frames en un SRT / VTT.",
+  "kw": "extraer subtítulos incrustados,ocr de subtítulos,extracción de subtítulos de video,subtítulos quemados,ocr subtítulos desde video,video a srt,subtítulo desde video,ocr de subtítulos hardcoded",
+  "intro": "Sube un video, marca la franja donde aparecen los subtítulos y la herramienta leerá cuadro a cuadro, fusionando los frames idénticos en un solo bloque con su tiempo.",
+  "feat": "La herramienta recorta la franja de subtítulos y utiliza binarización por brillo para aislar el texto del fondo, convirtiendo los frames consecutivos en un único cue con su duración exacta. Al procesar el video localmente, se obtienen los tiempos de inicio y fin, permitiendo una edición posterior para corregir posibles errores de lectura de caracteres.",
+  "who": "Equipos de subtitulado que localizan videos extranjeros, personas que re-subtitulan lanzamientos antiguos y editores que solo poseen el video final sin el archivo original."
+ },
+ "multilang": {
+  "title": "Muchos idiomas a la vez — sube una temporada entera | AI-SRTSub",
+  "desc": "Sube una temporada entera, marca los idiomas que necesitas y pulsa iniciar una vez. Los episodios y idiomas forman una sola cola y se ejecutan secuencialmente; descárgalo todo en un zip. Se reanuda donde se quedó y se detiene al cerrar la pestaña.",
+  "kw": "traducción de subtítulos por lotes,traducir subtítulos a varios idiomas,subtítulos multilingües,subtítulos de temporada completa,exportación por lotes de subtítulos,traducir srt a muchos idiomas,una temporada muchos idiomas",
+  "intro": "Sube una temporada entera de golpe, marca los idiomas de destino y pulsa iniciar. Episodios y idiomas se convierten en una sola cola: cada idioma llega hasta el final antes de empezar el siguiente, y todo se empaqueta en un único archivo zip.",
+  "feat": "Lo que suele fallar en la traducción por lotes es la concurrencia. Veinte episodios por cinco idiomas lanzados a la vez generan cientos de peticiones simultáneas que saturan la cola del servidor; las peticiones tempranas y tardías se mezclan y es imposible saber qué celda terminó realmente. Por eso esta página funciona deliberadamente como una sola cola: un lote a la vez, completando un idioma antes de pasar al siguiente. El progreso se guarda por episodio y por idioma en tu máquina, así que si se detiene en el tercer episodio, al reabrir la página y cargar los mismos archivos se retomará en ese lote sin reenviar lo ya procesado. Lo que delata una traducción automática por partes son los nombres: si traduces veinte episodios por separado, el mismo personaje acaba escrito de tres formas distintas. Por eso el glosario tiene su propio panel aquí —se sube una vez y lo comparte toda la temporada— y te indica cuántas entradas coincidieron realmente antes de empezar. Cierra la pestaña y la tarea se detiene de inmediato en lugar de consumir cuota en segundo plano.",
+  "who": "Equipos de subtitulación que adaptan una temporada completa a varios idiomas, canales que redistribuyen el mismo lote de episodios a diferentes mercados y traductores independientes que prefieren pulsar iniciar una vez y volver más tarde.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Traductor de subtítulos multilingüe por lotes"
+ }
 }

@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "sq",
-    "ogLocale": "sq_AL",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Përkthyes i Nëntitujve me AI për Filma dhe Seriale",
-    "desc": "Përkthyes falas i nëtitujve me AI — pa regjistrim, pa kufizime, pa filigran. Përktheni nëtitujt e filmave, serialeve dhe dokumentarëve në gjuhën tuaj me një klikim.",
-    "kw": "përkthyes i nëtitujve me AI,përkthe nëtitujt,përkthyes falas i nëtitujve,përkthe skedarin SRT,përkthe VTT,përkthe ASS,përkthim i nëtitujve të filmave,nëntituj të serialeve televizive,nëntituj të Netflix,nëntituj të KDrama,nëntituj të anime,nëntituj dygjuhësh,nëntituj të filmave të huaj,përkthe nëtitujt në internet,nëntituj të YouTube,mjet falas për përkthimin e nëtitujve,përkthe nëtituj falas,përkthyes SRT falas",
-    "ogTitle": "AI-SRTSub - Përkthyes i Nëntitujve me AI për Filma dhe Seriale",
-    "ogDesc": "Përkthyes falas i nëtitujve me AI 100% për adhuruesit e filmave: një klikim kthen nëtitujt e filmave të huaj, serialeve dhe dokumentarëve në gjuhën tuaj amtare, me rreshtim automatik të skemës kohore. Shijoni përmbajtjen globale pa pengesa.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Përkthyes falas i nëtitujve me AI 100% për adhuruesit e filmave: një klikim kthen nëtitujt e filmave të huaj, serialeve dhe dokumentarëve në gjuhën tuaj amtare, me rreshtim automatik të skemës kohore. Shijoni përmbajtjen globale pa pengesa.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Rreth këtij mjeti\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Përkthyes Falas i Nëntitujve Automatikë me AI</h2>\n    <p data-i18n-html=\"seoIntro\">Ky është një <strong>mjet falas online për përkthimin e nëtitujve i fuqizuar nga modele të mëdha gjuhësore</strong>. Ngarkoni skedarë SRT, VTT ose ASS dhe përktheni nëtituj midis anglishtes, kinezishtes, japonishtes, koreanishtes, spanjishtes, frëngjishtes dhe 15+ gjuhëve të tjera. Pa regjistrim, pa instalim, pa filigran — hapeni në shfletues dhe filloni përkthimin. Të dhënat e nëtitujve qëndrojnë në shfletuesin tuaj nëse nuk aktivizoni përkthimin në re.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Karakteristikat kryesore:</strong> Analizim dhe përkthim me AI për SRT, VTT dhe ASS, bashkim i mençur i fjalive (kur një fjali përfshin disa shenja kohore, ato bashkohen, përkthehen dhe më pas ndahen përsëri në skemën origjinale kohore), rreshtim i skemës kohore, mbështjellje automatike e rreshtave për tekstin CJK dhe Perëndimor, heqje e fjalëve mbushëse, trajtim i personalizuar i terminologjisë dhe stile të zgjedhshme përkthimi. Eksportoni skedarë standardë SRT, VTT, ASS ose TXT të gatshëm për t'u vendosur në videon tuaj.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kush e përdor atë:</strong> përkthyes videosh, krijues dhe lokalizues të YouTube, nxënës të gjuhëve, grupe dhe ekipe nëtitujsh që duhet të lokalizojnë përmbajtjen video shpejt.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Ky mjet kërkon JavaScript. Ju lutemi aktivizoni JavaScript në shfletuesin tuaj, më pas ngarkoni një skedar nëtitujsh (SRT / VTT / ASS) për të përkthyer nëtitujt me AI falas.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Krijues i Nëntitujve me Stil - Bashko Efektet Dygjuhëshe, ASS & VTT",
-    "desc": "Mjet falas për nëtituj me stil: bashkoni dy skedarë në dygjuhësh, ridizajnoni një skedë dygjuhëshe ose shtoni efekte. 5 paracaktime ASS / 6 VTT; eksportoni si SRT / VTT / ASS.",
-    "kw": "bashko nëtitujt,nëntituj dygjuhësh,kombino skedarët e nëtitujve,nëntituj me stil,stile nëtitujsh ASS,stile nëtitujsh VTT,efekte të nëtitujve,krijues i nëtitujve të dyfishtë,paracaktime ASS,shabllon nëtitujsh,mjet falas për nëtituj",
-    "intro": "Bashkoni dy skedarë nëtitujsh në dygjuhësh, ose stiloni një skedë: shkronjat, ngjyrën, skicën dhe pozicionin, të gjitha nëpërmjet pamjes direkte (WYSIWYG).",
-    "feat": "Bashkim dhe rregullim dygjuhësh, paracaktime stilesh ASS / VTT, fole stilesh për çdo vlerë, korrigjime të skemës kohore në vend dhe në masë, si dhe një pamje paraprake e drejtpërdrejtë që është fjalë për fjalë skedari i eksportuar.",
-    "who": "Krijues që bëjnë nëtituj dygjuhësh ose me stil, grupe kodimi dhe ekipe që kanë nevojë për tituj të aksesueshëm."
-  },
-  "clean": {
-    "title": "Pastrues i Nëntitujve - Hiq Filigranet, Shenjat SDH & Etiketat HTML",
-    "desc": "Pastrues falas i nëtitujve në internet: hiq filigranet, reklamat, SDH, etiketat HTML, efektet ASS; rregullo shkronjat e mëdha, mojibake. 13 rregulla të ndryshueshme, zhbërje për çdo ndryshim, skema kohore e paprekur.",
-    "kw": "pastrues i nëtitujve,pastro skedarin srt,hiq filigranin e nëtitujve,hiq nëtitujt SDH,hiq etiketat HTML nga nëtitujt,rregullo nëtitujt me shkronja të mëdha,rregullo mojibake,hiq nëtitujt për persona me dëmtim dëgjimi,hiq efektet ASS",
-    "intro": "Kaloni një nëtitull të shkarkuar fillimisht këtu: filigranet, reklamat, shenjat SDH dhe etiketat HTML, zhduken në një kalim të vetëm.",
-    "feat": "13 rregulla në katër grupe (9 të aktivizuara si parazgjedhje), heqje e filigraneve dhe SDH, rregullime të shkronjave të mëdha dhe mojibake, listë ndryshimesh për çdo shenjë me kthim mbrapsht individual, dhe koha nuk preket kurrë.",
-    "who": "Kushdo që ka marrë një nëtitull ekzistues dhe thjesht e do të përdorshëm, si dhe grupe që pastrojnë material në masë."
-  },
-  "glossary": {
-    "title": "Zëvendësim Masiv i Termave në Nëntituj - Fjalor AI-SRTSub",
-    "desc": "Zëvendësim fjalori për nëtitujt: listoni \"e vjetër → e re\" një herë dhe i gjithë skedari SRT / VTT / ASS / TXT përditësohet. Koha, stilet dhe blloqet NOTE mbeten; zhbërje për çdo rresht.",
-    "kw": "fjalor i nëtitujve,zëvendësim në masë i srt,gjej dhe zëvendëso nëtitujt,zëvendësim i termave të nëtitujve,redaktim në masë i srt,zëvendëso fjalët në nëtituj,unifiko emrat e nëtitujve,terminologji e nëtitujve,zëvendëso tekstin në vtt,mjet fjalori srt,zëvendësim i terminologjisë në masë",
-    "intro": "Një fjalor me rregulla \"term i vjetër → term i ri\" të zbatueshme në të gjithë skedarin e nëtitujve menjëherë, me kohën, stilet ASS dhe blloqet e shënimeve VTT të paprekura në nivel bajti.",
-    "feat": "Një rregull për rresht, i ndarë me -> , => , → ose një skedë; rreshtat që fillojnë me # janë komente. Përputhja e fjalës së plotë e mban \"art\" jashtë \"start\", ndjeshmëria ndaj shkronjave të mëdha është opsionale, dhe ju mund ta kufizoni zëvendësimin në rreshtin 1 ose rreshtin 2 të shenjave dygjuhëshe. Çdo shenjë e ndryshuar listohet, dhe çdo një prej tyre mund të kthehet në gjendjen e mëparshme.",
-    "who": "Kushdo që unifikon emrat dhe terminologjinë nëpër një sezon, rregullon fjalorin e përkthimit automatik në masë, ose përshtat nëtitujt e dikujt tjetër sipas stilit të tij.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Kontrolli i Cilësisë së Nëntitujve - Koha dhe Elipsa | AI-SRTSub",
-    "desc": "Kontroll i cilësisë së nëtitujve falas në internet: ngarkoni SRT, VTT ose ASS dhe kontrolloni mbivendosjet, kohëzgjatjen, shpejtësinë e leximit, gjerësinë e rreshtit, ndarjet e rreshtave, numërimin dhe kodimin kundrejt rregullave të asaj gjuhe. 27 gjuhë, 27 grupe pragjesh, plus rregulla specifike për gjuhën.",
-    "kw": "kontrollues i nëtitujve,kontroll i cilësisë së nëtitujve,validues srt,kontroll i cilësisë së nëtitujve,kontroll srt,kontroll i kohës së nëtitujve,validues i nëtitujve,kontrollo skedarin srt,korrigjim i nëtitujve,linter i nëtitujve",
-    "intro": "Ngarkoni një skedar nëtitujsh dhe kontrollojeni atë kundrejt rregullave të gjuhës së tij - çdo gjetje vjen me vlerën e matur dhe pragun. Ekzekutohet plotësisht në shfletuesin tuaj, asgjë nuk ngarkohet.",
-    "feat": "Kontrollon shenjat e mbivendosura, që shfaqen shumë shkurt ose shumë gjatë në ekran, shpejtësinë e leximit, gjerësinë e rreshtit, numrin e rreshtave, ndarjet e vështira të rreshtave, numërimin, shenjat boshe, mojibake dhe karakteret e kontrollit. Gjerësia dhe shpejtësia e leximit ndjekin sistemin e shkrimit: kinezishtja matet me karaktere me gjerësi të plotë, shenjat bashkuese tajlandeze dhe arabe llogariten si gjerësi zero. Rregullat specifike për gjuhën mbulojnë pikëpyetjen hapëse spanjolle ¿, hapësirën pa ndarje frënge para ? ! ; :, pikëpyetjen greke, pikësimin me gjerësi të plotë në kinezisht dhe japonisht, si dhe pikëpyetjen dhe presjen arabe. Elementët e rregullueshëm automatikisht listohen veçmas, dhe çdo gjë që lëviz kodet kohore çaktivizohet si parazgjedhje.",
-    "who": "Grupe nëtitujsh, furnizues lokalizimi, redaktorë dhe kushdo që dëshiron të kontrollojë një skedar para dorëzimit.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Përkthyes i Nëntitujve — SRT/VTT/ASS në Gjuhën Tuaj",
-    "desc": "Lëshoni një skedar SRT / VTT / ASS, zgjidhni një gjuhë të synuar dhe merrni përkthim të lidhur me skemën kohore. 100 gjuhë, falas, pa regjistrim."
-  },
-  "convert": {
-    "title": "Konvertues i Nëntitujve - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Konvertues falas i nëtitujve në internet: konvertoni midis SRT, VTT, ASS, SBV, LRC dhe TXT duke mbajtur të paprekur skemën kohore, etiketat e efekteve ASS pastrohen automatikisht.",
-    "kw": "konvertues i nëtitujve,srt në vtt,vtt në srt,ass në srt,sbv në srt,srt në lrc,nëntituj në txt,konverto nëtitujt,konvertues srt,konvertues vtt",
-    "intro": "Konvertoni midis SRT, VTT, ASS, SBV, LRC dhe TXT duke mbajtur të paprekur skemën kohore.",
-    "feat": "Formati i hyrjes zbulohet automatikisht dhe vulat kohore rishkruhen për formatin e synuar; etiketat e efekteve ASS dhe ndarjet e detyruara të rreshtave bëhen tekst i lexueshëm kur eksportoni në një format të thjeshtë; skedarët e teksteve këngëtare nuk kanë fushë orësh, kështu që çdo gjë pas një ore llogaritet në minuta.",
-    "who": "Kushdo kies lojtari i të cilit refuzon një skedar nëtitujsh, dhe kushdo që lëviz materialin midis një redaktori dhe një lojtari në internet.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Ndarës i Nëntitujve Dygjuhësh - Mbani Vetëm Një Gjuhë | AI-SRTSub",
-    "desc": "Ndarës falas i nëtitujve dygjuhësh në internet: ndani një skedar dygjuhësh nëtitujsh në një gjurmë origjinale dhe një gjurmë të përkthyer, ose mbani vetëm njërën.",
-    "kw": "ndarës i nëtitujve dygjuhësh,nda srt dygjuhësh,hiq nëtitujt e gjuhës së dytë,mbaj vetëm nëtitujt në anglisht,nxirr nëtitujt e përkthyer,ndarje dygjuhëshe srt,ndarje dygjuhëshe ass",
-    "intro": "Ndani një skedar dygjuhësh nëtitujsh në një gjurmë origjinale dhe një gjurmë të përkthyer, ose mbani vetëm njërën prej tyre.",
-    "feat": "Trajton të dyja skemat e zakonshme - një shenjë që mban dy rreshta, dhe dy shenja që ndajnë të njëjtën skemë kohore. Gjurmët ndahen sipas rendit dhe llojit të shkrimit, skema kohore mbahet ekzaktësisht siç është, dhe një skedar me një gjuhë shënohet në vend që të boshatiset në heshtje.",
-    "who": "Kushdo që ka marrë një skedar dygjuhësh të gatshëm dhe dëshiron vetëm një gjuhë, dhe ekipet e nëtitujve që arkivojnë origjinalin dhe përkthimin veçmas.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Zhvendosja e Kohës së Titrave - Lëviz, RiPërmaso, Bashko dhe Ndaj | AI-SRTSub",
-    "desc": "Mjet falas i kohëzgjatjes së nëtitujve në internet: zhvendosni gjithçka menjëherë, përpjesëtoni me një raport, ose rregulloni vonesën me dy pika spirancë. Punon me SRT, VTT, ASS, SBV, LRC dhe TXT.",
-    "kw": "zhvendosje e kohës së nëtitujve,zhvendos kohën e srt,rregullim i sinkronizimit të nëtitujve,përpjesëto kohën e nëtitujve,rregullo vonesën e nëtitujve,kompensim i kohës srt,rregullim i vonesës së nëtitujve,bashko nëtitujt,nda nëtitujt,kombino srt,nda nëtituj të gjatë",
-    "intro": "Kur nëtitujt janë jashtë sinkronizimit, lëvizni të gjithë skemën kohore, përpjesëtojeni atë me një raport, ose rregullojeni me dy pika spirancë. Ai gjithashtu mund të bashkojë rreshtat që janë ndarë dhe të ndajë ata që zgjasin shumë.",
-    "feat": "Zhvendosja lëviz çdo shenjë pa ndryshuar kohën që secila qëndron në ekran. Përpjesëtimi shumëzon të dy skajet, kështu që gjatësia e shenjës ndryshon me të - e dobishme midis 24 dhe 25 fps. Rregullimi me dy pika trajton skedarët që janë edhe të zhvendosur, edhe që ecin me shpejtësi të gabuar. Kohët që dalin negative bllokohen në zero, dhe mjeti ju tregon se sa prej tyre u prekën. I njëjti format hyn, i njëjti format del - pa konvertim, dhe stilet ASS, stilimi për rresht dhe etiketat e efekteve mbahen ekzaktësisht siç ishin. Shenjat dygjuhëshe qëndrojnë në dy rreshta kur bashkohen dhe kapërcehen gjatë ndarjes.",
-    "who": "Kushdo, nëtitujt e të cilit shmangin sinkronizimin pas një ndryshimi burimor, ecin pak më shpejt ose më ngadalë, ose vijnë nga dikush që punon në një shpejtësi tjetër kadri.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Rregullo Titrat e Korruptuara - Riparo Kodimin e Gabuar | AI-SRTSub",
-    "desc": "Riparim falas në internet për nëtitujt e dëmtuar: zbulon nëse skedari është UTF-8, GBK, Big5, Shift_JIS ose EUC-KR, rivendos tekstin e lexuar gabim, ruan përsëri për lojtarin tuaj.",
-    "kw": "rregullo nëtitujt e dëmtuar,mojibake e nëtitujve,rregullim i kodimit srt,rregullo kodimin e nëtitujve,utf8 në gbk subtitle,srt shfaq karaktere të çuditshme,kodim i gabuar i nëtitujve,ass i dëmtuar,vtt i dëmtuar,zbulo kodimin e nëtitujve",
-    "intro": "Nëntitujt që hapen si një mur me pakuptimësi pothuajse gjithmonë lexohen me kodimin e gabuar. Lëshoni skendarin brenda, dhe ai zbulon se në cilin kodim është shkruar realisht skedari dhe kthen mbrapsht karakteret e lexuara gabim.",
-    "feat": "Skedarët e ngarkuar dekodohen përsëri nga bajtet origjinale, kështu që asgjë nuk humbet: nëse skedari rezulton të jetë GBK, ai thotë kështu, dhe nëse lojtari juaj është ai që e lexon gabim, ruajtja e një kopjeje si \"UTF-8 me BOM\" zakonisht e zgjidh atë. Teksti i ngjitur nuk është më bajtet origjinale, kështu që shumë më pak mund të rikuperohet; nëse ai tashmë përmban karaktere zëvendësuese, kjo është e parikuperueshme dhe mjeti e thotë hapur në vend që të shtirret ndryshe. Numrat e rreshtave dhe kodet kohore nuk preken kurrë, dhe etiketat e stileve ASS lihen saktësisht siç ishin.",
-    "who": "Kushdo që ka shkarkuar nëtituj që hapen si zhargon, sheh kuti në vend të kinezishtes në lojtar, ose i është dorëzuar një skedar me një kodim të panjohur.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Nxirr Tekst Nga Nëntitujt - SRT/ASS/VTT në Tekst të Thjeshtë | AI-SRTSub",
-    "desc": "Nxjerrës falas i nëtitujve në tekst në internet: lexon SRT, VTT, ASS, SBV, LRC dhe TXT, heq kodet kohore dhe numrat e rreshtave, dhe nxjerr dialog të pastër si paragrafë ose një rresht për çdo shenjë.",
-    "kw": "nxirr tekst nga nëtitujt,nëntituj në tekst,srt në txt,srt në tekst të thjeshtë,ass në txt,vtt në txt,transkript i nëtitujve,nxirr dialog nga srt,srt hiq kodet kohore,nxerrës i tekstit të nëtitujve",
-    "intro": "Nxirrni dialogun nga nëtitujt SRT / VTT / ASS / SBV / LRC / TXT si tekst i thjeshtë i pastër: kodet kohore, numrat e shenjave dhe etiketat e stileve hiqen automatikisht.",
-    "feat": "Dy skema: paragrafë të vazhdueshëm të ndarë në pauza dhe pikësim në fund të fjalisë, ose një rresht për shenjë për listat e dialogjeve. Shenjat e zërit si \"(telefoni bie)\", filigranet burimore dhe rreshtat e përsëritur njëri pas tjetrit hiqen si parazgjedhje; emrat e folësve si \"TOM:\" dhe rreshtat e këngëve mund të mbahen ose të hiqen. Mbështjellja e rreshtave bashkohet përsëri sipas skriptit — kinezishtja bashkohet direkt, koreanishtja dhe latinishtja shtojnë hapësira — kështu që asgjë nuk ngjitet bashkë.",
-    "who": "Kushdo që dëshiron tekstin e nëtitujve për shënime, skripte, praktikë përkthimi ose për të ushqyer një mjet tjetër, pa fshirë qindra kode kohore me dorë.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Nxirrni Nëntitujt e Integruar nga MKV / MP4 në SRT | AI-SRTSub",
-    "desc": "Nxirrni nëtitujt e integruar nga MKV, WebM, MP4, MOV; eksportoni si SRT / VTT / ASS / TXT. Pa ngarkim ose rikodim — skedarët lexohen në shfletuesin tuaj; shumë GB në rregull.",
-    "kw": "nxirr nëtitujt e integruar,mkv në srt,nxjerrje e nëtitujve mp4,nxirr nëtitujt nga video,nxerrës i nëtitujve të integruar,srt nga mkv,nxjerrje e nëtitujve mov,eksport i gjurmës së nëtitujve,vtt nga mkv,nxirr nëtituj të butë,shkyçje e nëtitujve mkv",
-    "intro": "Tërhiqni gjurmën e nëtitujve të mbyllur brenda një MKV ose MP4 drejtpërdrejt në një SRT — pa ngarkim, gjithçka ndodh në shfletuesin tuaj.",
-    "feat": "Lexon gjurmët e tekstit të thjeshtë, ASS, WebVTT dhe mov_text / tx3g, mban kokën dhe rezolucionin origjinal ASS, dhe lexon në pjesë të vogla sipas zhvendosjes, kështu që një skedar i madh nuk mbushet kurrë në memorie.",
-    "who": "Kushdo që ka një filmi që mbart nëtituj të butë dhe dëshiron tekstin jashtë, grupe kodimi dhe ekipe fansub që fillojnë nga gjurma origjinale.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Konvertues i Nëntitujve Kinezë - Të Thjeshtuar ⇄ Tradicionalë | AI-SRTSub",
-    "desc": "Konvertues falas i nëtitujve kinezë: Të thjeshtuar ⇄ Tradicionalë (Tajvan / Hong Kong) dhe anasjelltas. Ndryshojnë vetëm dialogët — kodet kohore dhe etiketat ASS qëndrojnë. Ndërtuar mbi OpenCC.",
-    "kw": "konvertues i nëtitujve kinezë,të thjeshtuar në tradicionalë,tradicionalë në të thjeshtuar,srt kinezisht tradicionale,konverto nëtitujt kinezisht,kinezisht tradicionale e tajvanit,kinezisht tradicionale e hong kongut,konvertim han,konverto srt në kinezisht tradicionale,srt kinezisht e thjeshtuar,subtitol opencc",
-    "intro": "Konvertoni një skedar të plotë nëtitujsh midis të thjeshtuarve dhe tradicionalëve, duke mos ndryshuar asgjë përveç dialogut.",
-    "feat": "Nëntë drejtime: tradicionale e përgjithshme, fjalor i Tajvanit, forma të Tajvanit, Hong Kong, kthim te të thjeshtuarat, dhe forma rajonale tradicionale në tradicionale. Përdor fjalorin OpenCC me zgjidhjen e frazave sipas përputhjes më të gjatë të parë.",
-    "who": "Kushdo që dorëzon nëtituj për audiencën e Tajvanit ose Hong Kongut, distributorë që përgatisin versione rajonale dhe redaktorë që kanë marrë një skedar tradicional dhe duan të thjeshtuar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Ndarës & Bashkues i Nëntitujve - SRT / VTT | AI-SRTSub",
-    "desc": "Ndani nëtitujt sipas kohëzgjatjes ose numrit, ose bashkoni shumë skedarë në rregull ose sipas vulës kohore. Rrinumërimi është automatik, dialogu i paprekur. SRT & VTT.",
-    "kw": "ndarës i nëtitujve,nda nëtitujt,bashko skedarët srt,bashkues srt,kombino nëtitujt,nda srt,bashko skedarët srt,prit nëtitujt,nda vtt,bashkues i nëtitujve",
-    "intro": "Prisni një nëtitull të gjatë në pjesë, ose bashkoni shumë skedarë në një. Ekzekutohet plotësisht në shfletuesin tuaj — asgjë nuk ngarkohet.",
-    "feat": "Ndani sipas kohëzgjatjes ose numrit me rinumërim për çdo pjesë dhe kohëzim opsional me bazë zero; bashkoni në mënyrë sekuenciale me një hapësirë ose ndërthurni sipas vulave kohore origjinale. SRT dhe VTT.",
-    "who": "Krijues që ndajnë episode për ngarkim, ekipe që rishikojnë në pjesë dhe redaktorë që bashkojnë nëtituj me shumë pjesë.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Nëntitujt në Excel/CSV dhe Kthehu Mbrapa | AI-SRTSub",
-    "desc": "Ktheni SRT ose VTT në një fletë Excel ose CSV për rishikim dhe përkthim, pastaj kthejeni përsëri. Kodet kohore mbeten të sakta, ndarjet e rreshtave mbijetojnë. Asgjë nuk ngarkohet.",
-    "kw": "nëtituj në excel,srt në csv,srt në excel,excel në srt,csv në srt,fletëllogaritëse e nëtitujve,konvertues i nëtitujve në tabelë",
-    "intro": "Eksportoni nëtitujt në një fletëllogaritëse për rishikim dhe përkthim, pastaj importoni fletën përsëri. Ekzekutohet plotësisht në shfletuesin tuaj.",
-    "feat": "Një klikim nga SRT ose VTT në xlsx ose CSV; redaktoni kohët, tekstin dhe shënimet në fletëllogaritësen tuaj, pastaj eksportoni përsëri në SRT ose VTT. Kolonat e kohës ruajnë saktësinë e plotë të milisekondave; ndarjet e rreshtave brenda qelisë ruhen. Kokat e kinezishtes dhe anglishtes funksionojnë të dyja.",
-    "who": "Përkthyes, ekipe fansub dhe redaktorë që rishikojnë, shënojnë ose rregullojnë në masë nëtitujt në një fletëllogaritëse.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Konverto Nëntitujt në Masë në SRT/VTT | AI-SRTSub",
-    "desc": "Lëshoni dhjetëra ose qindra skedarë SRT/VTT, konvertojini të gjithë në një format dhe shkarkoni një ZIP. Rrinumërimi dhe vulat kohore të normalizuara; skedarët e palexueshëm të shënuar.",
-    "kw": "konverto nëtitujt në masë,srt në vtt,konvertues i nëtitujve në masë,srt në masë,konverto nëtituj të shumtë,zip i nëtitujve",
-    "intro": "Zvarritni qindra skedarë nëtitujsh, konvertojini të gjithë, merrni një ZIP. Ekzekutohet plotësisht në shfletuesin tuaj.",
-    "feat": "SRT në VTT dhe anasjelltas në masë; numrat e sekuencës u rirenditën dhe vulat kohore u normalizuan për formatin e synuar. Skedarët që nuk mund të analizohen shënohen dhe lënë jashtë ZIP. Emrat e skedarëve origjinalë mbahen me një shtesë të re; përplasjet marrin një prapashtesë.",
-    "who": "Redaktorë dhe krijues nëtitujsh që konvertojnë dosje të tëra serialesh, dhe pronarë faqesh që ushqejnë lojtarët me një format të vetëm.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Redaktori i Teksteve LRC - Kap Kohën Gjatë Dëgjimit | AI-SRTSub",
-    "desc": "Ngarkoni një këngë, ngjitni tekstin e këngës dhe goditni kohën e secilit rresht gjatë dëgjimit; eksportoni LRC ose SRT. Importoni LRC ekzistuese për akordim të imtësishëm. I drejtuar nga tastiera, plotësisht në shfletues.",
-    "kw": "redaktor lrc në internet,krijo lrc,kohëzimi i tekstit të këngës,krijues lrc,krijo lrc,sinkronizues i teksteve të këngëve,lrc në srt",
-    "intro": "Ngarkoni muzikë, ngjitni tekstin e këngës, goditni kohëzimin rresht pas rreshti ndërsa dëgjoni, dhe eksportoni LRC ose SRT. Asgjë nuk ngarkohet.",
-    "feat": "Punon me MP3, M4A, FLAC, WAV dhe OGG. Një rresht për çdo rresht; skedarët LRC ekzistues mund të importohen dhe rregullohen. Hapësira luan/ndalon, Enter vulos rreshtin aktual, Z zhbër - duart qëndrojnë në tastierë.",
-    "who": "Muzikantë që sinkronizojnë kopje, krijues që shtojnë këngë në video, dhe kushdo që ndërton nëtituj tekstesh këngësh për një lojtar.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "Rirreshtuesi i titrave të YouTube - Bashkoni fjalitë e thyera | AI-SRTSub",
-    "desc": "Titrat automatike të YouTube i presin fjalitë çdo 3-4 sekonda. Ky mjet i mban fjalët dhe i lëviz kufijtë atje ku mbarojnë fjalitë. Falas, 100 gjuhë.",
-    "kw": "rregullim titrash youtube,titra automatike youtube,rirreshtim titrash,bashkim fjalish në titra,rregullim titrash të thyera,rreshtim srt,ri-segmentim titrash,riparim titrash youtube,titra me ndërgjegjësim fjalie",
-    "intro": "Ngarkoni një skedar titrash të YouTube, zgjidhni gjuhën dhe mjeti do t'i bashkojë fjalitë nëpër blloqe, duke i prerë ato sërish fjali për fjali. Asnjë fjalë nuk ndryshohet dhe kohët e blloqeve mbeten sa më afër vulave kohore origjinale.",
-    "feat": "Titrat automatike të YouTube ndahen në blloqe 3-4 sekondëshe pa marrë parasysh fjalitë. Mjeti përdor vulat kohore si spiranca, përcakton fundin e fjalisë nga shenjat e pikësimit dhe përdor programim dinamik për të gjetur pikën më të mirë të ndarjes, duke përshtatur kohën e shfaqjes me shpejtësinë e leximit. Secila nga 100 gjuhët ka rregulla të veçanta: kinezishtja dhe japonishtja nuk kanë hapësira, tajlandishtja i shënon rrallë kufijtë, hindishtja përdor . dhe arabishtja ؟ . Gjerësia e rreshtit ndjek sistemin e shkrimit: 16 karaktere për kinezishten, 42 për alfabetet latine. Para eksportimit, teksti krahasohet karakter për karakter për të shmangur humbjen e fjalëve.",
-    "who": "Ekipet e titrave që kthejnë titrat e YouTube, podkasteve dhe kurseve në titra të gatshëm, si dhe krijuesit që janë lodhur nga fjalitë që ndërpriten në mes.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio në titra — kthe fjalimin në SRT në shfletues | AI-SRTSub",
-    "desc": "Audio ose video në titra: njohja e fjalimit kryhet në shfletues, ndan rezultatin në fjali dhe eksporton SRT / VTT. Asgjë nuk ngarkohet, falas.",
-    "kw": "audio në srt,fjalim në titra,gjenero titra nga audio,gjenerues automatik i titrave,transkripto audio në srt,titra whisper,njohja e fjalimit në shfletues,gjenerim offline i titrave",
-    "intro": "Hidhni një skedar audio ose video, zgjidhni një gjuhë dhe një model, dhe njohja do të kryhet direkt në shfletuesin tuaj. Rezultati është një draft titrash me kohëzgjatje, të ndara saktë sipas fjalive.",
-    "feat": "Ky mjet shton një shtresë inteligjente mbi njohjen e fjalimit duke ndarë fjalitë sipas shenjave të pikësimit, duke rregulluar gjatësinë e rreshtave dhe duke optimizuar kohën e shfaqjes në ekran pa mbivendosje.",
-    "who": "Krijuesit që shtojnë titra në videot e tyre, ekipet që kthejnë podkaste në tekst dhe kushdo që ka nevojë për një draft titrash për redaktim."
-  },
-  "ocrsub": {
-    "title": "OCR për titra të ngulitura — lexo titrat në video | AI-SRTSub",
-    "desc": "Titrat e ngulitura në video nuk mund të nxirren si skedar. Shënoni zonën dhe mjeti i lexon ato kornizë pas kornize, duke krijuar SRT / VTT falas.",
-    "kw": "nxirr titra të ngulitura,ocr titrash,ekstraktim titrash nga video,titra të djegura në video,ocr titra nga video,video në srt,titra nga video,ocr për titra të ngulitura",
-    "intro": "Hidhni një video, shënoni zonën ku ndodhen titrat dhe mjeti do t'i lexojë ato kornizë pas kornize, duke bashkuar kornizat identike në një titër të vetëm me kohëzgjatje.",
-    "feat": "Mjeti përdor përpunimin e imazhit për të izoluar zonën e titrave, duke binarizuar shkronjat bazuar në ndriçim dhe duke i kthyer ato në tekst të sinkronizuar me kohën e shfaqjes në video.",
-    "who": "Ekipet e përkthimit që lokalizojnë video të huaja, redaktorët që punojnë me video të vjetra dhe ata që nuk kanë skedarin origjinal të titrave."
-  }
+ "index": {
+  "htmlLang": "sq",
+  "ogLocale": "sq_AL",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Përkthyes i Nëntitujve me AI për Filma dhe Seriale",
+  "desc": "Përkthyes falas i nëtitujve me AI — pa regjistrim, pa kufizime, pa filigran. Përktheni nëtitujt e filmave, serialeve dhe dokumentarëve në gjuhën tuaj me një klikim.",
+  "kw": "përkthyes i nëtitujve me AI,përkthe nëtitujt,përkthyes falas i nëtitujve,përkthe skedarin SRT,përkthe VTT,përkthe ASS,përkthim i nëtitujve të filmave,nëntituj të serialeve televizive,nëntituj të Netflix,nëntituj të KDrama,nëntituj të anime,nëntituj dygjuhësh,nëntituj të filmave të huaj,përkthe nëtitujt në internet,nëntituj të YouTube,mjet falas për përkthimin e nëtitujve,përkthe nëtituj falas,përkthyes SRT falas",
+  "ogTitle": "AI-SRTSub - Përkthyes i Nëntitujve me AI për Filma dhe Seriale",
+  "ogDesc": "Përkthyes falas i nëtitujve me AI 100% për adhuruesit e filmave: një klikim kthen nëtitujt e filmave të huaj, serialeve dhe dokumentarëve në gjuhën tuaj amtare, me rreshtim automatik të skemës kohore. Shijoni përmbajtjen globale pa pengesa.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Përkthyes falas i nëtitujve me AI 100% për adhuruesit e filmave: një klikim kthen nëtitujt e filmave të huaj, serialeve dhe dokumentarëve në gjuhën tuaj amtare, me rreshtim automatik të skemës kohore. Shijoni përmbajtjen globale pa pengesa.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Rreth këtij mjeti\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Përkthyes Falas i Nëntitujve Automatikë me AI</h2>\n    <p data-i18n-html=\"seoIntro\">Ky është një <strong>mjet falas online për përkthimin e nëtitujve i fuqizuar nga modele të mëdha gjuhësore</strong>. Ngarkoni skedarë SRT, VTT ose ASS dhe përktheni nëtituj midis anglishtes, kinezishtes, japonishtes, koreanishtes, spanjishtes, frëngjishtes dhe 15+ gjuhëve të tjera. Pa regjistrim, pa instalim, pa filigran — hapeni në shfletues dhe filloni përkthimin. Të dhënat e nëtitujve qëndrojnë në shfletuesin tuaj nëse nuk aktivizoni përkthimin në re.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Karakteristikat kryesore:</strong> Analizim dhe përkthim me AI për SRT, VTT dhe ASS, bashkim i mençur i fjalive (kur një fjali përfshin disa shenja kohore, ato bashkohen, përkthehen dhe më pas ndahen përsëri në skemën origjinale kohore), rreshtim i skemës kohore, mbështjellje automatike e rreshtave për tekstin CJK dhe Perëndimor, heqje e fjalëve mbushëse, trajtim i personalizuar i terminologjisë dhe stile të zgjedhshme përkthimi. Eksportoni skedarë standardë SRT, VTT, ASS ose TXT të gatshëm për t'u vendosur në videon tuaj.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kush e përdor atë:</strong> përkthyes videosh, krijues dhe lokalizues të YouTube, nxënës të gjuhëve, grupe dhe ekipe nëtitujsh që duhet të lokalizojnë përmbajtjen video shpejt.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Ky mjet kërkon JavaScript. Ju lutemi aktivizoni JavaScript në shfletuesin tuaj, më pas ngarkoni një skedar nëtitujsh (SRT / VTT / ASS) për të përkthyer nëtitujt me AI falas.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Krijues i Nëntitujve me Stil - Bashko Efektet Dygjuhëshe, ASS & VTT",
+  "desc": "Mjet falas për nëtituj me stil: bashkoni dy skedarë në dygjuhësh, ridizajnoni një skedë dygjuhëshe ose shtoni efekte. 5 paracaktime ASS / 6 VTT; eksportoni si SRT / VTT / ASS.",
+  "kw": "bashko nëtitujt,nëntituj dygjuhësh,kombino skedarët e nëtitujve,nëntituj me stil,stile nëtitujsh ASS,stile nëtitujsh VTT,efekte të nëtitujve,krijues i nëtitujve të dyfishtë,paracaktime ASS,shabllon nëtitujsh,mjet falas për nëtituj",
+  "intro": "Bashkoni dy skedarë nëtitujsh në dygjuhësh, ose stiloni një skedë: shkronjat, ngjyrën, skicën dhe pozicionin, të gjitha nëpërmjet pamjes direkte (WYSIWYG).",
+  "feat": "Bashkim dhe rregullim dygjuhësh, paracaktime stilesh ASS / VTT, fole stilesh për çdo vlerë, korrigjime të skemës kohore në vend dhe në masë, si dhe një pamje paraprake e drejtpërdrejtë që është fjalë për fjalë skedari i eksportuar.",
+  "who": "Krijues që bëjnë nëtituj dygjuhësh ose me stil, grupe kodimi dhe ekipe që kanë nevojë për tituj të aksesueshëm."
+ },
+ "clean": {
+  "title": "Pastrues i Nëntitujve - Hiq Filigranet, Shenjat SDH & Etiketat HTML",
+  "desc": "Pastrues falas i nëtitujve në internet: hiq filigranet, reklamat, SDH, etiketat HTML, efektet ASS; rregullo shkronjat e mëdha, mojibake. 13 rregulla të ndryshueshme, zhbërje për çdo ndryshim, skema kohore e paprekur.",
+  "kw": "pastrues i nëtitujve,pastro skedarin srt,hiq filigranin e nëtitujve,hiq nëtitujt SDH,hiq etiketat HTML nga nëtitujt,rregullo nëtitujt me shkronja të mëdha,rregullo mojibake,hiq nëtitujt për persona me dëmtim dëgjimi,hiq efektet ASS",
+  "intro": "Kaloni një nëtitull të shkarkuar fillimisht këtu: filigranet, reklamat, shenjat SDH dhe etiketat HTML, zhduken në një kalim të vetëm.",
+  "feat": "13 rregulla në katër grupe (9 të aktivizuara si parazgjedhje), heqje e filigraneve dhe SDH, rregullime të shkronjave të mëdha dhe mojibake, listë ndryshimesh për çdo shenjë me kthim mbrapsht individual, dhe koha nuk preket kurrë.",
+  "who": "Kushdo që ka marrë një nëtitull ekzistues dhe thjesht e do të përdorshëm, si dhe grupe që pastrojnë material në masë."
+ },
+ "glossary": {
+  "title": "Zëvendësim Masiv i Termave në Nëntituj - Fjalor AI-SRTSub",
+  "desc": "Zëvendësim fjalori për nëtitujt: listoni \"e vjetër → e re\" një herë dhe i gjithë skedari SRT / VTT / ASS / TXT përditësohet. Koha, stilet dhe blloqet NOTE mbeten; zhbërje për çdo rresht.",
+  "kw": "fjalor i nëtitujve,zëvendësim në masë i srt,gjej dhe zëvendëso nëtitujt,zëvendësim i termave të nëtitujve,redaktim në masë i srt,zëvendëso fjalët në nëtituj,unifiko emrat e nëtitujve,terminologji e nëtitujve,zëvendëso tekstin në vtt,mjet fjalori srt,zëvendësim i terminologjisë në masë",
+  "intro": "Një fjalor me rregulla \"term i vjetër → term i ri\" të zbatueshme në të gjithë skedarin e nëtitujve menjëherë, me kohën, stilet ASS dhe blloqet e shënimeve VTT të paprekura në nivel bajti.",
+  "feat": "Një rregull për rresht, i ndarë me -> , => , → ose një skedë; rreshtat që fillojnë me # janë komente. Përputhja e fjalës së plotë e mban \"art\" jashtë \"start\", ndjeshmëria ndaj shkronjave të mëdha është opsionale, dhe ju mund ta kufizoni zëvendësimin në rreshtin 1 ose rreshtin 2 të shenjave dygjuhëshe. Çdo shenjë e ndryshuar listohet, dhe çdo një prej tyre mund të kthehet në gjendjen e mëparshme.",
+  "who": "Kushdo që unifikon emrat dhe terminologjinë nëpër një sezon, rregullon fjalorin e përkthimit automatik në masë, ose përshtat nëtitujt e dikujt tjetër sipas stilit të tij.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Kontrolli i Cilësisë së Nëntitujve - Koha dhe Elipsa | AI-SRTSub",
+  "desc": "Kontroll i cilësisë së nëtitujve falas në internet: ngarkoni SRT, VTT ose ASS dhe kontrolloni mbivendosjet, kohëzgjatjen, shpejtësinë e leximit, gjerësinë e rreshtit, ndarjet e rreshtave, numërimin dhe kodimin kundrejt rregullave të asaj gjuhe. 27 gjuhë, 27 grupe pragjesh, plus rregulla specifike për gjuhën.",
+  "kw": "kontrollues i nëtitujve,kontroll i cilësisë së nëtitujve,validues srt,kontroll i cilësisë së nëtitujve,kontroll srt,kontroll i kohës së nëtitujve,validues i nëtitujve,kontrollo skedarin srt,korrigjim i nëtitujve,linter i nëtitujve",
+  "intro": "Ngarkoni një skedar nëtitujsh dhe kontrollojeni atë kundrejt rregullave të gjuhës së tij - çdo gjetje vjen me vlerën e matur dhe pragun. Ekzekutohet plotësisht në shfletuesin tuaj, asgjë nuk ngarkohet.",
+  "feat": "Kontrollon shenjat e mbivendosura, që shfaqen shumë shkurt ose shumë gjatë në ekran, shpejtësinë e leximit, gjerësinë e rreshtit, numrin e rreshtave, ndarjet e vështira të rreshtave, numërimin, shenjat boshe, mojibake dhe karakteret e kontrollit. Gjerësia dhe shpejtësia e leximit ndjekin sistemin e shkrimit: kinezishtja matet me karaktere me gjerësi të plotë, shenjat bashkuese tajlandeze dhe arabe llogariten si gjerësi zero. Rregullat specifike për gjuhën mbulojnë pikëpyetjen hapëse spanjolle ¿, hapësirën pa ndarje frënge para ? ! ; :, pikëpyetjen greke, pikësimin me gjerësi të plotë në kinezisht dhe japonisht, si dhe pikëpyetjen dhe presjen arabe. Elementët e rregullueshëm automatikisht listohen veçmas, dhe çdo gjë që lëviz kodet kohore çaktivizohet si parazgjedhje.",
+  "who": "Grupe nëtitujsh, furnizues lokalizimi, redaktorë dhe kushdo që dëshiron të kontrollojë një skedar para dorëzimit.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Përkthyes i Nëntitujve — SRT/VTT/ASS në Gjuhën Tuaj",
+  "desc": "Lëshoni një skedar SRT / VTT / ASS, zgjidhni një gjuhë të synuar dhe merrni përkthim të lidhur me skemën kohore. 100 gjuhë, falas, pa regjistrim."
+ },
+ "convert": {
+  "title": "Konvertues i Nëntitujve - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Konvertues falas i nëtitujve në internet: konvertoni midis SRT, VTT, ASS, SBV, LRC dhe TXT duke mbajtur të paprekur skemën kohore, etiketat e efekteve ASS pastrohen automatikisht.",
+  "kw": "konvertues i nëtitujve,srt në vtt,vtt në srt,ass në srt,sbv në srt,srt në lrc,nëntituj në txt,konverto nëtitujt,konvertues srt,konvertues vtt",
+  "intro": "Konvertoni midis SRT, VTT, ASS, SBV, LRC dhe TXT duke mbajtur të paprekur skemën kohore.",
+  "feat": "Formati i hyrjes zbulohet automatikisht dhe vulat kohore rishkruhen për formatin e synuar; etiketat e efekteve ASS dhe ndarjet e detyruara të rreshtave bëhen tekst i lexueshëm kur eksportoni në një format të thjeshtë; skedarët e teksteve këngëtare nuk kanë fushë orësh, kështu që çdo gjë pas një ore llogaritet në minuta.",
+  "who": "Kushdo kies lojtari i të cilit refuzon një skedar nëtitujsh, dhe kushdo që lëviz materialin midis një redaktori dhe një lojtari në internet.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Ndarës i Nëntitujve Dygjuhësh - Mbani Vetëm Një Gjuhë | AI-SRTSub",
+  "desc": "Ndarës falas i nëtitujve dygjuhësh në internet: ndani një skedar dygjuhësh nëtitujsh në një gjurmë origjinale dhe një gjurmë të përkthyer, ose mbani vetëm njërën.",
+  "kw": "ndarës i nëtitujve dygjuhësh,nda srt dygjuhësh,hiq nëtitujt e gjuhës së dytë,mbaj vetëm nëtitujt në anglisht,nxirr nëtitujt e përkthyer,ndarje dygjuhëshe srt,ndarje dygjuhëshe ass",
+  "intro": "Ndani një skedar dygjuhësh nëtitujsh në një gjurmë origjinale dhe një gjurmë të përkthyer, ose mbani vetëm njërën prej tyre.",
+  "feat": "Trajton të dyja skemat e zakonshme - një shenjë që mban dy rreshta, dhe dy shenja që ndajnë të njëjtën skemë kohore. Gjurmët ndahen sipas rendit dhe llojit të shkrimit, skema kohore mbahet ekzaktësisht siç është, dhe një skedar me një gjuhë shënohet në vend që të boshatiset në heshtje.",
+  "who": "Kushdo që ka marrë një skedar dygjuhësh të gatshëm dhe dëshiron vetëm një gjuhë, dhe ekipet e nëtitujve që arkivojnë origjinalin dhe përkthimin veçmas.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Zhvendosja e Kohës së Titrave - Lëviz, RiPërmaso, Bashko dhe Ndaj | AI-SRTSub",
+  "desc": "Mjet falas i kohëzgjatjes së nëtitujve në internet: zhvendosni gjithçka menjëherë, përpjesëtoni me një raport, ose rregulloni vonesën me dy pika spirancë. Punon me SRT, VTT, ASS, SBV, LRC dhe TXT.",
+  "kw": "zhvendosje e kohës së nëtitujve,zhvendos kohën e srt,rregullim i sinkronizimit të nëtitujve,përpjesëto kohën e nëtitujve,rregullo vonesën e nëtitujve,kompensim i kohës srt,rregullim i vonesës së nëtitujve,bashko nëtitujt,nda nëtitujt,kombino srt,nda nëtituj të gjatë",
+  "intro": "Kur nëtitujt janë jashtë sinkronizimit, lëvizni të gjithë skemën kohore, përpjesëtojeni atë me një raport, ose rregullojeni me dy pika spirancë. Ai gjithashtu mund të bashkojë rreshtat që janë ndarë dhe të ndajë ata që zgjasin shumë.",
+  "feat": "Zhvendosja lëviz çdo shenjë pa ndryshuar kohën që secila qëndron në ekran. Përpjesëtimi shumëzon të dy skajet, kështu që gjatësia e shenjës ndryshon me të - e dobishme midis 24 dhe 25 fps. Rregullimi me dy pika trajton skedarët që janë edhe të zhvendosur, edhe që ecin me shpejtësi të gabuar. Kohët që dalin negative bllokohen në zero, dhe mjeti ju tregon se sa prej tyre u prekën. I njëjti format hyn, i njëjti format del - pa konvertim, dhe stilet ASS, stilimi për rresht dhe etiketat e efekteve mbahen ekzaktësisht siç ishin. Shenjat dygjuhëshe qëndrojnë në dy rreshta kur bashkohen dhe kapërcehen gjatë ndarjes.",
+  "who": "Kushdo, nëtitujt e të cilit shmangin sinkronizimin pas një ndryshimi burimor, ecin pak më shpejt ose më ngadalë, ose vijnë nga dikush që punon në një shpejtësi tjetër kadri.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Rregullo Titrat e Korruptuara - Riparo Kodimin e Gabuar | AI-SRTSub",
+  "desc": "Riparim falas në internet për nëtitujt e dëmtuar: zbulon nëse skedari është UTF-8, GBK, Big5, Shift_JIS ose EUC-KR, rivendos tekstin e lexuar gabim, ruan përsëri për lojtarin tuaj.",
+  "kw": "rregullo nëtitujt e dëmtuar,mojibake e nëtitujve,rregullim i kodimit srt,rregullo kodimin e nëtitujve,utf8 në gbk subtitle,srt shfaq karaktere të çuditshme,kodim i gabuar i nëtitujve,ass i dëmtuar,vtt i dëmtuar,zbulo kodimin e nëtitujve",
+  "intro": "Nëntitujt që hapen si një mur me pakuptimësi pothuajse gjithmonë lexohen me kodimin e gabuar. Lëshoni skendarin brenda, dhe ai zbulon se në cilin kodim është shkruar realisht skedari dhe kthen mbrapsht karakteret e lexuara gabim.",
+  "feat": "Skedarët e ngarkuar dekodohen përsëri nga bajtet origjinale, kështu që asgjë nuk humbet: nëse skedari rezulton të jetë GBK, ai thotë kështu, dhe nëse lojtari juaj është ai që e lexon gabim, ruajtja e një kopjeje si \"UTF-8 me BOM\" zakonisht e zgjidh atë. Teksti i ngjitur nuk është më bajtet origjinale, kështu që shumë më pak mund të rikuperohet; nëse ai tashmë përmban karaktere zëvendësuese, kjo është e parikuperueshme dhe mjeti e thotë hapur në vend që të shtirret ndryshe. Numrat e rreshtave dhe kodet kohore nuk preken kurrë, dhe etiketat e stileve ASS lihen saktësisht siç ishin.",
+  "who": "Kushdo që ka shkarkuar nëtituj që hapen si zhargon, sheh kuti në vend të kinezishtes në lojtar, ose i është dorëzuar një skedar me një kodim të panjohur.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Nxirr Tekst Nga Nëntitujt - SRT/ASS/VTT në Tekst të Thjeshtë | AI-SRTSub",
+  "desc": "Nxjerrës falas i nëtitujve në tekst në internet: lexon SRT, VTT, ASS, SBV, LRC dhe TXT, heq kodet kohore dhe numrat e rreshtave, dhe nxjerr dialog të pastër si paragrafë ose një rresht për çdo shenjë.",
+  "kw": "nxirr tekst nga nëtitujt,nëntituj në tekst,srt në txt,srt në tekst të thjeshtë,ass në txt,vtt në txt,transkript i nëtitujve,nxirr dialog nga srt,srt hiq kodet kohore,nxerrës i tekstit të nëtitujve",
+  "intro": "Nxirrni dialogun nga nëtitujt SRT / VTT / ASS / SBV / LRC / TXT si tekst i thjeshtë i pastër: kodet kohore, numrat e shenjave dhe etiketat e stileve hiqen automatikisht.",
+  "feat": "Dy skema: paragrafë të vazhdueshëm të ndarë në pauza dhe pikësim në fund të fjalisë, ose një rresht për shenjë për listat e dialogjeve. Shenjat e zërit si \"(telefoni bie)\", filigranet burimore dhe rreshtat e përsëritur njëri pas tjetrit hiqen si parazgjedhje; emrat e folësve si \"TOM:\" dhe rreshtat e këngëve mund të mbahen ose të hiqen. Mbështjellja e rreshtave bashkohet përsëri sipas skriptit — kinezishtja bashkohet direkt, koreanishtja dhe latinishtja shtojnë hapësira — kështu që asgjë nuk ngjitet bashkë.",
+  "who": "Kushdo që dëshiron tekstin e nëtitujve për shënime, skripte, praktikë përkthimi ose për të ushqyer një mjet tjetër, pa fshirë qindra kode kohore me dorë.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Nxirrni Nëntitujt e Integruar nga MKV / MP4 në SRT | AI-SRTSub",
+  "desc": "Nxirrni nëtitujt e integruar nga MKV, WebM, MP4, MOV; eksportoni si SRT / VTT / ASS / TXT. Pa ngarkim ose rikodim — skedarët lexohen në shfletuesin tuaj; shumë GB në rregull.",
+  "kw": "nxirr nëtitujt e integruar,mkv në srt,nxjerrje e nëtitujve mp4,nxirr nëtitujt nga video,nxerrës i nëtitujve të integruar,srt nga mkv,nxjerrje e nëtitujve mov,eksport i gjurmës së nëtitujve,vtt nga mkv,nxirr nëtituj të butë,shkyçje e nëtitujve mkv",
+  "intro": "Tërhiqni gjurmën e nëtitujve të mbyllur brenda një MKV ose MP4 drejtpërdrejt në një SRT — pa ngarkim, gjithçka ndodh në shfletuesin tuaj.",
+  "feat": "Lexon gjurmët e tekstit të thjeshtë, ASS, WebVTT dhe mov_text / tx3g, mban kokën dhe rezolucionin origjinal ASS, dhe lexon në pjesë të vogla sipas zhvendosjes, kështu që një skedar i madh nuk mbushet kurrë në memorie.",
+  "who": "Kushdo që ka një filmi që mbart nëtituj të butë dhe dëshiron tekstin jashtë, grupe kodimi dhe ekipe fansub që fillojnë nga gjurma origjinale.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Konvertues i Nëntitujve Kinezë - Të Thjeshtuar ⇄ Tradicionalë | AI-SRTSub",
+  "desc": "Konvertues falas i nëtitujve kinezë: Të thjeshtuar ⇄ Tradicionalë (Tajvan / Hong Kong) dhe anasjelltas. Ndryshojnë vetëm dialogët — kodet kohore dhe etiketat ASS qëndrojnë. Ndërtuar mbi OpenCC.",
+  "kw": "konvertues i nëtitujve kinezë,të thjeshtuar në tradicionalë,tradicionalë në të thjeshtuar,srt kinezisht tradicionale,konverto nëtitujt kinezisht,kinezisht tradicionale e tajvanit,kinezisht tradicionale e hong kongut,konvertim han,konverto srt në kinezisht tradicionale,srt kinezisht e thjeshtuar,subtitol opencc",
+  "intro": "Konvertoni një skedar të plotë nëtitujsh midis të thjeshtuarve dhe tradicionalëve, duke mos ndryshuar asgjë përveç dialogut.",
+  "feat": "Nëntë drejtime: tradicionale e përgjithshme, fjalor i Tajvanit, forma të Tajvanit, Hong Kong, kthim te të thjeshtuarat, dhe forma rajonale tradicionale në tradicionale. Përdor fjalorin OpenCC me zgjidhjen e frazave sipas përputhjes më të gjatë të parë.",
+  "who": "Kushdo që dorëzon nëtituj për audiencën e Tajvanit ose Hong Kongut, distributorë që përgatisin versione rajonale dhe redaktorë që kanë marrë një skedar tradicional dhe duan të thjeshtuar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Ndarës & Bashkues i Nëntitujve - SRT / VTT | AI-SRTSub",
+  "desc": "Ndani nëtitujt sipas kohëzgjatjes ose numrit, ose bashkoni shumë skedarë në rregull ose sipas vulës kohore. Rrinumërimi është automatik, dialogu i paprekur. SRT & VTT.",
+  "kw": "ndarës i nëtitujve,nda nëtitujt,bashko skedarët srt,bashkues srt,kombino nëtitujt,nda srt,bashko skedarët srt,prit nëtitujt,nda vtt,bashkues i nëtitujve",
+  "intro": "Prisni një nëtitull të gjatë në pjesë, ose bashkoni shumë skedarë në një. Ekzekutohet plotësisht në shfletuesin tuaj — asgjë nuk ngarkohet.",
+  "feat": "Ndani sipas kohëzgjatjes ose numrit me rinumërim për çdo pjesë dhe kohëzim opsional me bazë zero; bashkoni në mënyrë sekuenciale me një hapësirë ose ndërthurni sipas vulave kohore origjinale. SRT dhe VTT.",
+  "who": "Krijues që ndajnë episode për ngarkim, ekipe që rishikojnë në pjesë dhe redaktorë që bashkojnë nëtituj me shumë pjesë.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Nëntitujt në Excel/CSV dhe Kthehu Mbrapa | AI-SRTSub",
+  "desc": "Ktheni SRT ose VTT në një fletë Excel ose CSV për rishikim dhe përkthim, pastaj kthejeni përsëri. Kodet kohore mbeten të sakta, ndarjet e rreshtave mbijetojnë. Asgjë nuk ngarkohet.",
+  "kw": "nëtituj në excel,srt në csv,srt në excel,excel në srt,csv në srt,fletëllogaritëse e nëtitujve,konvertues i nëtitujve në tabelë",
+  "intro": "Eksportoni nëtitujt në një fletëllogaritëse për rishikim dhe përkthim, pastaj importoni fletën përsëri. Ekzekutohet plotësisht në shfletuesin tuaj.",
+  "feat": "Një klikim nga SRT ose VTT në xlsx ose CSV; redaktoni kohët, tekstin dhe shënimet në fletëllogaritësen tuaj, pastaj eksportoni përsëri në SRT ose VTT. Kolonat e kohës ruajnë saktësinë e plotë të milisekondave; ndarjet e rreshtave brenda qelisë ruhen. Kokat e kinezishtes dhe anglishtes funksionojnë të dyja.",
+  "who": "Përkthyes, ekipe fansub dhe redaktorë që rishikojnë, shënojnë ose rregullojnë në masë nëtitujt në një fletëllogaritëse.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Konverto Nëntitujt në Masë në SRT/VTT | AI-SRTSub",
+  "desc": "Lëshoni dhjetëra ose qindra skedarë SRT/VTT, konvertojini të gjithë në një format dhe shkarkoni një ZIP. Rrinumërimi dhe vulat kohore të normalizuara; skedarët e palexueshëm të shënuar.",
+  "kw": "konverto nëtitujt në masë,srt në vtt,konvertues i nëtitujve në masë,srt në masë,konverto nëtituj të shumtë,zip i nëtitujve",
+  "intro": "Zvarritni qindra skedarë nëtitujsh, konvertojini të gjithë, merrni një ZIP. Ekzekutohet plotësisht në shfletuesin tuaj.",
+  "feat": "SRT në VTT dhe anasjelltas në masë; numrat e sekuencës u rirenditën dhe vulat kohore u normalizuan për formatin e synuar. Skedarët që nuk mund të analizohen shënohen dhe lënë jashtë ZIP. Emrat e skedarëve origjinalë mbahen me një shtesë të re; përplasjet marrin një prapashtesë.",
+  "who": "Redaktorë dhe krijues nëtitujsh që konvertojnë dosje të tëra serialesh, dhe pronarë faqesh që ushqejnë lojtarët me një format të vetëm.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Redaktori i Teksteve LRC - Kap Kohën Gjatë Dëgjimit | AI-SRTSub",
+  "desc": "Ngarkoni një këngë, ngjitni tekstin e këngës dhe goditni kohën e secilit rresht gjatë dëgjimit; eksportoni LRC ose SRT. Importoni LRC ekzistuese për akordim të imtësishëm. I drejtuar nga tastiera, plotësisht në shfletues.",
+  "kw": "redaktor lrc në internet,krijo lrc,kohëzimi i tekstit të këngës,krijues lrc,krijo lrc,sinkronizues i teksteve të këngëve,lrc në srt",
+  "intro": "Ngarkoni muzikë, ngjitni tekstin e këngës, goditni kohëzimin rresht pas rreshti ndërsa dëgjoni, dhe eksportoni LRC ose SRT. Asgjë nuk ngarkohet.",
+  "feat": "Punon me MP3, M4A, FLAC, WAV dhe OGG. Një rresht për çdo rresht; skedarët LRC ekzistues mund të importohen dhe rregullohen. Hapësira luan/ndalon, Enter vulos rreshtin aktual, Z zhbër - duart qëndrojnë në tastierë.",
+  "who": "Muzikantë që sinkronizojnë kopje, krijues që shtojnë këngë në video, dhe kushdo që ndërton nëtituj tekstesh këngësh për një lojtar.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "Rirreshtuesi i titrave të YouTube - Bashkoni fjalitë e thyera | AI-SRTSub",
+  "desc": "Titrat automatike të YouTube i presin fjalitë çdo 3-4 sekonda. Ky mjet i mban fjalët dhe i lëviz kufijtë atje ku mbarojnë fjalitë. Falas, 100 gjuhë.",
+  "kw": "rregullim titrash youtube,titra automatike youtube,rirreshtim titrash,bashkim fjalish në titra,rregullim titrash të thyera,rreshtim srt,ri-segmentim titrash,riparim titrash youtube,titra me ndërgjegjësim fjalie",
+  "intro": "Ngarkoni një skedar titrash të YouTube, zgjidhni gjuhën dhe mjeti do t'i bashkojë fjalitë nëpër blloqe, duke i prerë ato sërish fjali për fjali. Asnjë fjalë nuk ndryshohet dhe kohët e blloqeve mbeten sa më afër vulave kohore origjinale.",
+  "feat": "Titrat automatike të YouTube ndahen në blloqe 3-4 sekondëshe pa marrë parasysh fjalitë. Mjeti përdor vulat kohore si spiranca, përcakton fundin e fjalisë nga shenjat e pikësimit dhe përdor programim dinamik për të gjetur pikën më të mirë të ndarjes, duke përshtatur kohën e shfaqjes me shpejtësinë e leximit. Secila nga 100 gjuhët ka rregulla të veçanta: kinezishtja dhe japonishtja nuk kanë hapësira, tajlandishtja i shënon rrallë kufijtë, hindishtja përdor . dhe arabishtja ؟ . Gjerësia e rreshtit ndjek sistemin e shkrimit: 16 karaktere për kinezishten, 42 për alfabetet latine. Para eksportimit, teksti krahasohet karakter për karakter për të shmangur humbjen e fjalëve.",
+  "who": "Ekipet e titrave që kthejnë titrat e YouTube, podkasteve dhe kurseve në titra të gatshëm, si dhe krijuesit që janë lodhur nga fjalitë që ndërpriten në mes.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio në titra — kthe fjalimin në SRT në shfletues | AI-SRTSub",
+  "desc": "Audio ose video në titra: njohja e fjalimit kryhet në shfletues, ndan rezultatin në fjali dhe eksporton SRT / VTT. Asgjë nuk ngarkohet, falas.",
+  "kw": "audio në srt,fjalim në titra,gjenero titra nga audio,gjenerues automatik i titrave,transkripto audio në srt,titra whisper,njohja e fjalimit në shfletues,gjenerim offline i titrave",
+  "intro": "Hidhni një skedar audio ose video, zgjidhni një gjuhë dhe një model, dhe njohja do të kryhet direkt në shfletuesin tuaj. Rezultati është një draft titrash me kohëzgjatje, të ndara saktë sipas fjalive.",
+  "feat": "Ky mjet shton një shtresë inteligjente mbi njohjen e fjalimit duke ndarë fjalitë sipas shenjave të pikësimit, duke rregulluar gjatësinë e rreshtave dhe duke optimizuar kohën e shfaqjes në ekran pa mbivendosje.",
+  "who": "Krijuesit që shtojnë titra në videot e tyre, ekipet që kthejnë podkaste në tekst dhe kushdo që ka nevojë për një draft titrash për redaktim."
+ },
+ "ocrsub": {
+  "title": "OCR për titra të ngulitura — lexo titrat në video | AI-SRTSub",
+  "desc": "Titrat e ngulitura në video nuk mund të nxirren si skedar. Shënoni zonën dhe mjeti i lexon ato kornizë pas kornize, duke krijuar SRT / VTT falas.",
+  "kw": "nxirr titra të ngulitura,ocr titrash,ekstraktim titrash nga video,titra të djegura në video,ocr titra nga video,video në srt,titra nga video,ocr për titra të ngulitura",
+  "intro": "Hidhni një video, shënoni zonën ku ndodhen titrat dhe mjeti do t'i lexojë ato kornizë pas kornize, duke bashkuar kornizat identike në një titër të vetëm me kohëzgjatje.",
+  "feat": "Mjeti përdor përpunimin e imazhit për të izoluar zonën e titrave, duke binarizuar shkronjat bazuar në ndriçim dhe duke i kthyer ato në tekst të sinkronizuar me kohën e shfaqjes në video.",
+  "who": "Ekipet e përkthimit që lokalizojnë video të huaja, redaktorët që punojnë me video të vjetra dhe ata që nuk kanë skedarin origjinal të titrave."
+ },
+ "multilang": {
+  "title": "Shumë gjuhë njëherësh — ngarko një sezon, radhit çdo gjuhë | AI-SRTSub",
+  "desc": "Hidh një sezon të plotë, zgjidh gjuhët që të duhen dhe nisni njëherësh. Episodet dhe gjuhët bëhen një radhë e vetme dhe shkojnë në sfond; rezultatet vijnë në një zip të vetëm. Vazhdon aty ku u la.",
+  "kw": "përkthim mandatesh,përkthim titujsh në disa gjuhë,tituj shumëgjuhësh,tituj për një sezon të plotë,eksport i grupuar titujsh,përkthe srt në shumë gjuhë,një sezon shumë gjuhë",
+  "intro": "Hidh një sezon të plotë menjëherë, zgjidh gjuhët e synuara dhe shtyp nisjen. Episodet dhe gjuhët kthehen në një radhë të vetme: çdo gjuhë shkon deri në fund para se të fillojë tjetra dhe çdo gjë paketohet në një skedar zip të vetëm.",
+  "feat": "Pjesa që dështon zakonisht në përkthimet në masë është ngarkesa e njëkohshme. Njëzet episode me pesë gjuhë të lëshuara njëherësh krijojnë qindra kërkesa që bllokojnë serverin dhe askush nuk e di se cili skedar përfundoi realisht. Ndaj kjo faqe funksionon si një radhë e vetme: një grup në atë kohë, një gjuhë deri në përfundim para se të kalojë tek tjetra. Progresi ruhet për çdo episod dhe gjuhë në kompjuterin tuaj, kështu që nëse ndërpritet te episodi i tretë, ju hapni faqen përsëri, ngarkoni po ato skedarë dhe ai vazhdon nga ai grup pa dërguar sërish ato që janë bërë. Ajo që prish një sezon janë emrat: përkthe njëzet episode veçmas dhe i njëjti personazh përfundon me tre shkrime të ndryshme. Kjo është arsyeja pse fjalori është në panelin e tij këtu — ngarkohet një herë, ndahet nga i gjithë sezoni — dhe ju tregon se sa fjalë u përshtatën para se të filloni. Mbyll skedën dhe detyra ndalon menjëherë në vend që të harxhojë kuotën në sfond.",
+  "who": "Ekipet e titujve që përshtatin një sezon të plotë në disa gjuhë, kanalet që shpërndajnë të njëjtin grup episodesh në tregje të ndryshme dhe përkthyesit solo që preferojnë të shtypin nisjen një herë dhe të kthehen më vonë.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Koha për çdo shkronjë, Eksporto ASS | AI-SRTSub",
+  "desc": "Krijues falas i titujve për karaoke në internet: ngarko një këngë, ngjit tekstin, prek çdo rresht dhe ndaje automatikisht në shkronja ose prekji me muzikën. Eksporto ASS me etiketa \\\\kf për CapCut dhe Premiere.",
+  "kw": "krijues titujsh karaoke,ass karaoke,tekste me nivel fjalësh,etiketa kf,karaoke lrc,lëvizja e tekstit,krijues ass karaoke,ai srtsub",
+  "intro": "Ngarko një këngë, ngjit tekstin, prek çdo rresht dhe shpërndaje çdo rresht sipas shkronjave të tij - automatikisht sipas gjerësisë, duke prekur bashkë me muzikën, ose duke tërhequr kufijtë. Shiko fjalët teksa ndizen gjatë këndimit.",
+  "feat": "Kinezishtja ndahet për shkronjë, anglishtja për fjalë, shenjat e pikësimit vijnë bashkë. Një hapësirë e rregullueshme në fund parandalon që shkronja e fundit të mbivendoset mbi zërin. Eksporto ASS për CapCut / Premiere / Aegisub me etiketa \\\\kf, LRC të përmirësuar për lojtarët në nivel fjalësh, ose SRT me rresht të plotë si alternativë. Çdo gjë ekzekutohet në shfletuesin tuaj - pa ngarkime.",
+  "who": "Krijuesit që shtojnë tekste në video kopertinash dhe pamje koncertesh, krijues të videove muzikore dhe çdokush që prodhon tituj karaoke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

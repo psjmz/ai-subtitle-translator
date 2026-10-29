@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Ses Dosyasından SRT Altyazı Oluşturma | AI-SRTSub",
-    "desc": "Tarayıcınızda konuşmayı metne dönüştürün, cümleleri zamanlayın ve SRT/VTT olarak dışa aktarın. Dosya yükleme gerektirmez, tamamen ücretsizdir.",
-    "kw": "sesi srt yapma,konuşmayı altyazıya çevirme,otomatik altyazı oluşturucu,sesi metne dökme,whisper altyazı,tarayıcı tabanlı konuşma tanıma,çevrimdışı altyazı oluşturma",
-    "intro": "Ses veya video dosyasını sürükleyip bırakın, dili ve modeli seçin; konuşma tanıma işlemi doğrudan tarayıcınızda gerçekleşir. Sonuç, zamanlaması ayarlanmış ve cümle yapısına göre bölünmüş bir altyazı taslağıdır.",
-    "feat": "Bu araç, ham konuşma verisini cümle yapısına, satır genişliğine ve okuma hızına göre optimize edilmiş profesyonel altyazı bloklarına dönüştürür.",
-    "who": "Kendi videolarına altyazı eklemek isteyen içerik üreticileri, podcast ve eğitim videolarını metne dönüştüren ekipler ve altyazı taslağına ihtiyaç duyan herkes içindir."
-  },
-  "ocrsub": {
-    "title": "Gömülü Altyazı OCR — Videodan Altyazı Çıkarma | AI-SRTSub",
-    "desc": "Videoya gömülü altyazıları OCR ile okuyun ve SRT/VTT olarak kaydedin. Alanı seçin, araç kare kare okusun. Tamamen ücretsiz ve tarayıcı tabanlıdır.",
-    "kw": "gömülü altyazı çıkarma,altyazı ocr,videodan altyazı alma,hardcoded altyazı ocr,video srt dönüştürücü,altyazı ayıklama,görüntüden metne altyazı",
-    "intro": "Videoyu yükleyin, altyazıların bulunduğu alanı işaretleyin; araç kare kare okuma yaparak aynı metinleri zamanlanmış tek bir altyazı bloğunda birleştirir.",
-    "feat": "Gömülü altyazılar, ekranın alt kısmındaki sabit bir alandan parlaklık farkı kullanılarak ayrıştırılır ve OCR teknolojisi ile metne dönüştürülür.",
-    "who": "Yabancı videoları yerelleştiren altyazı ekipleri, eski sürümleri yeniden altyazılayanlar ve orijinal altyazı dosyası olmayan editörler içindir."
-  }
+ "autosub": {
+  "title": "Ses Dosyasından SRT Altyazı Oluşturma | AI-SRTSub",
+  "desc": "Tarayıcınızda konuşmayı metne dönüştürün, cümleleri zamanlayın ve SRT/VTT olarak dışa aktarın. Dosya yükleme gerektirmez, tamamen ücretsizdir.",
+  "kw": "sesi srt yapma,konuşmayı altyazıya çevirme,otomatik altyazı oluşturucu,sesi metne dökme,whisper altyazı,tarayıcı tabanlı konuşma tanıma,çevrimdışı altyazı oluşturma",
+  "intro": "Ses veya video dosyasını sürükleyip bırakın, dili ve modeli seçin; konuşma tanıma işlemi doğrudan tarayıcınızda gerçekleşir. Sonuç, zamanlaması ayarlanmış ve cümle yapısına göre bölünmüş bir altyazı taslağıdır.",
+  "feat": "Bu araç, ham konuşma verisini cümle yapısına, satır genişliğine ve okuma hızına göre optimize edilmiş profesyonel altyazı bloklarına dönüştürür.",
+  "who": "Kendi videolarına altyazı eklemek isteyen içerik üreticileri, podcast ve eğitim videolarını metne dönüştüren ekipler ve altyazı taslağına ihtiyaç duyan herkes içindir."
+ },
+ "ocrsub": {
+  "title": "Gömülü Altyazı OCR — Videodan Altyazı Çıkarma | AI-SRTSub",
+  "desc": "Videoya gömülü altyazıları OCR ile okuyun ve SRT/VTT olarak kaydedin. Alanı seçin, araç kare kare okusun. Tamamen ücretsiz ve tarayıcı tabanlıdır.",
+  "kw": "gömülü altyazı çıkarma,altyazı ocr,videodan altyazı alma,hardcoded altyazı ocr,video srt dönüştürücü,altyazı ayıklama,görüntüden metne altyazı",
+  "intro": "Videoyu yükleyin, altyazıların bulunduğu alanı işaretleyin; araç kare kare okuma yaparak aynı metinleri zamanlanmış tek bir altyazı bloğunda birleştirir.",
+  "feat": "Gömülü altyazılar, ekranın alt kısmındaki sabit bir alandan parlaklık farkı kullanılarak ayrıştırılır ve OCR teknolojisi ile metne dönüştürülür.",
+  "who": "Yabancı videoları yerelleştiren altyazı ekipleri, eski sürümleri yeniden altyazılayanlar ve orijinal altyazı dosyası olmayan editörler içindir."
+ },
+ "multilang": {
+  "title": "Tek seferde çoklu dil: Tüm sezonu yükle, sıraya koy | AI-SRTSub",
+  "desc": "Bütün bir sezonu ekleyin, dilleri seçin ve tek tıkla başlatın. Bölümler ve diller tek bir kuyrukta arka arkaya işlenir; sonuçlar tek zip dosyası olarak iner. Yarıda kalırsa kaldığı yerden devam eder, sekme kapatıldığında durur.",
+  "kw": "toplu altyazı çevirisi,çoklu dil altyazı çevir,tüm sezon altyazı,altyazı toplu dışa aktar,srt çoklu dile çevir,bir sezon çok dilli altyazı,ai srtsub toplu çeviri,otomatik altyazı çevir",
+  "intro": "Bütün bir sezonu tek seferde bırakın, hedef dilleri işaretleyin ve başlat tuşuna basın. Bölümler ve diller tek bir kuyrukta birleşir: her dil sonuna kadar işlenir, ardından sıradaki gelir ve her şey tek bir zip içinde paketlenir.",
+  "feat": "Toplu çevirilerde en sık yaşanan sorun eşzamanlılıktır. Yirmi bölüm ve beş dil aynı anda gönderildiğinde yüzlerce istek sunucu kuyruğunu tıkar; istekler birbirine karıştığı için hangi dosyanın bittiği anlaşılmaz. Bu yüzden bu sayfada işlemler kasıtlı olarak tek bir kuyrukta yürütülür: her seferinde tek bir parti ve bir dil tamamlanmadan diğerine geçilmez. İlerleme durumu bilgisayarınızda her bölüm ve dil için ayrı saklanır, böylece işlem üçüncü bölümde kesilirse sayfayı yeniden açıp aynı dosyaları yüklediğinizde, önceden bitenleri tekrar göndermeden kaldığı yerden devam eder. Bir sezonu ele veren en büyük detay karakter isimleridir; yirmi bölümü ayrı ayrı çevirdiğinizde aynı karakter üç farklı şekilde yazılabilir. İşte bu yüzden sözlük paneli bu sayfada yer alır; bir kez yüklenir, tüm sezon tarafından paylaşılır ve başlamadan önce kaç girdinin eşleştiğini size gösterir. Sekmeyi kapattığınızda arka planda kotanızı harcamak yerine görev derhal durdurulur.",
+  "who": "Tam bir sezonu birden fazla dile çeviren altyazı ekipleri, aynı bölüm grubunu farklı pazarlara dağıtan kanallar ve başlat tuşuna bir kez basıp sonrasında geri dönmek isteyen bağımsız çevirmenler.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Toplu Çok Dilli Altyazı Çevirmeni"
+ }
 }

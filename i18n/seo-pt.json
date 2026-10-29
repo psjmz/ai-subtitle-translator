@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Áudio para Legendas — crie SRT no navegador | AI-SRTSub",
-    "desc": "Converta áudio ou vídeo em legendas SRT/VTT no navegador. Reconhecimento de fala local, sem uploads, gratuito e com segmentação automática de frases.",
-    "kw": "áudio para srt,fala para legenda,gerador de legendas automático,transcrever áudio para srt,legendas whisper,reconhecimento de fala no navegador,geração de legendas offline",
-    "intro": "Arraste um arquivo de áudio ou vídeo, escolha o idioma e o modelo para processar a transcrição diretamente no seu navegador. O resultado é um rascunho de legenda sincronizado, segmentado e formatado.",
-    "feat": "Esta ferramenta processa o fluxo de palavras do reconhecimento de fala, segmentando frases, ajustando a largura das linhas conforme o idioma, otimizando o tempo de leitura e garantindo que não haja sobreposição de legendas.",
-    "who": "Criadores de conteúdo, equipes de produção de podcasts e cursos, e editores que precisam de um rascunho de legenda para vídeos sem arquivos originais."
-  },
-  "ocrsub": {
-    "title": "OCR de Legendas Embutidas — extraia legendas de vídeo | AI-SRTSub",
-    "desc": "Extraia legendas gravadas na imagem do vídeo. Marque a área, o OCR lê quadro a quadro e gera arquivos SRT ou VTT de forma gratuita e local.",
-    "kw": "extrair legendas embutidas,ocr de legendas,extração de legendas de vídeo,legendas queimadas,ocr de legendas de vídeo,vídeo para srt,legenda de vídeo,ocr de legendas hardcoded",
-    "intro": "Arraste um vídeo, marque a área onde as legendas aparecem e a ferramenta lerá quadro a quadro, unindo frames idênticos em uma única legenda sincronizada.",
-    "feat": "O processo isola a faixa de legendas, aplica binarização por brilho para remover o fundo e utiliza OCR para converter formas em texto, consolidando frames consecutivos em uma única entrada de tempo.",
-    "who": "Equipes de localização de vídeos, profissionais que trabalham com relançamentos de mídia e editores que possuem apenas o vídeo final sem o arquivo de legenda original."
-  }
+ "autosub": {
+  "title": "Áudio para Legendas — crie SRT no navegador | AI-SRTSub",
+  "desc": "Converta áudio ou vídeo em legendas SRT/VTT no navegador. Reconhecimento de fala local, sem uploads, gratuito e com segmentação automática de frases.",
+  "kw": "áudio para srt,fala para legenda,gerador de legendas automático,transcrever áudio para srt,legendas whisper,reconhecimento de fala no navegador,geração de legendas offline",
+  "intro": "Arraste um arquivo de áudio ou vídeo, escolha o idioma e o modelo para processar a transcrição diretamente no seu navegador. O resultado é um rascunho de legenda sincronizado, segmentado e formatado.",
+  "feat": "Esta ferramenta processa o fluxo de palavras do reconhecimento de fala, segmentando frases, ajustando a largura das linhas conforme o idioma, otimizando o tempo de leitura e garantindo que não haja sobreposição de legendas.",
+  "who": "Criadores de conteúdo, equipes de produção de podcasts e cursos, e editores que precisam de um rascunho de legenda para vídeos sem arquivos originais."
+ },
+ "ocrsub": {
+  "title": "OCR de Legendas Embutidas — extraia legendas de vídeo | AI-SRTSub",
+  "desc": "Extraia legendas gravadas na imagem do vídeo. Marque a área, o OCR lê quadro a quadro e gera arquivos SRT ou VTT de forma gratuita e local.",
+  "kw": "extrair legendas embutidas,ocr de legendas,extração de legendas de vídeo,legendas queimadas,ocr de legendas de vídeo,vídeo para srt,legenda de vídeo,ocr de legendas hardcoded",
+  "intro": "Arraste um vídeo, marque a área onde as legendas aparecem e a ferramenta lerá quadro a quadro, unindo frames idênticos em uma única legenda sincronizada.",
+  "feat": "O processo isola a faixa de legendas, aplica binarização por brilho para remover o fundo e utiliza OCR para converter formas em texto, consolidando frames consecutivos em uma única entrada de tempo.",
+  "who": "Equipes de localização de vídeos, profissionais que trabalham com relançamentos de mídia e editores que possuem apenas o vídeo final sem o arquivo de legenda original."
+ },
+ "multilang": {
+  "title": "Vários idiomas de uma vez | AI-SRTSub",
+  "desc": "Carregue uma temporada inteira, selecione os idiomas e inicie de uma vez. Episódios e idiomas formam uma fila única executada em sequência; os resultados vêm em um único zip. Retoma de onde parou e para se fechar a aba.",
+  "kw": "tradução em lote de legendas,traduzir legendas vários idiomas,legendas multilíngues,legendas temporada inteira,exportação em lote de legendas,traduzir srt para vários idiomas,uma temporada muitos idiomas",
+  "intro": "Carregue uma temporada inteira de uma vez, marque os idiomas desejados e clique em iniciar. Episódios e idiomas tornam-se uma única fila: cada idioma vai até o final antes que o próximo comece, e tudo é compactado em um único arquivo zip.",
+  "feat": "O que costuma falhar na tradução em lote é a concorrência. Vinte episódios vezes cinco idiomas disparados ao mesmo tempo geram centenas de requisições simultâneas, o que sobrecarrega a fila do servidor — as requisições se misturam e fica impossível saber qual etapa realmente terminou. Por isso, esta página executa deliberadamente uma única fila por vez, concluindo um idioma antes de passar para o seguinte. O progresso é armazenado por episódio e idioma no seu computador; se houver interrupção no terceiro episódio, basta reabrir a página, carregar os mesmos arquivos e o processo retoma exatamente naquele lote, sem reenviar o que já foi feito. O erro mais comum em temporadas são os nomes: traduzir vinte episódios separadamente faz com que o mesmo personagem acabe com grafias diferentes. É por isso que o glossário tem seu próprio painel aqui — você o envia uma vez, compartilhado por toda a temporada, e ele mostra quantas entradas realmente corresponderam antes de você começar. Feche a aba e a tarefa para imediatamente, sem gastar cota em segundo plano.",
+  "who": "Equipes de legendagem adaptando uma temporada inteira para vários idiomas, canais redistribuindo o mesmo lote de episódios para diferentes mercados, e tradutores independentes que preferem iniciar uma tarefa uma vez e voltar mais tarde.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Tradutor de Legendas Multilíngue em Lote"
+ }
 }

@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "sn",
-    "ogLocale": "sn_ZW",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Shanduro Yezvinyorwa zveMarudzi ese, Zviri muMitauro Yenyu",
-    "desc": "Shanduro yezvinyorwa zvemafimure inoshandisa AI yemahara — hapana kunyoresa, hapana miganhu, hapana watermark. Shandura zvinyorwa zvemafirimu, maseries nezvinyorwa zvechokwadi kuita mutauro wenyu nekanya kamwe chete.",
-    "kw": "mushanduri wezvinyorwa zveAI,shandura zvinyorwa,mushanduri wezvinyorwa wemahara,shandura faira reSRT,shandura VTT,shandura ASS,shanduro yezvinyorwa zvemafirimu,zvinyorwa zveTV series,zvinyorwa zveNetflix,zvinyorwa zveKDrama,zvinyorwa zveanime,zvinyorwa zvakapetwa,zvinyorwa zvemafirimu ekune dzimwe nyika,shandura zvinyorwa online,zvinyorwa zveYouTube,chishandiso chekushandura zvinyorwa wemahara,shandura zvinyorwa mahara,mushanduri weSRT wemahara",
-    "ogTitle": "AI-SRTSub - Shanduro Yezvinyorwa zveMarudzi ese, Zviri muMitauro Yenyu",
-    "ogDesc": "Mushanduri wezvinyorwa zveAI wemahara 100% kune vanoda mafirimu: nekanya kamwe cheteanoshandura zvinyorwa zvemafirimu ekune dzimwe nyika, series nezvinyorwa zvechokwadi kuita mutauro wenyu wekuzvarwa, uine kurongwa kwenguva otomatiki. Nakirwa nezviri mukati zvenyika yose pasina zvipingamupinyi.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "Mushanduri wezvinyorwa zveAI wemahara 100% kune vanoda mafirimu: nekanya kamwe cheteanoshandura zvinyorwa zvemafirimu ekune dzimwe nyika, series nezvinyorwa zvechokwadi kuita mutauro wenyu wekuzvarwa, uine kurongwa kwenguva otomatiki. Nakirwa nezviri mukati zvenyika yose pasina zvipingamupinyi.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Nezve chishandiso ichi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Mushanduri Wezvinyorwa WeAI Wemahara Wemabhuku</h2>\n    <p data-i18n-html=\"seoIntro\">Ili <strong>chishandiso chemahara chekushandura zvinyorwa online chinofambiswa nemhando huru dzemitauro</strong>. Isa mafaera eSRT, VTT kana ASS woshandura zvinyorwa pakati peChirungu, Chinarisi, ChiJapanese, ChiKorean, ChiSpanish, ChiFrench uye mimwe mitauro inodarika 15+. Hapana kunyoresa, hapana kuiswa, hapana watermark — zvibude mubrowser wobva watanga kushandura. Data yezvinyorwa inorara mubrowser yako kunze kwekunge wabvumira shanduro yegore.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Zvinhu zvikuru:</strong> Kuongorora kweSRT, VTT neASS nekushandura kweAI, kubatanidzwa kwemitsara kwakangwara (kana mutsara mumwe uchipfuura pamusoro pezvinyorwa zvakawanda, zvinyorwa zvinobatanidzwa, zvinoshandurwa,ozoparadzaniswa zvakare pamusoro penguva yepakutanga), kurongwa kwenguva, kuputirwa kwemitsara otomatiki kune zvinyorwa zveCJK neWestern, kubviswa kwemashoko asina basa, kubata mazwi akasarudzika, uye masitaera ekushandura anogona kusarudzwa. Tumira mafaera akajairika eSRT, VTT, ASS kana TXT akagadzirira kuiswa pamusoro pevhidhiyo yako.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ndiani anozvishandisa:</strong> vaturikiri vevhidhiyo, vanyori veYouTube nevaturikiri, vadzidzi vemitauro, mapoka ezvinyorwa nezvikwata zvinoda kugadzirisa zviri mukati mevhidhiyo nekukurumidza.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Chishandiso ichi chinoda JavaScript. Ndapota batsira kuita kuti JavaScript ishande mubrowser yako, wozoisa faira rezvinyorwa (SRT / VTT / ASS) kuti ushandure zvinyorwa neAI mahara.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Mugadziri Wezvinyorwa ZveSitaera - Kubatanidza Bilingual, ASS & VTT Effect",
-    "desc": "Chishandiso chemahara chezvinyorwa zvine sitaera: batanidza mafaera maviri kuita bilingual, dzosera sitaera yetireki ye bilingual, kana kuwedzera mhedzisiro. 5 ASS / 6 VTT presets; tumira seSRT / VTT / ASS.",
-    "kw": "batanidza zvinyorwa,zvinyorwa zvemitauro miviri,batanidza mafaera ezvinyorwa,zvinyorwa zvine sitaera,sitaera yezvinyorwa zveASS,sitaera yezvinyorwa zveVTT,mhedzisiro yezvinyorwa,mugadziri wezvinyorwa zviviri,ma-preset eASS,templatedhi yezvinyorwa,chishandiso chezvinyorwa wemahara",
-    "intro": "Batanidza mafaera maviri ezvinyorwa kuita bilingual, kana kugadzirisa tireki: fonti, ruvara, mutsara wekunze nenzvimbo, zvese ziri WYSIWG.",
-    "feat": "Kubatanidza nekuvandudza kweBilingual, ASS / VTT style presets, slots dzesitaera imwe neimwe, kugadzirisa nguva munzvimbo uye nehuwandu, uye kutarisa mhenyu iri pamutemo faira rakatumirwa.",
-    "who": "Vanyori vanogadzira zvinyorwa zvemitauro miviri kana zvine sitaera, zvikwata zvekuchengetera, nezvikwata zvinoda zvinyorwa zvinowanikwa nyore."
-  },
-  "clean": {
-    "title": "Muchenesi Wezvinyorwa - Bvisa Watermarks, SDH Cues & HTML Tags",
-    "desc": "Muchenesi wezvinyorwa zvepaIndaneti wemahara: bvisa watermarks, ads, SDH, HTML tags, ASS effects; gadzirisa ma-caps, mojibake. 13 mitemo inoshanduka, unyorera pakuchinja, nguva yakasimba.",
-    "kw": "muchenesi wezvinyorwa,chenesa faira re-srt,bvisa watermark yezvinyorwa,bvisa zvinyorwa zve-sdh,bvisa ma-html tags kubva kune zvinyorwa,gadzirisa zvinyorwa zvese zve-caps,gadzirisa mojibake,bvisa zvinyorwa zvevanzwa zvakaipa,bvisa ma-ass effects",
-    "intro": "Mhanyisa zvinyorwa zvakadhawunirodha apa pakutanga: watermarks, ads, SDH cues neHTML tags, zvapera nekanya kamwe chete.",
-    "feat": "Mitemo 13 mumapoka mana (9 iri kushanda nekutadza), kubviswa kwewatermark neSDH, kugadziriswa kwezvese-caps nemojibake, runyorwa rwekuchinja kwe-cue neimwe neimwe ine kudzoserwa kwayo, uye nguva haimbobatwi.",
-    "who": "Chero munhu akatora zvinyorwa zviripo uye achida kuti zvishandiswe, uye zvikwata zvinochenesa zvinhu muhuwandu."
-  },
-  "glossary": {
-    "title": "Shanduko Yamazwi Ezvinyorwa - Glossari Imwe, Faira Rose | AI-SRTSub",
-    "desc": "Shanduko yeglossary yezvinyorwa: nyora \"kare → chitsva\" kamwe chete uye faira rose reSRT / VTT / ASS / TXT rinogadziridzwa. Nguva, masitaera nemabhokisi eNOTE anoramba aripo; dzosera pamutsei nemutsetse.",
-    "kw": "glossary yezvinyorwa,tsiva srt muhuwandu,tsvaga wotsiva zvinyorwa,shanduko yamazwi ezvinyorwa,gadzirisa srt muhuwandu,tsiva mazwi muzvinyorwa,batana mazwi ezvinyorwa,terminology yezvinyorwa,tsiva zvinyorwa mu-vtt,chishandiso cheglossary srt,shanduko yezwi muhuwandu",
-    "intro": "Glossary yemitemo \"yezwi rekare → zwi ritsva\" inoiswa pamusoro pefaira rose rezvinyorwa kamwe chete, ine nguva, ASS styles uye VTT note blocks zvakasara zvakafanana zvakakwana.",
-    "feat": "Mutsetse mumwe pamutsetse, wakaparaniswa ne-> , => , → kana tab; mitemo inotanga na # inyora. Kufanana kwezwi rose kunochengeta \"art\" kunze kwe \"start\", kusiyanisa kwemavara kunosarudzwa, uye unogona kudzivisa kutsiva kumutsetse 1 kana mutsetse 2 wezvinyorwa zviviri. Ose cue akachinjwa anonyorwa, uye chero ipi zvayo inogona kudzoswa.",
-    "who": "Chero munhu anobatanidza mazwi neterminology pamusoro pemwaka, kugadzirisa mazwi ekushandura kwemuchina muhuwandu, kana kugadzirisa zvinyorwa zveumwe munhu kuti zvienderane nesitaera yavo yepamusha.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Subtitle QC - Tarisa Nguva neLayout neMutauro | AI-SRTSub",
-    "desc": "Tarisiro yezvinyorwa zvepamhepo yemahara: isa SRT, VTT kana ASS uye tarisa kupindirana, nguva, kumhanya kukuverenga, hupamhi hwemutsetse, kuputika kwemitsetse, nhamba nekunyora pasi pemitemo yemutauro iyoyo. Mitauro 27, zvikamu zvechiyero 27, pamwe nemitemo yakanangana nemutauro.",
-    "kw": "mutarisiri wezvinyorwa,subtitle qc,srt validator,chiratidzo chemhando yezvinyorwa,srt check,tarisiro yenguva yezvinyorwa,subtitle validator,tarisa faira re-srt,kugadzirisa zvinyorwa,subtitle linter",
-    "intro": "Isa faira rezvinyorwa woongorora pasi pemitemo yemutauro wacho - chigumisiro chega chega chine kukosha kwakapimwa nechekure. Inomhanya zvizere mumabhurawuza yako, hapana chakaiswa paIndaneti.",
-    "feat": "Inotarisa zvinyorwa zvinopindirana, zvipfupi zvakanyanya kana zvisina kufanira pachiratidziro, kumhanya kukuverenga, hupamhi hwemutsetse, kuverenga kwemitsetse, kuputsika kwemitsetse kusingafadzi, nhamba, zvinyorwa zvisina chinhu, mojibake nemavara ekudzora. Hupamhi nekumhanya kukuverenga zvinotevera nzira yekunyora: ChiChinese chinoyerwa mumavara akazara, Thai neArabic kusanganisa zviratidzo zvinoverengwa sezero hupamhi. Mitemo yakanangana nemutauro inovhara chivharo cheSpanish ¿, nzvimbo yeFrench isina kuputika isati yasvika ? ! ; :, chiratidzo cheGiriki chevhunzo, punction yakazara muChinese neJapanese, pamwe nechiratidzo chevhunzo nekomwa yeChi Arabic. Zvinhu zvinogona kugadziriswa otomatiki zvinonyorwa zvakasiyana, uye chero chinhu chinofambisa nenguva hachina kutariswa nekutadza.",
-    "who": "Mapoka ezvinyorwa,vatengesi vemunharaunda,vanyori uye chero munhu anoda kutarisa faira asati aunza.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Mushanduri Wezvinyorwa — SRT/VTT/ASS kuita Mutauro Wako",
-    "desc": "Isa faira reSRT / VTT / ASS, sarudza mutauro waunoda, uye uwane shanduro yakavharwa nenguva. Mitauro 100, yemahara, hapana kunyoresa."
-  },
-  "convert": {
-    "title": "Mushanduri Wezvinyorwa - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Mushanduri wezvinyorwa zvepamhepo wemahara: shandura pakati peSRT, VTT, ASS, SBV, LRC neTXT uine nguva yakasimba, ma-tags e-ASS akacheneswa otomatiki.",
-    "kw": "mushanduri wezvinyorwa,srt kuenda ku-vtt,vtt kuenda ku-srt,ass kuenda ku-srt,sbv kuenda ku-srt,srt kuenda ku-lrc,subtitle kuenda ku-txt,shandura zvinyorwa,srt converter,vtt converter",
-    "intro": "Shandura pakati peSRT, VTT, ASS, SBV, LRC neTXT uine nguva yakasimba isina kubatwa.",
-    "feat": "Mutauro wekuisa unoonekwa otomatiki uye nenguva dzinonyorwa zvakare kune faira rakatarisirwa; ma-tags e-ASS uye kuputika kwemitsetse kunozivikanwa kunova zvinyorwa zvinoverengeka paunotuma kune yakajairika fomati; mafaera emazwi emwiyo haana ndima yawa, saka chero chinhu chapfuura awa imwe chinoverengwa mumaminitsi.",
-    "who": "Chero munhu ane mutambi asingabvumi faira rezvinyorwa, uye chero munhu anofambisa zvinhu pakati pemunyori nemutambi wepamhepo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Kupatsanura Zvinyorwa Zvemitauro Miviri - Chengeta Mutauro Mumwe | AI-SRTSub",
-    "desc": "Chishandiso chemahara chepamusoro chepamusoro chekupatsanura zvinyorwa zvemitauro miviri: patsura faira rezvinyorwa zvemitauro miviri kuita tireki yepakutanga netireki yakashandurwa, kana kuchengeta imwe chete.",
-    "kw": "kupatsanura zvinyorwa zvemitauro miviri,patsura srt yemutauro miviri,bvisa zvinyorwa zvemutauro wechipiri,chengeta zvinyorwa zveChirungu chete,dhirowa zvinyorwa zvakashandurwa,patsura srt yemutauro miviri,patsura ass yemutauro miviri",
-    "intro": "Patsura faira rezvinyorwa zvemitauro miviri kuita tireki yepakutanga netireki yakashandurwa, kana kuchengeta imwe chete yadzo.",
-    "feat": "Inobata marongero ose akajairika - cue imwe ine mitsara miviri, uye cue mbiri dzinogovana nguva imwe chete. Matireki akapatsanurwa nekurongeka nemhando yescript, nguva inochengetwa sekunge yakaita, uye faira remutauro mumwe rinonongedzerwa panzvimbo yekuti risasvikirwe zvinyararire.",
-    "who": "Chero munhu akapihwa faira remutauro miviri rakatoitwa anoda mutauro mumwe chete, nezvikwata zvezvinyorwa zvinochengeta zvacho zvepakutanga nezvekushandura zvakasiyana.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Shanduko Yenguva Yezvinyorwa: Fambisa, Rescale & Patsura | AI-SRTSub",
-    "desc": "Chishandiso chemahara chepamusoro chenguva yezvinyorwa: fambisa zvese kamwe chete, rescale neyakaenzana, kana kugadzirisa drift nenzvimbo mbiri dzechikwata. Inoshanda neSRT, VTT, ASS, SBV, LRC neTXT.",
-    "kw": "shanduko yenguva yezvinyorwa,fambisa nguva ye-srt,gadzirisa kuwirirana kwezvinyorwa,rescale nguva yezvinyorwa,gadzirisa kunonoka kwezvinyorwa,srt time offset,gadzirisa drift yezvinyorwa,batanidza zvinyorwa,patsura zvinyorwa,batanidza srt,patsura zvinyorwa zvehurefu",
-    "intro": "Kana zvinyorwa zvisiri kuwirirana, fambisa nguva yose, irescale neyakaenzana, kana kuigadzirisa nenzvimbo mbiri dzechikwata. Inogona zvakare kubatanidza mitsara yakapatsanurwa, nekupatsanura iyo inomhanya kwenguva refu.",
-    "feat": "Kufambisa kunofambisa cue imwe neimwe pasina kuchinja kuti cue imwe neimwe inogara kwenguva yakareba sei pachiratidziro. Rescaling inowanza magumo ose ari maviri, saka kureba kwe-cue kunochinja nayo - zvakanaka pakati pe24 ne25 fps. Kugadzirisa kwenzvimbo mbiri kunobata mafaera ari kure uye ari kumhanya nekumhanya kusiri kwo. Nguva dzinobuda dzisina kunaka dzinonamirwa kuzero, uye chishandiso chinokuudza kuti ngani dzakakanganiswa. Fomati imwe chete mukati, fomati imwe chete kunze - pasina kuchinja, uye ASS styles, per-line styling neeffect tags zvinochengetwa sezvazvaive. Zvinyorwa zvemitauro miviri zvinoramba zviri pamitsara miviri kana zvakabatanidzwa uye zvinosiirwa panguva yekupatsanura.",
-    "who": "Chero munhu ane zvinyorwa zvinoenda kure mushure mekuchinja kwekwakabva, zvinomhanya zvishoma nekukurumidza kana zvishoma, kana kubva kune mumwe munhu aishanda pane imwe furemu rate.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Gadzirisa Zvinyorwa Zvakaora - Gadzirisa Mojibake / Encoding Isiri Yo",
-    "desc": "Kugadzirisa zvemahara online kwenzvinyorwa zvakaora: zvinokuona kana faira riri UTF-8, GBK, Big5, Shift_JIS kana EUC-KR, zvinodzosera zvinyorwa zvakaverengwa zvisiri izvo, zvichichengetera mutambi wako.",
-    "kw": "gadzirisa zvinyorwa zvakaora,mojibake yezvinyorwa,gadzirisa encoding ye-srt,gadzirisa encoding yezvinyorwa,utf8 kuenda ku-gbk zvinyorwa,srt inoratidza mavara asinganzwisisike,encoding yezvinyorwa isiri yo,ass yakashata,vtt yakashata,ona encoding yezvinyorwa",
-    "intro": "Zvinyorwa zvinovhurwa semadziro ezvisina musoro dzinenge nguva dzose dzinoverengwa neencoding isiri iyo. Isa faira mukati, uye rinobva raziva kuti faira racho rakanyatsonyorwa mune ipi encoding uye rinodzosera mavara akaverengwa zvisiri izvo.",
-    "feat": "Mafaera akaiswa anoroverwa zvakare kubva kuvaite vepakutanga, saka hapana chinorasika: kana faira rikatendeuka kuva GBK, rinodaro, uye kana mutambi wako ari iye ari kuverenga nenzira isiri iyo, kuchengeta kope se \"UTF-8 with BOM\" kunowanzogadzirisa. Zvinyorwa zvakakopa hazvisiri zvaimbova bytes zvekutanga, saka zvishoma zvikuru zvinogona kudzoswa; kana yatova nemavara ekutsiva, izvo hazvigoni kudzoswa uye chishandiso chinodaro zviri nyore panzvimbo yekunyepedzera neimwe nzira. Nhamba dzemitsetse nenguva hazviimbobatwi, uye ASS style tags dzinochengetwa sekudzaite.",
-    "who": "Chero munhu akadhawunirodha zvinyorwa zvinovhurwa sezvinhu zvisina musoro, anoona mabhokisi panzvimbo yeChiChinese mumutambi, kana akapihwa faira rine encoding isingazivikanwe.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Tora Zvinyorwa - SRT/ASS/VTT kuita Plain Text | AI-SRTSub",
-    "desc": "Chishandiso chemahara chepamusoro chekubvisa zvinyorwa kuenda kune zvinyorwa: chinoverenga SRT, VTT, ASS, SBV, LRC neTXT, chinodonha nenguva nenhamba dzemitsetse, uye chinobudisa kutaura kwakachena semaparagirafu kana mutsetse mumwe pamutsetse wega wega.",
-    "kw": "tora zvinyorwa kubva kune zvinyorwa,zvinyorwa kuenda kune zvinyorwa,srt kuenda ku-txt,srt kuenda ku-plain text,ass kuenda ku-txt,vtt kuenda ku-txt,kunyora kwezvinyorwa,tora kutaura kubva ku-srt,srt bvisa nguva,chishandiso chezvinyorwa",
-    "intro": "Tora nhaurirano kubva kune SRT / VTT / ASS / SBV / LRC / TXT zvinyorwa sezvinyorwa zvakachena zvakajeka: nguva, nhamba dze-cue nema-style tags zvinobviswa otomatiki.",
-    "feat": "Marongero maviri: maparagirafu anoenderera mberi akapatsanurwa pazororo nemapunctuation ekugumisa mitsara, kana mutsetse mumwe pamutsetse kune mazita enkulumo. Zvinyorwa zvekunzwa zvakaita se \"(foni iri kurira)\", watermarks dzekwakabva nemitsara inodzokororwa kumashure-kumashure zvinobviswa nekutadza; mazita evatauri akaita se \"TOM:\" nemitsara yemwiyo zvinogona kuchengetwa kana kudonha. Kuputirwa kwemitsetse kunobatanidzwa zvakare pascript yega yega - ChiChinese chinobatanidza zvakananga, ChiKorean neLatin zvinowedzera nzvimbo - saka hapana chinonamatirana pamwe chete.",
-    "who": "Chero munhu anoda zvinyorwa zvezvinyorwa zvezvinyorwa zvezvinyorwa, scripts, kudzidzira kuturikira kana kupa chimwe chishandiso, pasina kudzima mazana enguva nemaoko.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Tora Zvinyorwa Zvakatengeswa Kubva kuMKV / MP4 kuenda kuSRT | AI-SRTSub",
-    "desc": "Tora zvinyorwa zvakatengeswa kubva kuMKV, WebM, MP4, MOV; tumira seSRT / VTT / ASS / TXT. Hapana kurodha kana kure-encode — mafaera anoverengwa mubrowser yako; multi-GB OK.",
-    "kw": "tora zvinyorwa zvakatengeswa,mkv kuenda ku-srt,mp4 subtitle extract,tora zvinyorwa kubva kuvhidhiyo,embedded subtitle extractor,srt kubva ku-mkv,mov subtitle extract,subtitle track export,vtt kubva ku-mkv,tora soft subtitles,mkv subtitle rip",
-    "intro": "Tora tireki yezvinyorwa yakavharirwa mukati meMKV kana MP4 zvakananga kuita SRT — hapana kurodha, zvese zvinoitika mubrowser yako.",
-    "feat": "Inoverenga plain-text, ASS, WebVTT ne-mov_text / tx3g tracks, inochengeta wepakutanga ASS header ne resolution, uye inoverenga muzvidimbu zvidiki ne offset kuti faira hombe risazadze memory.",
-    "who": "Chero munhu ane firimu rine soft subtitles anoda zvinyorwa zvese kunze, zvikwata zvekuchengetera, nevatambi vefansub vanotanga kubva kune wepakutanga track.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Mushanduri Wezvinyorwa ZveChiChinese - Nyore ⇄ Chekare | AI-SRTSub",
-    "desc": "Mushanduri wezvinyorwa zveChiChinese wemahara: Nyore ⇄ Chekare (Taiwan / Hong Kong) uye kumashure. Kutaura chete ndiko kunochinja — nguva nema-ASS tags zvinoramba zviripo. Yakavakirwa paOpenCC.",
-    "kw": "mushanduri wezvinyorwa zvechichinese,nyore kuenda kuchekare,chekare kuenda kunyore,srt traditional chinese,shandura zvinyorwa chichinese,taiwan traditional chinese,hong kong traditional chinese,han conversion,shandura srt kuita traditional chinese,simplified chinese srt,opencc subtitle",
-    "intro": "Shandura faira rese rezvinyorwa pakati peNyore neChekare, pasina chinochinja kunze kwemakurukuro.",
-    "feat": "Nzira mapfumbamwe: Chekare chakajairika, mazwi eTaiwan, mafomu eTaiwan, Hong Kong, kudzokera kuNyore, nemafomu enzvimbo eChekare kuenda kuChekare. Inoshandisa OpenCC dictionary ine longest-match-first phrase resolution.",
-    "who": "Chero munhu anoendesa zvinyorwa kuvaoni vekuTaiwan kana vekuHong Kong, vagoveraji vanogadzirira shanduro dzenzvimbo, nevanyori vakagamuchira faira reChekare uye vanoda Nyore.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Kupatsanura neKusanganisa Zvinyorwa - SRT / VTT | AI-SRTSub",
-    "desc": "Patsura zvinyorwa nenguva kana kuverenga, kana kubatanidza mafaera mazhinji nenzira kana nenguva. Kumutsva kwenhamba kunongoita otomatiki, nhaurirano haibatiwe. SRT & VTT.",
-    "kw": "subtitle splitter,patsura zvinyorwa,batanidza srt files,srt merger,batanidza zvinyorwa,patsura srt,batanidza srt files,cheka zvinyorwa,patsura vtt,subtitle merger",
-    "intro": "Cheka chinyorwa chimwe chirefu kuita zvidimbu, kana kubatanidza mafaera mazhinji kuita rimwe. Inomhanya zvizere mubrowser yako — hapana chinorodhwa.",
-    "feat": "Patsura nenguva kana kuverenga nekumutsva kwenhamba kwechikamu chimwe nechimwe uye zero-based timing isina kusungirwa; batanidza zvichitezana negaka kana kusangana nenguva dzevepakutanga. SRT neVTT.",
-    "who": "Vanyori vanopatsanura zvikamu zvekurodha, zvikwata zvinoongorora muzvidimbu, nevanyori vanobatanidza zvinyorwa zvezvidimbu zvakawanda.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Zvinyorwa kuenda kuExcel/CSV neKudzokera | AI-SRTSub",
-    "desc": "Shandura SRT kana VTT kuita Excel kana CSV sheet kuti uongorore nekuvandudza, wobva wadzosa. Nguva dzinoramba dzichida kuva chaidzo, kuputika kwemitsetse kunopukunyuka. Hapana chinorodhwa.",
-    "kw": "zvinyorwa kuenda kuexcel,srt kuenda ku-csv,srt kuenda ku-excel,excel kuenda ku-srt,csv kuenda ku-srt,spreadsheet yezvinyorwa,tafura yezvinyorwa",
-    "intro": "Tumira zvinyorwa ku spreadsheet kuti uongorore nekuvandudza, wobva waisa sheet yacho kumashure. Inomhanya zvizere mumabhurawuza yako.",
-    "feat": "Kanya kamwe kubva kuSRT kana VTT kuenda ku xlsx kana CSV; chinja nguva, zvinyorwa nemanyorero mu spreadsheet yako, wobva watumira kumashure kuSRT kana VTT. Makoramu enguva anochengeta kusimba kwemillisecond; kuputika kwemitsetse mukati meceli kunochengetwa. Misoro yeChiChinese neChirungu yese inoshanda.",
-    "who": "Vaturikiri, zvikwata zvefansub nevanyori vanoongorora, kunyora kana kugadzirisa zvinyorwa muhuwandu mu spreadsheet.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Shandura Zvinyorwa Muhuwandu kuSRT/VTT | AI-SRTSub",
-    "desc": "Isa makumi kana mazana emafaera eSRT/VTT, shandura ese kuita fomati imwe uye dhawunirodha ZIP imwe. Kuverenga patsva nenguva zvakarongwa; mafaera asingaverengeke akaiswa chiratidzo.",
-    "kw": "shandura zvinyorwa muhuwandu,srt kuenda ku-vtt,mushanduri wezvinyorwa muhuwandu,srt huru,shandura zvinyorwa zvakawanda,zip yezvinyorwa",
-    "intro": "Dhonza mazana emafaera ezvinyorwa, shandura ese, tora ZIP imwe. Inomhanya zvizere mumabhurawuza yako — hapana chinorodhwa.",
-    "feat": "SRT kuenda kuVTT nekudzokera muhuwandu; nhamba dzejereri dzakatorwa zvakare nenguva dzakarongwa nerudzi rwefomati. Mafaera asingakwanise kuverengwa anoiswa chiratidzo uye anorashwa kubva kuZIP. Mazita epakutanga emafaera akachengetwa nekuwedzera kutsva; zvisungo zvinowana suffix.",
-    "who": "Vanyori nevatiki vanoshandura mafolda ese eresheni, nevaridzi vesaiti vanopa vatambi fomati imwe chete.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Mugadziri Weziyo dzeLRC - Bata Nguva Uchiteerera | AI-SRTSub",
-    "desc": "Isa rwiyo, namira mashoko, wobva wataura nguva yemutsetse mumwe nemumwe uchiteerera; tumira LRC kana SRT. Isa LRC iripo kuti ugadzirise zvakanaka. Inofambiswa nekibhodhi, yakazara mumabhurawuza.",
-    "kw": "murerami we-lrc online,gadzira lrc,nguva yezwi,murerami we-lrc,gadzira lrc,synchronizer yezwi,lrc kuenda ku-srt",
-    "intro": "Isa mimhanzi, namira mashoko, bata nguva mutsetse nemutsetse sezvaunoteerera, uye tumira LRC kana SRT. Hapana chinorodhwa.",
-    "feat": "Inoshanda neMP3, M4A, FLAC, WAV neOGG. Mutsetse mumwe pamutsetse wega wega; mafaera eLRC aripo anogona kuiswa nekuvandudzwa. Space inoridza/inombomira, Enter inodhinda mutsetse uripo, Z inodzosera shure - maoko anoramba ari pakibhodhi.",
-    "who": "Vaimbi vanosanganisa makava, vanyori vanowedzera nziyo kumavhidhiyo, uye chero munhu anovaka zvinyorwa zvemashoko emutambi.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "YouTube Subtitle Realigner - Gadzirisa Mitsara Yakaputsika | AI-SRTSub",
-    "desc": "Zvinyorwa zveYouTube zvinotema mitsara pamasekondi 3-4. Chishandiso ichi hachichinji mazwi asi chinongofambisa miganhu painopera chaiko. Mahara, mitauro zana.",
-    "kw": "kugadzirisa youtube subtitle,youtube auto captions,kugadzirisa subtitle,kurongwa kwemitsara ye subtitle,gadzirisa subtitle dzakaputsika,srt sentence alignment,subtitle re-segmentation,kugadzirisa youtube captions,sentence aware subtitles",
-    "intro": "Isa faira reYouTube auto-generated subtitle, sarudza mutauro, uye chishandiso ichi chinobatanidza mitsara zvakare. Hapana shoko rinochinjwa, uye nguva dze subtitle dzinoramba dziri pedyo nenguva dzekutanga sezvinobvira.",
-    "feat": "YouTube auto-captions inochekwa kuita 3-4 masekondi pasina hanya nekuti mitsara inopera kupi. Chishandiso ichi chinoshandisa nguva dzekutanga senzvimbo dzekumira, chinoona magumo emitsara, uye chinosarudza nzvimbo dzakanaka dzekucheka. Mitauro 100 ine mitemo yayo: Chinese neJapanese hazvina nzvimbo pakati pemashoko, Thai inongoratidza miganhu, Hindi inopera ne ।, Arabic ne ؟, Armenian ne ։. Upamhi hwemutsara unotevedzera kunyorwa - 16 mavara eChinese, 42 emavara eLatin. Tisati taexport, rugwaro runoenzaniswa kuti hapana shoko rakarasika.",
-    "who": "Zvikwata zvinogadzirisa YouTube, podcast uye course auto-captions kuita subtitles dzakazara, nevagadziri vevhidhiyo vanoda mitsara yakazara isingamire nepakati.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio kuenda kuSubtitles — shandura kutaura kuita SRT | AI-SRTSub",
-    "desc": "Isa odhiyo kana vhidhiyo, uwane ma-subtitle: ASR inoshanda mubrowser yako, inocheka mitsara, uye inoburitsa SRT kana VTT mahara pasina kuisa pa-internet.",
-    "kw": "audio kuenda ku srt,kutaura kuita subtitle,gadzira subtitles kubva ku odhiyo,automatic subtitle generator,nyora odhiyo kuita srt,whisper subtitles,browser speech recognition,offline subtitle generation",
-    "intro": "Isa odhiyo kana vhidhiyo, sarudza mutauro, uye ASR inoshanda mukati mebrowser yako. Unowana dhirafti ye-subtitle ine nguva yakarongwa zvakanaka.",
-    "feat": "Chishandiso ichi chinoshandura kutaura kuita mitsara yakachekwa zvakanaka, ichitevera mitemo yemutauro uye kukurumidza kuverenga pasina kuisa odhiyo yako pa-internet.",
-    "who": "Vagadziri vemavhidhiyo, vanhu vanoita mapodcast, uye chero munhu anoda dhirafti ye-subtitle anogona kugadzirisa."
-  },
-  "ocrsub": {
-    "title": "Hardcoded Subtitle OCR — verenga ma-subtitle ari pavhidhiyo | AI-SRTSub",
-    "desc": "Ma-subtitle akapiswa pavhidhiyo haabudiki nyore. Chishandiso ichi chinoshandisa OCR kuverenga mitsara iyi frame neframe ichigadzira SRT kana VTT mahara.",
-    "kw": "bvisa hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles kubva ku vhidhiyo,video kuenda ku srt,subtitle kubva ku vhidhiyo,hardcoded caption ocr",
-    "intro": "Isa vhidhiyo, taridza nzvimbo ine ma-subtitle, uye chishandiso ichi chinoverenga frame neframe chichibatanidza mitsara yakafanana kuita cue imwe chete.",
-    "feat": "Chishandiso ichi chinoshandisa OCR kubvisa ma-subtitle akapiswa pavhidhiyo nekutarisa nzvimbo yakatarwa, ichichinja mifananidzo kuita mitsara yakarongwa nenguva.",
-    "who": "Zvikwata zvinoshandura mitauro yemavhidhiyo, vanhu vanoda ma-subtitle emavhidhiyo ekare, uye vashandi vekugadzira vhidhiyo vasina faira rekutanga."
-  }
+ "index": {
+  "htmlLang": "sn",
+  "ogLocale": "sn_ZW",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Shanduro Yezvinyorwa zveMarudzi ese, Zviri muMitauro Yenyu",
+  "desc": "Shanduro yezvinyorwa zvemafimure inoshandisa AI yemahara — hapana kunyoresa, hapana miganhu, hapana watermark. Shandura zvinyorwa zvemafirimu, maseries nezvinyorwa zvechokwadi kuita mutauro wenyu nekanya kamwe chete.",
+  "kw": "mushanduri wezvinyorwa zveAI,shandura zvinyorwa,mushanduri wezvinyorwa wemahara,shandura faira reSRT,shandura VTT,shandura ASS,shanduro yezvinyorwa zvemafirimu,zvinyorwa zveTV series,zvinyorwa zveNetflix,zvinyorwa zveKDrama,zvinyorwa zveanime,zvinyorwa zvakapetwa,zvinyorwa zvemafirimu ekune dzimwe nyika,shandura zvinyorwa online,zvinyorwa zveYouTube,chishandiso chekushandura zvinyorwa wemahara,shandura zvinyorwa mahara,mushanduri weSRT wemahara",
+  "ogTitle": "AI-SRTSub - Shanduro Yezvinyorwa zveMarudzi ese, Zviri muMitauro Yenyu",
+  "ogDesc": "Mushanduri wezvinyorwa zveAI wemahara 100% kune vanoda mafirimu: nekanya kamwe cheteanoshandura zvinyorwa zvemafirimu ekune dzimwe nyika, series nezvinyorwa zvechokwadi kuita mutauro wenyu wekuzvarwa, uine kurongwa kwenguva otomatiki. Nakirwa nezviri mukati zvenyika yose pasina zvipingamupinyi.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "Mushanduri wezvinyorwa zveAI wemahara 100% kune vanoda mafirimu: nekanya kamwe cheteanoshandura zvinyorwa zvemafirimu ekune dzimwe nyika, series nezvinyorwa zvechokwadi kuita mutauro wenyu wekuzvarwa, uine kurongwa kwenguva otomatiki. Nakirwa nezviri mukati zvenyika yose pasina zvipingamupinyi.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Nezve chishandiso ichi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Mushanduri Wezvinyorwa WeAI Wemahara Wemabhuku</h2>\n    <p data-i18n-html=\"seoIntro\">Ili <strong>chishandiso chemahara chekushandura zvinyorwa online chinofambiswa nemhando huru dzemitauro</strong>. Isa mafaera eSRT, VTT kana ASS woshandura zvinyorwa pakati peChirungu, Chinarisi, ChiJapanese, ChiKorean, ChiSpanish, ChiFrench uye mimwe mitauro inodarika 15+. Hapana kunyoresa, hapana kuiswa, hapana watermark — zvibude mubrowser wobva watanga kushandura. Data yezvinyorwa inorara mubrowser yako kunze kwekunge wabvumira shanduro yegore.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Zvinhu zvikuru:</strong> Kuongorora kweSRT, VTT neASS nekushandura kweAI, kubatanidzwa kwemitsara kwakangwara (kana mutsara mumwe uchipfuura pamusoro pezvinyorwa zvakawanda, zvinyorwa zvinobatanidzwa, zvinoshandurwa,ozoparadzaniswa zvakare pamusoro penguva yepakutanga), kurongwa kwenguva, kuputirwa kwemitsara otomatiki kune zvinyorwa zveCJK neWestern, kubviswa kwemashoko asina basa, kubata mazwi akasarudzika, uye masitaera ekushandura anogona kusarudzwa. Tumira mafaera akajairika eSRT, VTT, ASS kana TXT akagadzirira kuiswa pamusoro pevhidhiyo yako.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ndiani anozvishandisa:</strong> vaturikiri vevhidhiyo, vanyori veYouTube nevaturikiri, vadzidzi vemitauro, mapoka ezvinyorwa nezvikwata zvinoda kugadzirisa zviri mukati mevhidhiyo nekukurumidza.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Chishandiso ichi chinoda JavaScript. Ndapota batsira kuita kuti JavaScript ishande mubrowser yako, wozoisa faira rezvinyorwa (SRT / VTT / ASS) kuti ushandure zvinyorwa neAI mahara.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Mugadziri Wezvinyorwa ZveSitaera - Kubatanidza Bilingual, ASS & VTT Effect",
+  "desc": "Chishandiso chemahara chezvinyorwa zvine sitaera: batanidza mafaera maviri kuita bilingual, dzosera sitaera yetireki ye bilingual, kana kuwedzera mhedzisiro. 5 ASS / 6 VTT presets; tumira seSRT / VTT / ASS.",
+  "kw": "batanidza zvinyorwa,zvinyorwa zvemitauro miviri,batanidza mafaera ezvinyorwa,zvinyorwa zvine sitaera,sitaera yezvinyorwa zveASS,sitaera yezvinyorwa zveVTT,mhedzisiro yezvinyorwa,mugadziri wezvinyorwa zviviri,ma-preset eASS,templatedhi yezvinyorwa,chishandiso chezvinyorwa wemahara",
+  "intro": "Batanidza mafaera maviri ezvinyorwa kuita bilingual, kana kugadzirisa tireki: fonti, ruvara, mutsara wekunze nenzvimbo, zvese ziri WYSIWG.",
+  "feat": "Kubatanidza nekuvandudza kweBilingual, ASS / VTT style presets, slots dzesitaera imwe neimwe, kugadzirisa nguva munzvimbo uye nehuwandu, uye kutarisa mhenyu iri pamutemo faira rakatumirwa.",
+  "who": "Vanyori vanogadzira zvinyorwa zvemitauro miviri kana zvine sitaera, zvikwata zvekuchengetera, nezvikwata zvinoda zvinyorwa zvinowanikwa nyore."
+ },
+ "clean": {
+  "title": "Muchenesi Wezvinyorwa - Bvisa Watermarks, SDH Cues & HTML Tags",
+  "desc": "Muchenesi wezvinyorwa zvepaIndaneti wemahara: bvisa watermarks, ads, SDH, HTML tags, ASS effects; gadzirisa ma-caps, mojibake. 13 mitemo inoshanduka, unyorera pakuchinja, nguva yakasimba.",
+  "kw": "muchenesi wezvinyorwa,chenesa faira re-srt,bvisa watermark yezvinyorwa,bvisa zvinyorwa zve-sdh,bvisa ma-html tags kubva kune zvinyorwa,gadzirisa zvinyorwa zvese zve-caps,gadzirisa mojibake,bvisa zvinyorwa zvevanzwa zvakaipa,bvisa ma-ass effects",
+  "intro": "Mhanyisa zvinyorwa zvakadhawunirodha apa pakutanga: watermarks, ads, SDH cues neHTML tags, zvapera nekanya kamwe chete.",
+  "feat": "Mitemo 13 mumapoka mana (9 iri kushanda nekutadza), kubviswa kwewatermark neSDH, kugadziriswa kwezvese-caps nemojibake, runyorwa rwekuchinja kwe-cue neimwe neimwe ine kudzoserwa kwayo, uye nguva haimbobatwi.",
+  "who": "Chero munhu akatora zvinyorwa zviripo uye achida kuti zvishandiswe, uye zvikwata zvinochenesa zvinhu muhuwandu."
+ },
+ "glossary": {
+  "title": "Shanduko Yamazwi Ezvinyorwa - Glossari Imwe, Faira Rose | AI-SRTSub",
+  "desc": "Shanduko yeglossary yezvinyorwa: nyora \"kare → chitsva\" kamwe chete uye faira rose reSRT / VTT / ASS / TXT rinogadziridzwa. Nguva, masitaera nemabhokisi eNOTE anoramba aripo; dzosera pamutsei nemutsetse.",
+  "kw": "glossary yezvinyorwa,tsiva srt muhuwandu,tsvaga wotsiva zvinyorwa,shanduko yamazwi ezvinyorwa,gadzirisa srt muhuwandu,tsiva mazwi muzvinyorwa,batana mazwi ezvinyorwa,terminology yezvinyorwa,tsiva zvinyorwa mu-vtt,chishandiso cheglossary srt,shanduko yezwi muhuwandu",
+  "intro": "Glossary yemitemo \"yezwi rekare → zwi ritsva\" inoiswa pamusoro pefaira rose rezvinyorwa kamwe chete, ine nguva, ASS styles uye VTT note blocks zvakasara zvakafanana zvakakwana.",
+  "feat": "Mutsetse mumwe pamutsetse, wakaparaniswa ne-> , => , → kana tab; mitemo inotanga na # inyora. Kufanana kwezwi rose kunochengeta \"art\" kunze kwe \"start\", kusiyanisa kwemavara kunosarudzwa, uye unogona kudzivisa kutsiva kumutsetse 1 kana mutsetse 2 wezvinyorwa zviviri. Ose cue akachinjwa anonyorwa, uye chero ipi zvayo inogona kudzoswa.",
+  "who": "Chero munhu anobatanidza mazwi neterminology pamusoro pemwaka, kugadzirisa mazwi ekushandura kwemuchina muhuwandu, kana kugadzirisa zvinyorwa zveumwe munhu kuti zvienderane nesitaera yavo yepamusha.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Subtitle QC - Tarisa Nguva neLayout neMutauro | AI-SRTSub",
+  "desc": "Tarisiro yezvinyorwa zvepamhepo yemahara: isa SRT, VTT kana ASS uye tarisa kupindirana, nguva, kumhanya kukuverenga, hupamhi hwemutsetse, kuputika kwemitsetse, nhamba nekunyora pasi pemitemo yemutauro iyoyo. Mitauro 27, zvikamu zvechiyero 27, pamwe nemitemo yakanangana nemutauro.",
+  "kw": "mutarisiri wezvinyorwa,subtitle qc,srt validator,chiratidzo chemhando yezvinyorwa,srt check,tarisiro yenguva yezvinyorwa,subtitle validator,tarisa faira re-srt,kugadzirisa zvinyorwa,subtitle linter",
+  "intro": "Isa faira rezvinyorwa woongorora pasi pemitemo yemutauro wacho - chigumisiro chega chega chine kukosha kwakapimwa nechekure. Inomhanya zvizere mumabhurawuza yako, hapana chakaiswa paIndaneti.",
+  "feat": "Inotarisa zvinyorwa zvinopindirana, zvipfupi zvakanyanya kana zvisina kufanira pachiratidziro, kumhanya kukuverenga, hupamhi hwemutsetse, kuverenga kwemitsetse, kuputsika kwemitsetse kusingafadzi, nhamba, zvinyorwa zvisina chinhu, mojibake nemavara ekudzora. Hupamhi nekumhanya kukuverenga zvinotevera nzira yekunyora: ChiChinese chinoyerwa mumavara akazara, Thai neArabic kusanganisa zviratidzo zvinoverengwa sezero hupamhi. Mitemo yakanangana nemutauro inovhara chivharo cheSpanish ¿, nzvimbo yeFrench isina kuputika isati yasvika ? ! ; :, chiratidzo cheGiriki chevhunzo, punction yakazara muChinese neJapanese, pamwe nechiratidzo chevhunzo nekomwa yeChi Arabic. Zvinhu zvinogona kugadziriswa otomatiki zvinonyorwa zvakasiyana, uye chero chinhu chinofambisa nenguva hachina kutariswa nekutadza.",
+  "who": "Mapoka ezvinyorwa,vatengesi vemunharaunda,vanyori uye chero munhu anoda kutarisa faira asati aunza.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Mushanduri Wezvinyorwa — SRT/VTT/ASS kuita Mutauro Wako",
+  "desc": "Isa faira reSRT / VTT / ASS, sarudza mutauro waunoda, uye uwane shanduro yakavharwa nenguva. Mitauro 100, yemahara, hapana kunyoresa."
+ },
+ "convert": {
+  "title": "Mushanduri Wezvinyorwa - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Mushanduri wezvinyorwa zvepamhepo wemahara: shandura pakati peSRT, VTT, ASS, SBV, LRC neTXT uine nguva yakasimba, ma-tags e-ASS akacheneswa otomatiki.",
+  "kw": "mushanduri wezvinyorwa,srt kuenda ku-vtt,vtt kuenda ku-srt,ass kuenda ku-srt,sbv kuenda ku-srt,srt kuenda ku-lrc,subtitle kuenda ku-txt,shandura zvinyorwa,srt converter,vtt converter",
+  "intro": "Shandura pakati peSRT, VTT, ASS, SBV, LRC neTXT uine nguva yakasimba isina kubatwa.",
+  "feat": "Mutauro wekuisa unoonekwa otomatiki uye nenguva dzinonyorwa zvakare kune faira rakatarisirwa; ma-tags e-ASS uye kuputika kwemitsetse kunozivikanwa kunova zvinyorwa zvinoverengeka paunotuma kune yakajairika fomati; mafaera emazwi emwiyo haana ndima yawa, saka chero chinhu chapfuura awa imwe chinoverengwa mumaminitsi.",
+  "who": "Chero munhu ane mutambi asingabvumi faira rezvinyorwa, uye chero munhu anofambisa zvinhu pakati pemunyori nemutambi wepamhepo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Kupatsanura Zvinyorwa Zvemitauro Miviri - Chengeta Mutauro Mumwe | AI-SRTSub",
+  "desc": "Chishandiso chemahara chepamusoro chepamusoro chekupatsanura zvinyorwa zvemitauro miviri: patsura faira rezvinyorwa zvemitauro miviri kuita tireki yepakutanga netireki yakashandurwa, kana kuchengeta imwe chete.",
+  "kw": "kupatsanura zvinyorwa zvemitauro miviri,patsura srt yemutauro miviri,bvisa zvinyorwa zvemutauro wechipiri,chengeta zvinyorwa zveChirungu chete,dhirowa zvinyorwa zvakashandurwa,patsura srt yemutauro miviri,patsura ass yemutauro miviri",
+  "intro": "Patsura faira rezvinyorwa zvemitauro miviri kuita tireki yepakutanga netireki yakashandurwa, kana kuchengeta imwe chete yadzo.",
+  "feat": "Inobata marongero ose akajairika - cue imwe ine mitsara miviri, uye cue mbiri dzinogovana nguva imwe chete. Matireki akapatsanurwa nekurongeka nemhando yescript, nguva inochengetwa sekunge yakaita, uye faira remutauro mumwe rinonongedzerwa panzvimbo yekuti risasvikirwe zvinyararire.",
+  "who": "Chero munhu akapihwa faira remutauro miviri rakatoitwa anoda mutauro mumwe chete, nezvikwata zvezvinyorwa zvinochengeta zvacho zvepakutanga nezvekushandura zvakasiyana.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Shanduko Yenguva Yezvinyorwa: Fambisa, Rescale & Patsura | AI-SRTSub",
+  "desc": "Chishandiso chemahara chepamusoro chenguva yezvinyorwa: fambisa zvese kamwe chete, rescale neyakaenzana, kana kugadzirisa drift nenzvimbo mbiri dzechikwata. Inoshanda neSRT, VTT, ASS, SBV, LRC neTXT.",
+  "kw": "shanduko yenguva yezvinyorwa,fambisa nguva ye-srt,gadzirisa kuwirirana kwezvinyorwa,rescale nguva yezvinyorwa,gadzirisa kunonoka kwezvinyorwa,srt time offset,gadzirisa drift yezvinyorwa,batanidza zvinyorwa,patsura zvinyorwa,batanidza srt,patsura zvinyorwa zvehurefu",
+  "intro": "Kana zvinyorwa zvisiri kuwirirana, fambisa nguva yose, irescale neyakaenzana, kana kuigadzirisa nenzvimbo mbiri dzechikwata. Inogona zvakare kubatanidza mitsara yakapatsanurwa, nekupatsanura iyo inomhanya kwenguva refu.",
+  "feat": "Kufambisa kunofambisa cue imwe neimwe pasina kuchinja kuti cue imwe neimwe inogara kwenguva yakareba sei pachiratidziro. Rescaling inowanza magumo ose ari maviri, saka kureba kwe-cue kunochinja nayo - zvakanaka pakati pe24 ne25 fps. Kugadzirisa kwenzvimbo mbiri kunobata mafaera ari kure uye ari kumhanya nekumhanya kusiri kwo. Nguva dzinobuda dzisina kunaka dzinonamirwa kuzero, uye chishandiso chinokuudza kuti ngani dzakakanganiswa. Fomati imwe chete mukati, fomati imwe chete kunze - pasina kuchinja, uye ASS styles, per-line styling neeffect tags zvinochengetwa sezvazvaive. Zvinyorwa zvemitauro miviri zvinoramba zviri pamitsara miviri kana zvakabatanidzwa uye zvinosiirwa panguva yekupatsanura.",
+  "who": "Chero munhu ane zvinyorwa zvinoenda kure mushure mekuchinja kwekwakabva, zvinomhanya zvishoma nekukurumidza kana zvishoma, kana kubva kune mumwe munhu aishanda pane imwe furemu rate.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Gadzirisa Zvinyorwa Zvakaora - Gadzirisa Mojibake / Encoding Isiri Yo",
+  "desc": "Kugadzirisa zvemahara online kwenzvinyorwa zvakaora: zvinokuona kana faira riri UTF-8, GBK, Big5, Shift_JIS kana EUC-KR, zvinodzosera zvinyorwa zvakaverengwa zvisiri izvo, zvichichengetera mutambi wako.",
+  "kw": "gadzirisa zvinyorwa zvakaora,mojibake yezvinyorwa,gadzirisa encoding ye-srt,gadzirisa encoding yezvinyorwa,utf8 kuenda ku-gbk zvinyorwa,srt inoratidza mavara asinganzwisisike,encoding yezvinyorwa isiri yo,ass yakashata,vtt yakashata,ona encoding yezvinyorwa",
+  "intro": "Zvinyorwa zvinovhurwa semadziro ezvisina musoro dzinenge nguva dzose dzinoverengwa neencoding isiri iyo. Isa faira mukati, uye rinobva raziva kuti faira racho rakanyatsonyorwa mune ipi encoding uye rinodzosera mavara akaverengwa zvisiri izvo.",
+  "feat": "Mafaera akaiswa anoroverwa zvakare kubva kuvaite vepakutanga, saka hapana chinorasika: kana faira rikatendeuka kuva GBK, rinodaro, uye kana mutambi wako ari iye ari kuverenga nenzira isiri iyo, kuchengeta kope se \"UTF-8 with BOM\" kunowanzogadzirisa. Zvinyorwa zvakakopa hazvisiri zvaimbova bytes zvekutanga, saka zvishoma zvikuru zvinogona kudzoswa; kana yatova nemavara ekutsiva, izvo hazvigoni kudzoswa uye chishandiso chinodaro zviri nyore panzvimbo yekunyepedzera neimwe nzira. Nhamba dzemitsetse nenguva hazviimbobatwi, uye ASS style tags dzinochengetwa sekudzaite.",
+  "who": "Chero munhu akadhawunirodha zvinyorwa zvinovhurwa sezvinhu zvisina musoro, anoona mabhokisi panzvimbo yeChiChinese mumutambi, kana akapihwa faira rine encoding isingazivikanwe.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Tora Zvinyorwa - SRT/ASS/VTT kuita Plain Text | AI-SRTSub",
+  "desc": "Chishandiso chemahara chepamusoro chekubvisa zvinyorwa kuenda kune zvinyorwa: chinoverenga SRT, VTT, ASS, SBV, LRC neTXT, chinodonha nenguva nenhamba dzemitsetse, uye chinobudisa kutaura kwakachena semaparagirafu kana mutsetse mumwe pamutsetse wega wega.",
+  "kw": "tora zvinyorwa kubva kune zvinyorwa,zvinyorwa kuenda kune zvinyorwa,srt kuenda ku-txt,srt kuenda ku-plain text,ass kuenda ku-txt,vtt kuenda ku-txt,kunyora kwezvinyorwa,tora kutaura kubva ku-srt,srt bvisa nguva,chishandiso chezvinyorwa",
+  "intro": "Tora nhaurirano kubva kune SRT / VTT / ASS / SBV / LRC / TXT zvinyorwa sezvinyorwa zvakachena zvakajeka: nguva, nhamba dze-cue nema-style tags zvinobviswa otomatiki.",
+  "feat": "Marongero maviri: maparagirafu anoenderera mberi akapatsanurwa pazororo nemapunctuation ekugumisa mitsara, kana mutsetse mumwe pamutsetse kune mazita enkulumo. Zvinyorwa zvekunzwa zvakaita se \"(foni iri kurira)\", watermarks dzekwakabva nemitsara inodzokororwa kumashure-kumashure zvinobviswa nekutadza; mazita evatauri akaita se \"TOM:\" nemitsara yemwiyo zvinogona kuchengetwa kana kudonha. Kuputirwa kwemitsetse kunobatanidzwa zvakare pascript yega yega - ChiChinese chinobatanidza zvakananga, ChiKorean neLatin zvinowedzera nzvimbo - saka hapana chinonamatirana pamwe chete.",
+  "who": "Chero munhu anoda zvinyorwa zvezvinyorwa zvezvinyorwa zvezvinyorwa, scripts, kudzidzira kuturikira kana kupa chimwe chishandiso, pasina kudzima mazana enguva nemaoko.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Tora Zvinyorwa Zvakatengeswa Kubva kuMKV / MP4 kuenda kuSRT | AI-SRTSub",
+  "desc": "Tora zvinyorwa zvakatengeswa kubva kuMKV, WebM, MP4, MOV; tumira seSRT / VTT / ASS / TXT. Hapana kurodha kana kure-encode — mafaera anoverengwa mubrowser yako; multi-GB OK.",
+  "kw": "tora zvinyorwa zvakatengeswa,mkv kuenda ku-srt,mp4 subtitle extract,tora zvinyorwa kubva kuvhidhiyo,embedded subtitle extractor,srt kubva ku-mkv,mov subtitle extract,subtitle track export,vtt kubva ku-mkv,tora soft subtitles,mkv subtitle rip",
+  "intro": "Tora tireki yezvinyorwa yakavharirwa mukati meMKV kana MP4 zvakananga kuita SRT — hapana kurodha, zvese zvinoitika mubrowser yako.",
+  "feat": "Inoverenga plain-text, ASS, WebVTT ne-mov_text / tx3g tracks, inochengeta wepakutanga ASS header ne resolution, uye inoverenga muzvidimbu zvidiki ne offset kuti faira hombe risazadze memory.",
+  "who": "Chero munhu ane firimu rine soft subtitles anoda zvinyorwa zvese kunze, zvikwata zvekuchengetera, nevatambi vefansub vanotanga kubva kune wepakutanga track.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Mushanduri Wezvinyorwa ZveChiChinese - Nyore ⇄ Chekare | AI-SRTSub",
+  "desc": "Mushanduri wezvinyorwa zveChiChinese wemahara: Nyore ⇄ Chekare (Taiwan / Hong Kong) uye kumashure. Kutaura chete ndiko kunochinja — nguva nema-ASS tags zvinoramba zviripo. Yakavakirwa paOpenCC.",
+  "kw": "mushanduri wezvinyorwa zvechichinese,nyore kuenda kuchekare,chekare kuenda kunyore,srt traditional chinese,shandura zvinyorwa chichinese,taiwan traditional chinese,hong kong traditional chinese,han conversion,shandura srt kuita traditional chinese,simplified chinese srt,opencc subtitle",
+  "intro": "Shandura faira rese rezvinyorwa pakati peNyore neChekare, pasina chinochinja kunze kwemakurukuro.",
+  "feat": "Nzira mapfumbamwe: Chekare chakajairika, mazwi eTaiwan, mafomu eTaiwan, Hong Kong, kudzokera kuNyore, nemafomu enzvimbo eChekare kuenda kuChekare. Inoshandisa OpenCC dictionary ine longest-match-first phrase resolution.",
+  "who": "Chero munhu anoendesa zvinyorwa kuvaoni vekuTaiwan kana vekuHong Kong, vagoveraji vanogadzirira shanduro dzenzvimbo, nevanyori vakagamuchira faira reChekare uye vanoda Nyore.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Kupatsanura neKusanganisa Zvinyorwa - SRT / VTT | AI-SRTSub",
+  "desc": "Patsura zvinyorwa nenguva kana kuverenga, kana kubatanidza mafaera mazhinji nenzira kana nenguva. Kumutsva kwenhamba kunongoita otomatiki, nhaurirano haibatiwe. SRT & VTT.",
+  "kw": "subtitle splitter,patsura zvinyorwa,batanidza srt files,srt merger,batanidza zvinyorwa,patsura srt,batanidza srt files,cheka zvinyorwa,patsura vtt,subtitle merger",
+  "intro": "Cheka chinyorwa chimwe chirefu kuita zvidimbu, kana kubatanidza mafaera mazhinji kuita rimwe. Inomhanya zvizere mubrowser yako — hapana chinorodhwa.",
+  "feat": "Patsura nenguva kana kuverenga nekumutsva kwenhamba kwechikamu chimwe nechimwe uye zero-based timing isina kusungirwa; batanidza zvichitezana negaka kana kusangana nenguva dzevepakutanga. SRT neVTT.",
+  "who": "Vanyori vanopatsanura zvikamu zvekurodha, zvikwata zvinoongorora muzvidimbu, nevanyori vanobatanidza zvinyorwa zvezvidimbu zvakawanda.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Zvinyorwa kuenda kuExcel/CSV neKudzokera | AI-SRTSub",
+  "desc": "Shandura SRT kana VTT kuita Excel kana CSV sheet kuti uongorore nekuvandudza, wobva wadzosa. Nguva dzinoramba dzichida kuva chaidzo, kuputika kwemitsetse kunopukunyuka. Hapana chinorodhwa.",
+  "kw": "zvinyorwa kuenda kuexcel,srt kuenda ku-csv,srt kuenda ku-excel,excel kuenda ku-srt,csv kuenda ku-srt,spreadsheet yezvinyorwa,tafura yezvinyorwa",
+  "intro": "Tumira zvinyorwa ku spreadsheet kuti uongorore nekuvandudza, wobva waisa sheet yacho kumashure. Inomhanya zvizere mumabhurawuza yako.",
+  "feat": "Kanya kamwe kubva kuSRT kana VTT kuenda ku xlsx kana CSV; chinja nguva, zvinyorwa nemanyorero mu spreadsheet yako, wobva watumira kumashure kuSRT kana VTT. Makoramu enguva anochengeta kusimba kwemillisecond; kuputika kwemitsetse mukati meceli kunochengetwa. Misoro yeChiChinese neChirungu yese inoshanda.",
+  "who": "Vaturikiri, zvikwata zvefansub nevanyori vanoongorora, kunyora kana kugadzirisa zvinyorwa muhuwandu mu spreadsheet.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Shandura Zvinyorwa Muhuwandu kuSRT/VTT | AI-SRTSub",
+  "desc": "Isa makumi kana mazana emafaera eSRT/VTT, shandura ese kuita fomati imwe uye dhawunirodha ZIP imwe. Kuverenga patsva nenguva zvakarongwa; mafaera asingaverengeke akaiswa chiratidzo.",
+  "kw": "shandura zvinyorwa muhuwandu,srt kuenda ku-vtt,mushanduri wezvinyorwa muhuwandu,srt huru,shandura zvinyorwa zvakawanda,zip yezvinyorwa",
+  "intro": "Dhonza mazana emafaera ezvinyorwa, shandura ese, tora ZIP imwe. Inomhanya zvizere mumabhurawuza yako — hapana chinorodhwa.",
+  "feat": "SRT kuenda kuVTT nekudzokera muhuwandu; nhamba dzejereri dzakatorwa zvakare nenguva dzakarongwa nerudzi rwefomati. Mafaera asingakwanise kuverengwa anoiswa chiratidzo uye anorashwa kubva kuZIP. Mazita epakutanga emafaera akachengetwa nekuwedzera kutsva; zvisungo zvinowana suffix.",
+  "who": "Vanyori nevatiki vanoshandura mafolda ese eresheni, nevaridzi vesaiti vanopa vatambi fomati imwe chete.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Mugadziri Weziyo dzeLRC - Bata Nguva Uchiteerera | AI-SRTSub",
+  "desc": "Isa rwiyo, namira mashoko, wobva wataura nguva yemutsetse mumwe nemumwe uchiteerera; tumira LRC kana SRT. Isa LRC iripo kuti ugadzirise zvakanaka. Inofambiswa nekibhodhi, yakazara mumabhurawuza.",
+  "kw": "murerami we-lrc online,gadzira lrc,nguva yezwi,murerami we-lrc,gadzira lrc,synchronizer yezwi,lrc kuenda ku-srt",
+  "intro": "Isa mimhanzi, namira mashoko, bata nguva mutsetse nemutsetse sezvaunoteerera, uye tumira LRC kana SRT. Hapana chinorodhwa.",
+  "feat": "Inoshanda neMP3, M4A, FLAC, WAV neOGG. Mutsetse mumwe pamutsetse wega wega; mafaera eLRC aripo anogona kuiswa nekuvandudzwa. Space inoridza/inombomira, Enter inodhinda mutsetse uripo, Z inodzosera shure - maoko anoramba ari pakibhodhi.",
+  "who": "Vaimbi vanosanganisa makava, vanyori vanowedzera nziyo kumavhidhiyo, uye chero munhu anovaka zvinyorwa zvemashoko emutambi.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "YouTube Subtitle Realigner - Gadzirisa Mitsara Yakaputsika | AI-SRTSub",
+  "desc": "Zvinyorwa zveYouTube zvinotema mitsara pamasekondi 3-4. Chishandiso ichi hachichinji mazwi asi chinongofambisa miganhu painopera chaiko. Mahara, mitauro zana.",
+  "kw": "kugadzirisa youtube subtitle,youtube auto captions,kugadzirisa subtitle,kurongwa kwemitsara ye subtitle,gadzirisa subtitle dzakaputsika,srt sentence alignment,subtitle re-segmentation,kugadzirisa youtube captions,sentence aware subtitles",
+  "intro": "Isa faira reYouTube auto-generated subtitle, sarudza mutauro, uye chishandiso ichi chinobatanidza mitsara zvakare. Hapana shoko rinochinjwa, uye nguva dze subtitle dzinoramba dziri pedyo nenguva dzekutanga sezvinobvira.",
+  "feat": "YouTube auto-captions inochekwa kuita 3-4 masekondi pasina hanya nekuti mitsara inopera kupi. Chishandiso ichi chinoshandisa nguva dzekutanga senzvimbo dzekumira, chinoona magumo emitsara, uye chinosarudza nzvimbo dzakanaka dzekucheka. Mitauro 100 ine mitemo yayo: Chinese neJapanese hazvina nzvimbo pakati pemashoko, Thai inongoratidza miganhu, Hindi inopera ne ।, Arabic ne ؟, Armenian ne ։. Upamhi hwemutsara unotevedzera kunyorwa - 16 mavara eChinese, 42 emavara eLatin. Tisati taexport, rugwaro runoenzaniswa kuti hapana shoko rakarasika.",
+  "who": "Zvikwata zvinogadzirisa YouTube, podcast uye course auto-captions kuita subtitles dzakazara, nevagadziri vevhidhiyo vanoda mitsara yakazara isingamire nepakati.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio kuenda kuSubtitles — shandura kutaura kuita SRT | AI-SRTSub",
+  "desc": "Isa odhiyo kana vhidhiyo, uwane ma-subtitle: ASR inoshanda mubrowser yako, inocheka mitsara, uye inoburitsa SRT kana VTT mahara pasina kuisa pa-internet.",
+  "kw": "audio kuenda ku srt,kutaura kuita subtitle,gadzira subtitles kubva ku odhiyo,automatic subtitle generator,nyora odhiyo kuita srt,whisper subtitles,browser speech recognition,offline subtitle generation",
+  "intro": "Isa odhiyo kana vhidhiyo, sarudza mutauro, uye ASR inoshanda mukati mebrowser yako. Unowana dhirafti ye-subtitle ine nguva yakarongwa zvakanaka.",
+  "feat": "Chishandiso ichi chinoshandura kutaura kuita mitsara yakachekwa zvakanaka, ichitevera mitemo yemutauro uye kukurumidza kuverenga pasina kuisa odhiyo yako pa-internet.",
+  "who": "Vagadziri vemavhidhiyo, vanhu vanoita mapodcast, uye chero munhu anoda dhirafti ye-subtitle anogona kugadzirisa."
+ },
+ "ocrsub": {
+  "title": "Hardcoded Subtitle OCR — verenga ma-subtitle ari pavhidhiyo | AI-SRTSub",
+  "desc": "Ma-subtitle akapiswa pavhidhiyo haabudiki nyore. Chishandiso ichi chinoshandisa OCR kuverenga mitsara iyi frame neframe ichigadzira SRT kana VTT mahara.",
+  "kw": "bvisa hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles kubva ku vhidhiyo,video kuenda ku srt,subtitle kubva ku vhidhiyo,hardcoded caption ocr",
+  "intro": "Isa vhidhiyo, taridza nzvimbo ine ma-subtitle, uye chishandiso ichi chinoverenga frame neframe chichibatanidza mitsara yakafanana kuita cue imwe chete.",
+  "feat": "Chishandiso ichi chinoshandisa OCR kubvisa ma-subtitle akapiswa pavhidhiyo nekutarisa nzvimbo yakatarwa, ichichinja mifananidzo kuita mitsara yakarongwa nenguva.",
+  "who": "Zvikwata zvinoshandura mitauro yemavhidhiyo, vanhu vanoda ma-subtitle emavhidhiyo ekare, uye vashandi vekugadzira vhidhiyo vasina faira rekutanga."
+ },
+ "multilang": {
+  "title": "Mitauro yakawanda pamwe chete | AI-SRTSub",
+  "desc": "Isa mwaka wese, sarudza mitauro yaunoda, tobaya tanga kamwe chete. Zvikamu nezvinodiwa zvinotevedzana zvichishanda; mhedzisiro inobuda sezip imwe chete. Inoramba iripo yakamira, inodzima kana wavhara tab.",
+  "kw": "kushandura subtitles,batch subtitle translation,mitauro yakawanda,subtitles dzemwaka wese,subtitle batch export,turasi srt,mitauro yakawanda srt",
+  "intro": "Isa mwaka wese panguva imwe chete, sarudza mitauro yaunoda, tobaya tanga. Zvikamu nezvinodiwa zvinoumbwa zvose: mutauro mumwe unopedzisa usati watanga unotevera, uye zvese zvinorongedzerwa mu zip imwe chete.",
+  "feat": "Chinhu chinowanzoita dambudziko pakushandura zvakawanda ndiko kushanda panguva imwe chete. Zvikamu makumi maviri zvine mitauro mishanu zvikatumirwa pamwe chete zvinokonzeresa kuti server irembe, zvichiita kuti zvitadze kuzivikanwa kuti chii chapera. Saka peji rino rinoshanda zvine hungwaru kutevedzana: batch imwe panguva, mutauro mumwe kusvika waperera kune unotevera. Kufambira mberi kunochengetwa pakombuta yako, saka zvikatsvedza pachikamu chechitatu unongovhura peji, woisa mafaira akafanana, obva atangira pakamira pasina kudzokorora zvapera. Zita remunhu ndiro rinowanzochinja pakati pechikamu nechikamu kana ukashandura wega. Ndokusaka pane peji rekubatanidza mazita apo unogona kuisa kamwe chete kuitira mwaka wese, zvichikuratidza huwandu hwacho usati watanga. Vhara tab uye basa richamira pakarepo panzvimbo yekushandisa quota yako pasina kwainobatsira.",
+  "who": "Mapoka anoisa subtitles dzemwaka wese mumitauro yakasiyana-siyana, vashambadziri vanoparadzira zvikamu zvakafanana kumisika yakasiyana, uye vashanduri vega vanoda kubaya tanga kamwe chete vozosvika gare gare.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Gadzira ASS | AI-SRTSub",
+  "desc": "Gadzira karaoke subtitles yemahara online: isa rwiyo, namatira mazwi, baya mutsetse wega wega, wobva wakamura nemazwi kana kubaya nemimhanzi. Tumira ASS ine \\\\kf tags yeCapCut nePremiere, kana lrc inonaka.",
+  "kw": "karaoke subtitle maker,ass karaoke,word level lyrics,kf tags,karaoke lrc,lyric sweep,ass karaoke maker,ai srtsub",
+  "intro": "Isa rwiyo, namatira mazwi, baya mutsetse wega wega, wobva waparadzira mutsetse wese pamazwi - otomatiki, kubaya nemimhanzi, kana kudhonza miganhu. Tarisa mazwi achivheneka sezvaari kuimbwa.",
+  "feat": "Chinese inopatsanurwa nemabhii, English nemazwi, zvivezwa zvichifamba pamwe chete. Gomba rekumugumo rinoita kuti kiredhiti yekupedzisira isapfuure kuimba. Tumira ASS yeCapCut / Premiere / Aegisub ine \\\\kf tags, enhanced LRC yevatambi vemazwi, kana whole-line SRT seimwe nzira. Zvese zvinomhanya mubrowser yako - hapana zvinoiswa kumusoro.",
+  "who": "Vagadziri vanowedzera mazwi emadziso kumavhidhiyo ekufukidza nemakonzati, vagadziri veMVs dzemimhanzi, uye chero munhu anogadzira karaoke subtitles.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

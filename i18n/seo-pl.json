@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio na napisy — zamień mowę na SRT w przeglądarce | AI-SRTSub",
-    "desc": "Prześlij audio lub wideo, aby wygenerować napisy SRT/VTT w przeglądarce. Rozpoznawanie mowy działa lokalnie, bez przesyłania plików, całkowicie za darmo.",
-    "kw": "audio na srt, mowa na napisy, generator napisów, automatyczne napisy, transkrypcja audio na srt, napisy whisper, rozpoznawanie mowy w przeglądarce, napisy offline",
-    "intro": "Przeciągnij plik audio lub wideo, wybierz język i model, a rozpoznawanie mowy wykona się w Twojej przeglądarce. Otrzymasz gotowy szkic napisów z synchronizacją czasową.",
-    "feat": "Narzędzie przetwarza strumień mowy na poprawne napisy, dzieląc tekst na zdania, dbając o limity znaków w linii oraz zachowując odpowiednie tempo czytania bez nakładania się napisów.",
-    "who": "Twórcy wideo, zespoły transkrybujące podcasty i kursy oraz osoby potrzebujące szybkiego szkicu napisów do edycji."
-  },
-  "ocrsub": {
-    "title": "OCR napisów wtopionych — odczytaj napisy z wideo | AI-SRTSub",
-    "desc": "Napisy wtopione w obraz nie mają ścieżki tekstowej. Zaznacz obszar, a narzędzie odczyta tekst klatka po klatce i wyeksportuje plik SRT lub VTT za darmo.",
-    "kw": "ekstrakcja napisów wtopionych, ocr napisów, wyciąganie napisów z wideo, napisy hardcoded, ocr z wideo, wideo na srt, napisy z filmu, ocr napisów wideo",
-    "intro": "Prześlij wideo, zaznacz obszar z napisami, a narzędzie odczyta tekst klatka po klatce, łącząc identyczne sekwencje w jeden czasowy blok napisów.",
-    "feat": "Narzędzie wycina obszar napisów, stosuje binaryzację dla poprawy czytelności i rozpoznaje tekst, łącząc powtarzające się klatki w jeden spójny napis z odpowiednim czasem trwania.",
-    "who": "Zespoły lokalizujące krótkie filmy, osoby tworzące nowe napisy do starych wydań oraz montażyści posiadający tylko gotowy plik wideo bez oryginalnych napisów."
-  }
+ "autosub": {
+  "title": "Audio na napisy — zamień mowę na SRT w przeglądarce | AI-SRTSub",
+  "desc": "Prześlij audio lub wideo, aby wygenerować napisy SRT/VTT w przeglądarce. Rozpoznawanie mowy działa lokalnie, bez przesyłania plików, całkowicie za darmo.",
+  "kw": "audio na srt, mowa na napisy, generator napisów, automatyczne napisy, transkrypcja audio na srt, napisy whisper, rozpoznawanie mowy w przeglądarce, napisy offline",
+  "intro": "Przeciągnij plik audio lub wideo, wybierz język i model, a rozpoznawanie mowy wykona się w Twojej przeglądarce. Otrzymasz gotowy szkic napisów z synchronizacją czasową.",
+  "feat": "Narzędzie przetwarza strumień mowy na poprawne napisy, dzieląc tekst na zdania, dbając o limity znaków w linii oraz zachowując odpowiednie tempo czytania bez nakładania się napisów.",
+  "who": "Twórcy wideo, zespoły transkrybujące podcasty i kursy oraz osoby potrzebujące szybkiego szkicu napisów do edycji."
+ },
+ "ocrsub": {
+  "title": "OCR napisów wtopionych — odczytaj napisy z wideo | AI-SRTSub",
+  "desc": "Napisy wtopione w obraz nie mają ścieżki tekstowej. Zaznacz obszar, a narzędzie odczyta tekst klatka po klatce i wyeksportuje plik SRT lub VTT za darmo.",
+  "kw": "ekstrakcja napisów wtopionych, ocr napisów, wyciąganie napisów z wideo, napisy hardcoded, ocr z wideo, wideo na srt, napisy z filmu, ocr napisów wideo",
+  "intro": "Prześlij wideo, zaznacz obszar z napisami, a narzędzie odczyta tekst klatka po klatce, łącząc identyczne sekwencje w jeden czasowy blok napisów.",
+  "feat": "Narzędzie wycina obszar napisów, stosuje binaryzację dla poprawy czytelności i rozpoznaje tekst, łącząc powtarzające się klatki w jeden spójny napis z odpowiednim czasem trwania.",
+  "who": "Zespoły lokalizujące krótkie filmy, osoby tworzące nowe napisy do starych wydań oraz montażyści posiadający tylko gotowy plik wideo bez oryginalnych napisów."
+ },
+ "multilang": {
+  "title": "Wiele języków naraz — cały sezon i kolejka tłumaczeń | AI-SRTSub",
+  "desc": "Wrzuć cały sezon, zaznacz wybrane języki i włącz jednym przyciskiem. Odcinki i języki trafiają do wspólnej kolejki, a wyniki pobierzesz w jednej paczce zip. Wznowienie w miejscu przerwania i bezpieczne zatrzymanie po zamknięciu karty.",
+  "kw": "masowe tłumaczenie napisów,tłumaczenie napisów na wiele języków,napisy wielojęzyczne,napisy do całego sezonu,eksport masowy napisów,tłumaczenie srt na wiele języków,jeden sezon wiele języków",
+  "intro": "Wrzuć cały sezon na raz, zaznacz docelowe języki i naciśnij start. Odcinki i języki tworzą jedną kolejkę: każdy język jest tłumaczony do końca przed przejściem do następnego, a całość pakowana jest do pojedynczego pliku zip.",
+  "feat": "Największym problemem przy masowym tłumaczeniu jest współbieżność. Dwadzieścia odcinków w pięciu językach odpalonych naraz generuje setki zapytań, co dusi kolejkę po stronie serwera – wczesne i późne zapytania mieszają się, a odpowiedź na pytanie o ukończenie konkretnej komórki staje się niemożliwa. Dlatego ta strona działa celowo jako jedna kolejka: pojedyncza partia na raz, jeden język doprowadzony do końca przed kolejnym. Postęp jest zapisywany dla każdego odcinka i języka na Twoim urządzeniu, więc jeśli proces przerwie się na trzecim odcinku, po ponownym otwarciu strony i wczytaniu tych samych plików praca wznowi się od tego miejsca bez wysyłania tego, co już gotowe. Typowym problemem przy całym sezonie są imiona i nazwy własne: przetłumaczenie dwudziestu odcinków z osobna skutkuje tym, że ta sama postać pisana jest na trzy sposoby. Właśnie dlatego słownik ma tu swój osobny panel – przesyłasz go raz dla całego sezonu, a system pokazuje, ile wpisów faktycznie dopasowano przed rozpoczęciem pracy. Zamknij kartę, a zadanie natychmiast się zatrzyma zamiast marnować limit w tle.",
+  "who": "Zespoły tłumaczące cały sezon na kilka języków, kanały dystrybuujące ten sam pakiet odcinków na różne rynki oraz niezależni tłumacze, którzy wolą raz nacisnąć start i wrócić później.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ }
 }

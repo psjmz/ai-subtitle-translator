@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Audio zu Untertiteln — Sprache zu SRT im Browser | AI-SRTSub",
-    "desc": "Audio oder Video hochladen, Untertitel erhalten: Spracherkennung läuft im Browser, schneidet Text in Cues und exportiert SRT / VTT. Kein Upload, kostenlos.",
-    "kw": "audio zu srt, sprache zu untertitel, untertitel generieren, automatischer untertitel generator, audio zu srt transkribieren, whisper untertitel, browser spracherkennung, offline untertitel erstellung",
-    "intro": "Ziehen Sie eine Audio- oder Videodatei hinein, wählen Sie Sprache und Modell, und die Erkennung läuft direkt in Ihrem Browser. Das Ergebnis ist ein Untertitel-Entwurf mit Timing, der bereits in Sätze unterteilt ist.",
-    "feat": "Das Tool verarbeitet den Stream der Spracherkennung, schneidet Sätze an Satzzeichen, bricht Zeilen gemäß der Schriftsprache um und optimiert die Anzeigedauer basierend auf der Lesegeschwindigkeit ohne Überlappungen.",
-    "who": "Content-Ersteller, Podcast-Teams und Personen, die für Videomaterial ohne Untertitel schnell einen bearbeitbaren Entwurf benötigen."
-  },
-  "ocrsub": {
-    "title": "Hardcoded Untertitel OCR — Eingebrannte Untertitel lesen | AI-SRTSub",
-    "desc": "Eingebrannte Untertitel haben keine extrahierbare Spur. Markieren Sie den Bereich, das Tool liest Bild für Bild und erstellt SRT / VTT. Kostenlos.",
-    "kw": "eingebrannte untertitel extrahieren, untertitel ocr, video untertitel extraktion, hardcoded untertitel, ocr untertitel aus video, video zu srt, untertitel aus video, hardcoded caption ocr",
-    "intro": "Laden Sie ein Video hoch, markieren Sie den Bereich der Untertitel, und das Tool liest Bild für Bild, um identische Sequenzen zu einem zeitgesteuerten Cue zusammenzuführen.",
-    "feat": "Der Bereich wird zugeschnitten und nach Helligkeit binarisiert, sodass der Hintergrund verschwindet und die Texterkennung nur die Formen der Untertitel verarbeitet.",
-    "who": "Lokalisierungsteams, Editoren bei der Neu-Untertitelung und Personen, die nur das fertige Video ohne separate Untertiteldatei besitzen."
-  }
+ "autosub": {
+  "title": "Audio zu Untertiteln — Sprache zu SRT im Browser | AI-SRTSub",
+  "desc": "Audio oder Video hochladen, Untertitel erhalten: Spracherkennung läuft im Browser, schneidet Text in Cues und exportiert SRT / VTT. Kein Upload, kostenlos.",
+  "kw": "audio zu srt, sprache zu untertitel, untertitel generieren, automatischer untertitel generator, audio zu srt transkribieren, whisper untertitel, browser spracherkennung, offline untertitel erstellung",
+  "intro": "Ziehen Sie eine Audio- oder Videodatei hinein, wählen Sie Sprache und Modell, und die Erkennung läuft direkt in Ihrem Browser. Das Ergebnis ist ein Untertitel-Entwurf mit Timing, der bereits in Sätze unterteilt ist.",
+  "feat": "Das Tool verarbeitet den Stream der Spracherkennung, schneidet Sätze an Satzzeichen, bricht Zeilen gemäß der Schriftsprache um und optimiert die Anzeigedauer basierend auf der Lesegeschwindigkeit ohne Überlappungen.",
+  "who": "Content-Ersteller, Podcast-Teams und Personen, die für Videomaterial ohne Untertitel schnell einen bearbeitbaren Entwurf benötigen."
+ },
+ "ocrsub": {
+  "title": "Hardcoded Untertitel OCR — Eingebrannte Untertitel lesen | AI-SRTSub",
+  "desc": "Eingebrannte Untertitel haben keine extrahierbare Spur. Markieren Sie den Bereich, das Tool liest Bild für Bild und erstellt SRT / VTT. Kostenlos.",
+  "kw": "eingebrannte untertitel extrahieren, untertitel ocr, video untertitel extraktion, hardcoded untertitel, ocr untertitel aus video, video zu srt, untertitel aus video, hardcoded caption ocr",
+  "intro": "Laden Sie ein Video hoch, markieren Sie den Bereich der Untertitel, und das Tool liest Bild für Bild, um identische Sequenzen zu einem zeitgesteuerten Cue zusammenzuführen.",
+  "feat": "Der Bereich wird zugeschnitten und nach Helligkeit binarisiert, sodass der Hintergrund verschwindet und die Texterkennung nur die Formen der Untertitel verarbeitet.",
+  "who": "Lokalisierungsteams, Editoren bei der Neu-Untertitelung und Personen, die nur das fertige Video ohne separate Untertiteldatei besitzen."
+ },
+ "multilang": {
+  "title": "Viele Sprachen auf einmal: ganze Staffel hochladen, Warteschlange | AI-SRTSub",
+  "desc": "Laden Sie eine ganze Staffel hoch, wählen Sie die Zielsprachen aus und starten Sie den Prozess. Episoden und Sprachen bilden eine Warteschlange, das Ergebnis wird als ZIP-Datei gepackt.",
+  "kw": "Untertitel Batch-Übersetzung,Untertitel in mehrere Sprachen übersetzen,mehrsprachige Untertitel,ganze Staffel Untertitel,Untertitel Stapelexport,SRT in viele Sprachen übersetzen,eine Staffel viele Sprachen",
+  "intro": "Laden Sie eine ganze Staffel auf einmal hoch, markieren Sie die Zielsprachen und drücken Sie auf Start. Episoden und Sprachen bilden eine einzige Warteschlange: Jede Sprache läuft bis zum Ende, bevor die nächste beginnt, und alles wird in eine einzige ZIP-Datei gepackt.",
+  "feat": "Das Problem bei der Batch-Übersetzung ist die Parallelverarbeitung. Zwanzig Episoden mal fünf Sprachen gleichzeitig erzeugen Hunderte von Anfragen, was die serverseitige Warteschlange überlastet. Deshalb läuft diese Seite bewusst als einfache Warteschlange: ein Batch nach dem anderen, eine Sprache bis zum Abschluss vor der nächsten. Der Fortschritt wird pro Episode und Sprache lokal gespeichert. Wenn es bei Episode drei abbricht, laden Sie die Seite neu und machen genau dort weiter. Das Verräterischste bei Staffeln sind Namen: Übersetzt man Episoden einzeln, wird derselbe Charakter oft dreimal unterschiedlich geschrieben. Deshalb gibt es hier ein eigenes Glossar-Panel, das für die ganze Staffel gilt und vor dem Start anzeigt, wie viele Einträge übereinstimmen. Schließen Sie den Tab, stoppt die Aufgabe sofort.",
+  "who": "Untertitel-Teams, die eine komplette Staffel in mehrere Sprachen übersetzen, Kanäle, die dieselben Episoden in verschiedene Märkte exportieren, und Solo-Übersetzer, die lieber einmal starten und später zurückkehren.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ }
 }

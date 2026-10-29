@@ -1,18 +1,29 @@
 {
-  "autosub": {
-    "title": "Chuyển âm thanh sang phụ đề SRT trên trình duyệt | AI-SRTSub",
-    "desc": "Chuyển âm thanh hoặc video thành phụ đề SRT/VTT bằng ASR ngay trên trình duyệt. Không cần tải lên, miễn phí, bảo mật và tự động ngắt câu chính xác.",
-    "kw": "chuyển âm thanh sang srt,tạo phụ đề từ âm thanh,công cụ tạo phụ đề tự động,chuyển giọng nói thành phụ đề,whisper phụ đề,nhận dạng giọng nói trên trình duyệt,tạo phụ đề ngoại tuyến",
-    "intro": "Tải tệp âm thanh hoặc video lên, chọn ngôn ngữ và mô hình để AI-SRTSub thực hiện nhận dạng ngay trong trình duyệt. Kết quả là bản nháp phụ đề đã được căn chỉnh thời gian và ngắt dòng phù hợp.",
-    "feat": "Công cụ này tự động ngắt câu dựa trên dấu câu, điều chỉnh độ dài dòng theo hệ chữ viết và tối ưu hóa thời gian hiển thị để đảm bảo tốc độ đọc mà không bị chồng chéo.",
-    "who": "Người sáng tạo nội dung, đội ngũ sản xuất podcast hoặc khóa học cần tạo bản nháp phụ đề nhanh chóng từ video gốc."
-  },
-  "ocrsub": {
-    "title": "OCR phụ đề cứng — trích xuất phụ đề từ video | AI-SRTSub",
-    "desc": "Trích xuất phụ đề bị cháy (hardcoded) vào video bằng công nghệ OCR. Đánh dấu vùng phụ đề, công cụ sẽ đọc từng khung hình và xuất ra tệp SRT/VTT miễn phí.",
-    "kw": "trích xuất phụ đề cứng,ocr phụ đề,lấy phụ đề từ video,phụ đề bị cháy,ocr phụ đề từ video,video sang srt,phụ đề từ video,ocr phụ đề hardcoded",
-    "intro": "Tải video lên, đánh dấu khu vực chứa phụ đề và công cụ sẽ đọc từng khung hình, hợp nhất các khung hình giống nhau thành một phụ đề có thời gian cụ thể.",
-    "feat": "Công cụ cắt vùng chứa phụ đề, nhị phân hóa độ sáng để loại bỏ nền và sử dụng OCR để nhận dạng văn bản, sau đó hợp nhất các khung hình liên tiếp thành một tệp phụ đề hoàn chỉnh.",
-    "who": "Đội ngũ dịch thuật nội dung, người biên tập video cần lấy lại phụ đề từ các bản phát hành cũ hoặc video không có tệp phụ đề gốc."
-  }
+ "autosub": {
+  "title": "Chuyển âm thanh sang phụ đề SRT trên trình duyệt | AI-SRTSub",
+  "desc": "Chuyển âm thanh hoặc video thành phụ đề SRT/VTT bằng ASR ngay trên trình duyệt. Không cần tải lên, miễn phí, bảo mật và tự động ngắt câu chính xác.",
+  "kw": "chuyển âm thanh sang srt,tạo phụ đề từ âm thanh,công cụ tạo phụ đề tự động,chuyển giọng nói thành phụ đề,whisper phụ đề,nhận dạng giọng nói trên trình duyệt,tạo phụ đề ngoại tuyến",
+  "intro": "Tải tệp âm thanh hoặc video lên, chọn ngôn ngữ và mô hình để AI-SRTSub thực hiện nhận dạng ngay trong trình duyệt. Kết quả là bản nháp phụ đề đã được căn chỉnh thời gian và ngắt dòng phù hợp.",
+  "feat": "Công cụ này tự động ngắt câu dựa trên dấu câu, điều chỉnh độ dài dòng theo hệ chữ viết và tối ưu hóa thời gian hiển thị để đảm bảo tốc độ đọc mà không bị chồng chéo.",
+  "who": "Người sáng tạo nội dung, đội ngũ sản xuất podcast hoặc khóa học cần tạo bản nháp phụ đề nhanh chóng từ video gốc."
+ },
+ "ocrsub": {
+  "title": "OCR phụ đề cứng — trích xuất phụ đề từ video | AI-SRTSub",
+  "desc": "Trích xuất phụ đề bị cháy (hardcoded) vào video bằng công nghệ OCR. Đánh dấu vùng phụ đề, công cụ sẽ đọc từng khung hình và xuất ra tệp SRT/VTT miễn phí.",
+  "kw": "trích xuất phụ đề cứng,ocr phụ đề,lấy phụ đề từ video,phụ đề bị cháy,ocr phụ đề từ video,video sang srt,phụ đề từ video,ocr phụ đề hardcoded",
+  "intro": "Tải video lên, đánh dấu khu vực chứa phụ đề và công cụ sẽ đọc từng khung hình, hợp nhất các khung hình giống nhau thành một phụ đề có thời gian cụ thể.",
+  "feat": "Công cụ cắt vùng chứa phụ đề, nhị phân hóa độ sáng để loại bỏ nền và sử dụng OCR để nhận dạng văn bản, sau đó hợp nhất các khung hình liên tiếp thành một tệp phụ đề hoàn chỉnh.",
+  "who": "Đội ngũ dịch thuật nội dung, người biên tập video cần lấy lại phụ đề từ các bản phát hành cũ hoặc video không có tệp phụ đề gốc."
+ },
+ "multilang": {
+  "title": "Nhiều ngôn ngữ cùng lúc — tải cả mùa, xếp hàng đợi dịch | AI-SRTSub",
+  "desc": "Tải lên cả một mùa phim, chọn các ngôn ngữ bạn cần và bấm bắt đầu. Các tập nhân với ngôn ngữ tạo thành một hàng đợi chạy lần lượt; kết quả trả về trong một file zip. Tự động tiếp tục khi gián đoạn, dừng lại khi bạn đóng tab.",
+  "kw": "dịch phụ đề hàng loạt,dịch phụ đề nhiều ngôn ngữ,phụ đề đa ngôn ngữ,phụ đề cả mùa phim,xuất phụ đề hàng loạt,dịch srt sang nhiều ngôn ngữ,một mùa nhiều ngôn ngữ",
+  "intro": "Tải lên toàn bộ một mùa phim cùng lúc, chọn các ngôn ngữ mục tiêu và nhấn bắt đầu. Các tập nhân với ngôn ngữ sẽ trở thành một hàng đợi: mỗi ngôn ngữ chạy đến hết rồi mới chuyển sang ngôn ngữ tiếp theo, và tất cả được nén gọn trong một file zip duy nhất.",
+  "feat": "Điểm thường sai sót trong dịch hàng loạt chính là việc xử lý đồng thời. Hai mươi tập nhân với năm ngôn ngữ chạy cùng lúc sẽ tạo ra hàng trăm yêu cầu đổ về, làm quá tải hàng đợi phía máy chủ — các yêu cầu đầu và cuối xen lẫn vào nhau khiến bạn không thể biết ô nào đã hoàn thành thực sự. Do đó, trang này hoạt động có chủ đích dưới dạng một hàng đợi duy nhất: xử lý từng lô một, hoàn thành trọn vẹn một ngôn ngữ rồi mới sang ngôn ngữ tiếp theo. Tiến trình được lưu theo từng tập và từng ngôn ngữ trên máy của bạn, nên nếu bị lỗi ở tập ba, bạn chỉ cần mở lại trang, tải lên đúng các file đó và hệ thống sẽ tiếp tục từ lô đang dở dang mà không cần gửi lại những phần đã hoàn thành. Điểm dễ làm lộ việc dịch máy trong cả mùa phim chính là tên nhân vật: dịch rời rạc hai mươi tập sẽ khiến cùng một nhân vật được viết theo ba cách khác nhau. Đó là lý do bảng thuật ngữ được thiết kế thành một bảng riêng biệt ở đây — tải lên một lần, dùng chung cho cả mùa — và nó sẽ hiển thị số lượng mục khớp thực tế trước khi bạn bắt đầu. Đóng tab lại và tác vụ sẽ dừng ngay lập tức thay vì tiếp tục tiêu tốn hạn mức ở chế độ nền.",
+  "who": "Các đội ngũ làm phụ đề cho cả một mùa phim sang nhiều ngôn ngữ, các kênh phân phối cùng một bộ tập phim tới các thị trường khác nhau, và những dịch giả độc lập thích bấm bắt đầu một lần rồi quay lại sau.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ }
 }

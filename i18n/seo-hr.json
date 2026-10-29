@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "hr",
-    "ogLocale": "hr_HR",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub – Globalni filmovi i serije, titlovi na vašem jeziku",
-    "desc": "Besplatni AI prevoditelj titlova — bez registracije, bez ograničenja, bez vodenog žiga. Jednim klikom prevedite titlove stranih filmova, serija i dokumentaraca na svoj jezik.",
-    "kw": "AI prevoditelj titlova,prevođenje titlova,besplatni prevoditelj titlova,prevedi SRT datoteku,prevedi VTT,prevedi ASS,prijevod filmskih titlova,titlovi za TV serije,Netflix titlovi,KDrama titlovi,anime titlovi,dvojezični titlovi,titlovi stranih filmova,prevedi titlove online,YouTube titlovi,besplatni alat za prijevod titlova,prevedi titlove besplatno,besplatni SRT prevoditelj",
-    "ogTitle": "AI-SRTSub – Globalni filmovi i serije, titlovi na vašem jeziku",
-    "ogDesc": "100% besplatni AI prevoditelj titlova za ljubitelje filmova: jednim klikom pretvara titlove stranih filmova, serija i dokumentaraca na vaš materinski jezik, uz automatsko poravnanje vremenske trake. Uživajte u globalnom sadržaju bez prepreka.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "100% besplatni AI prevoditelj titlova za ljubitelje filmova: jednim klikom pretvara titlove stranih filmova, serija i dokumentaraca na vaš materinski jezik, uz automatsko poravnanje vremenske trake. Uživajte u globalnom sadržaju bez prepreka.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"O ovom alatu\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Besplatni AI prevoditelj automatskih titlova</h2>\n    <p data-i18n-html=\"seoIntro\">Ovo je <strong>besplatni mrežni alat za prevođenje titlova koji pokreću jezični modeli velikog kapaciteta</strong>. Prenesite SRT, VTT ili ASS datoteke i prevedite titlove između engleskog, kineskog, japanskog, korejskog, španjolskog, francuskog i 15+ drugih jezika. Bez registracije, bez instalacije, bez vodenog žiga — otvorite ga u pregledniku i počnite prevoditi. Podaci titlova ostaju u vašem pregledniku osim ako ne omogućite prijevod u oblaku.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Ključne značajke:</strong> analiza i AI prijevod SRT, VTT i ASS datoteka, pametno spajanje rečenica (kada jedna rečenica obuhvaća više dijelova, dijelovi se spajaju, prevode, a zatim ponovno dijele kroz izvornu vremensku traku), poravnanje vremenske trake, automatsko prelamanje redaka za CJK i zapadni tekst, uklanjanje poštapalica, prilagođeno rukovanje terminologijom i odabrani stilovi prevođenja. Izvezite standardne SRT, VTT, ASS ili TXT datoteke spremne za ugradnju u videozapis.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Tko ga koristi:</strong> prevoditelji videozapisa, YouTube kreatori i lokalizatori, učenici jezika, grupe za titlovanje i timovi kojima je potrebno brzo lokalizirati video sadržaj.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Ovaj alat zahtijeva JavaScript. Molimo omogućite JavaScript u svom pregledniku, a zatim prenijeti datoteku titlova (SRT / VTT / ASS) kako biste besplatno preveli titlove pomoću AI-ja.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Izrađivač stiliziranih titlova – Spojite dvojezične, ASS i VTT efekte",
-    "desc": "Besplatni alat za stilizirane titlove: spojite dvije datoteke u dvojezične, promijenite stil dvojezičnog zapisa ili dodajte efekte. 5 ASS / 6 VTT predložaka; izvoz u SRT / VTT / ASS.",
-    "kw": "spajanje titlova,dvojezični titlovi,kombiniranje datoteka titlova,stilizirani titlovi,ASS stilovi titlova,VTT stilovi titlova,efekti titlova,izrađivač dvostrukih titlova,ASS predlošci,predložak titlova,besplatni alat za titlove",
-    "intro": "Spojite dvije datoteke titlova u dvojezične ili stilizirajte zapis: font, boja, obris i položaj, sve u vizualnom obliku (WYSIWYG).",
-    "feat": "Dvojezično spajanje i prilagodba, ASS / VTT predlošci stilova, utori za stilove po vrijednostima, popravci vremenske trake na licu mjesta i u paketu te pregled uživo koji je doslovno izvezena datoteka.",
-    "who": "Kreatori koji izrađuju dvojezične ili stilizirane titlove, grupe za kodiranje i timovi kojima su potrebni pristupačni titlovi."
-  },
-  "clean": {
-    "title": "Čistač titlova – Uklonite vodene žigove, SDH dijelove i HTML oznake",
-    "desc": "Besplatni mrežni čistač titlova: uklonite vodene žigove, oglase, SDH, HTML oznake, ASS efekte; ispravite velika slova, greške u kodiranju. 13 pravila s mogućnošću uključivanja/isključivanja, poništavanje po promjeni, vremenska traka netaknuta.",
-    "kw": "čistač titlova,očisti srt datoteku,ukloni vodeni žig s titlova,ukloni SDH titlove,ukloni HTML oznake s titlova,ispravi titlove s velikim slovima,ispravi pogrešno kodiranje,ukloni titlove za nagluhe,ukloni ASS efekte",
-    "intro": "Rječnik pravila \"stari pojam → novi pojam\" primijenjen na cijelu datoteku titlova odjednom, pri čemu tajming, ASS stilovi i VTT blokovi napomena ostaju bitno identični.",
-    "feat": "13 pravila u četiri grupe (9 uključeno zadano), uklanjanje vodenih žigova i SDH-a, ispravci velikih slova i kodiranja, popis promjena po dijelu s pojedinačnim vraćanjem na staro, a tajming se nikada ne dira.",
-    "who": "Svatko tko je preuzeo postojeći titl i želi ga učiniti upotrebljivim, te grupe koje serijski čiste materijal."
-  },
-  "glossary": {
-    "title": "Skupna zamjena pojmova u titlovima - Jedan rojnik, cijela datoteka | AI-SRTSub",
-    "desc": "Zamjena iz rječnika za titlove: jednom unesite popis \"staro → novo\" i cijela SRT / VTT / ASS / TXT datoteka se ažurira. Tajming, stilovi i NOTE blokovi ostaju; mogućnost vraćanja po retku.",
-    "kw": "rječnik titlova,serijska zamjena srt,traži i zamijeni u titlovima,zamjena pojmova u titlovima,srt serijsko uređivanje,zamijeni riječi u titlovima,ujednači nazive titlova,terminologija titlova,zamijeni tekst u vtt,srt alat za rječnik,serijska zamjena terminologije",
-    "intro": "Rječnik pravila \"stari pojam → novi pojam\" primijenjen na cijelu datoteku titlova odjednom, pri čemu tajming, ASS stilovi i VTT blokovi napomena ostaju bitno identični.",
-    "feat": "Jedno pravilo po retku, odvojeno s -> , => , → ili tabulatorom; retci koji počinju s # su komentari. Podudaranje cijelih riječi čuva riječ \"art\" izvan riječi \"start\", razlikovanje malih i velikih slova je opcionalno, a zamjenu možete ograničiti na 1. ili 2. redak dvojezičnih dijelova. Svaki promijenjeni dio je navedeno na popisu, a svaki pojedinačni se može vratiti.",
-    "who": "Svatko tko ujednačava imena i terminologiju kroz cijelu sezonu, masovno ispravlja strojni prijevod ili prilagođava tuđe titlove vlastitom stilu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Kontrola kvalitete titlova – Provjerite tajming i izgled po jeziku | AI-SRTSub",
-    "desc": "Besplatna mrežna kontrola kvalitete titlova: prenesite SRT, VTT ili ASS i provjerite preklapanja, trajanje, brzinu čitanja, širinu redaka, prijelome redaka, numeriranje i kodiranje u odnosu na pravila tog jezika. 27 jezika, 27 skupova pragova, plus pravila specifična za jezik.",
-    "kw": "provjera titlova,kontrola kvalitete titlova,srt validator,provjera kvalitete titlova,srt provjera,provjera tajminga titlova,validator titlova,provjeri srt datoteku,lektura titlova,linter titlova",
-    "intro": "Prenesite datoteku titlova i provjerite je u odnosu na pravila njenog jezika – svaki nalaz dolazi s izmjerenom vrijednošću i pragom. Pokreće se u potpunosti u vašem pregledniku, ništa se ne učitava na poslužitelj.",
-    "feat": "Provjerava preklapajuće dijelove, prekratsko ili predugo prikazivanje na ekranu, brzinu čitanja, širinu retka, broj redaka, nespretne prijelome redaka, numeriranje, prazne dijelove, pogrešno kodiranje i kontrolne znakove. Širina i brzina čitanja prate sustav pisanja: kineski se mjeri u znakovima pune širine, tajlandski i arapski kombinirajući znakovi računaju se kao nulta širina. Pravila specifična za jezik pokrivaju španjolski otvarajući ¿, francuski neprekidni razmak prije ? ! ; :, grčki upitnik, interpunkciju pune širine u kineskom i japanskom te arapski upitnik i zarez. Stavke koje se mogu automatski ispraviti navedene su zasebno, a sve što pomiče vremenske oznake prema zadanim postavkama nije označeno.",
-    "who": "Grupe za titlovanje, dobavljači lokalizacije, urednici i svi koji žele provjeriti datoteku prije isporuke.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Prevoditelj titlova — SRT/VTT/ASS na vaš jezik",
-    "desc": "Ubacite SRT / VTT / ASS datoteku, odaberite ciljni jezik i dobijte prijevod zaključan na vremensku traku. 100 jezika, besplatno, bez registracije."
-  },
-  "convert": {
-    "title": "Pretvarač titlova - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
-    "desc": "Besplatni mrežni pretvarač titlova: pretvarajte između SRT, VTT, ASS, SBV, LRC i TXT formata uz očuvanu vremensku traku, dok se oznake ASS efekata automatski čiste.",
-    "kw": "pretvarač titlova,srt u vtt,vtt u srt,ass u srt,sbv u srt,srt u lrc,titl u txt,pretvori titlove,srt pretvarač,vtt pretvarač",
-    "intro": "Pretvarajte između SRT, VTT, ASS, SBV, LRC i TXT formata uz očuvanu vremensku traku.",
-    "feat": "Ulazni format se detektira automatski, a vremenske oznake se prepisuju za ciljni format; oznake ASS efekata i prisilni prijelomi redaka postaju čitljiv tekst kada izvozite u običan format; datoteke s tekstovima pjesama nemaju polje za sat, pa se sve nakon jednog sata računa u minutama.",
-    "who": "Svatko čiji uređaj za reprodukciju odbija datoteku s titlovima i svatko tko premješta materijal između uređaja za uređivanje i web playera.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Razdjelnik dvojezičnih titlova – Zadržite samo jedan jezik | AI-SRTSub",
-    "desc": "Besplatni mrežni razdjelnik dvojezičnih titlova: razdvojite dvojezičnu datoteku titlova na izvorni i prevedeni zapis, ili zadržite samo jedan.",
-    "kw": "razdjelnik dvojezičnih titlova,razdvoji dvojezični srt,ukloni titl na drugom jeziku,zadrži samo engleski titl,izdvoji prevedeni titl,srt dvojezično razdvajanje,ass dvojezično razdvajanje",
-    "intro": "Razdvojite dvojezičnu datoteku titlova na izvorni i prevedeni zapis, ili zadržite samo jedan od njih.",
-    "feat": "Obrađuje oba uobičajena rasporeda – jedan dio koji nosi dva retka i dva dijela koji dijele istu vremensku traku. Zapisi se dijele prema redoslijedu i vrsti pisma, vremenska traka ostaje točno kakva jest, a datoteka s jednim jezikom se označava umjesto da se tiho isprazni.",
-    "who": "Svatko kome je predana gotova dvojezična datoteku i želi samo jedan jezik, te timovi za titlovanje koji arhiviraju izvor i prijevod odvojeno.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Pomak vremenske trake titlova – Sinkronizacija i uređivanje | AI-SRTSub",
-    "desc": "Besplatni mrežni alat za tajming titlova: pomaknite sve odjednom, promijenite ljestvicu prema omjeru ili ispravite odstupanje s dvije sidrišne točke. Radi sa SRT, VTT, ASS, SBV, LRC i TXT formatima.",
-    "kw": "pomak tajminga titlova,pomakni srt tajming,prilagodba sinkronizacije titlova,promijeni ljestvicu tajminga titlova,ispravi kašnjenje titlova,srt vremenski pomak,ispravak odstupanja titlova,spoji titlove,razdvoji titlove,kombiniraj srt,razdvoji dugi titl",
-    "intro": "Kada titl nije sinkroniziran, pomaknite cijelu vremensku traku, promijenite joj ljestvicu prema omjeru ili je ispravite s dvjema sidrišnim točkama. Također može spojiti retke koji su bili razdvojeni i razdvojiti one koji traju predugo.",
-    "feat": "Pomicanje pomiče svaki dio bez mijenjanja trajanja prikaza svakog dijela na ekranu. Promjena ljestvice množi oba kraja, pa se duljina dijela mijenja zajedno s tim – korisno između 24 i 25 fps. Ispravak u dvije točke rješava datoteke koje imaju pomak i pogrešnu brzinu izvođenja. Vremenske oznake koje ispadnu negativne ograničene su na nulu, a alat vam govori koliko ih je pogođeno. Isti format ulaza, isti format izlaza – bez pretvorbe, a ASS stilovi, stilovi po retku i oznake efekata zadržani su točno onakvima kakvi jesu. Dvojezični dijelovi ostaju u dva retka kada se spajaju i preskaču se prilikom razdvajanja.",
-    "who": "Svatko čiji titlovi odstupaju nakon promjene izvora, rade malo prebrzo ili presporo, ili dolaze od nekoga tko radi s drugačijom brzinom kadrova.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Popravite oštećene titlove – Popravite pogrešno kodiranje / mojibake | AI-SRTSub",
-    "desc": "Besplatni mrežni popravak za oštećene titlove: otkriva je li datoteka u formatu UTF-8, GBK, Big5, Shift_JIS ili EUC-KR, vraća pogrešno pročitani tekst i ponovno ga sprema za vaš uređaj za reprodukciju.",
-    "kw": "popravi oštećene titlove,mojibake titlova,popravak srt kodiranja,popravi kodiranje titlova,utf8 u gbk titl,srt prikazuje čudne znakove,krivo kodiranje titlova,ass oštećeno,vtt oštećeno,detektiraj kodiranje titlova",
-    "intro": "Titl koji se otvara kao zid besmislica gotovo se uvijek čita s pogrešnim kodiranjem. Ubacite datoteku i alat će otkriti u kojem je kodiranju datoteka doista napisana te vratiti pogrešno pročitane znakove.",
-    "feat": "Prenesene datoteke se ponovno dekodiraju iz izvornih bajtova, tako da se ništa ne gubi: ako se ispostavi da je datoteka u formatu GBK, to će i pisati, a ako vaš uređaj za reprodukciju pogrešno čita, spremanje kopije kao \"UTF-8 s BOM-om\" obično to rješava. Zalijepljeni tekst više nije u izvornim bajtovima, stoga se može oporaviti puno manje; ako već sadrži zamjenske znakove, to je neoporavljivo i alat to jasno kaže umjesto da se pretvara drugačije. Brojevi redaka i vremenske oznake se nikada ne diraju, a oznake ASS stila ostaju točno onakvima kakve jesu.",
-    "who": "Svatko tko je preuzeo titlove koji se otvaraju kao gibberish, vidi pravokutnike umjesto kineskih znakova u playeru ili mu je predana datoteka s nepoznatim kodiranjem.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Izvucite tekst iz titlova – SRT/ASS/VTT u običan tekst | AI-SRTSub",
-    "desc": "Besplatni mrežni izvlačič teksta iz titlova: čita SRT, VTT, ASS, SBV, LRC i TXT, uklanja vremenske oznake i brojeve redaka te ispisuje čist dijalog kao odlomke ili jedan redak po dijelu.",
-    "kw": "izvuci tekst iz titlova,titl u tekst,srt u txt,srt u običan tekst,ass u txt,vtt u txt,transkript titlova,izvuci dijalog iz srta,srt ukloni vremenske oznake,izvlačič teksta iz titlova",
-    "intro": "Izvucite dijalog iz SRT / VTT / ASS / SBV / LRC / TXT titlova kao čist običan tekst: vremenske oznake, brojevi dijelova i oznake stila automatski se uklanjaju.",
-    "feat": "Dva rasporeda: neprekidni odlomci podijeljeni na stanke i interpunkciju na kraju rečenice, ili jedan redak po dijelu za popise dijaloga. Zvučni znakovi poput \"(telefon zvoni)\", vodeni žigovi izvora i ponovljeni uzastopni retci uklanjaju se prema zadanim postavkama; imena govornika poput \"TOM:\" i stihovi pjesama mogu se zadržati ili ukloniti. Prijelom redaka se ponovno spaja prema pismu — kineski se spaja izravno, korejski i latinični dodaju razmake — tako da se ništa ne lijepi zajedno.",
-    "who": "Svatko tko želi tekst titla za bilješke, skripte, vježbu prevođenja ili napajanje drugog alata, bez ručnog brisanja stotina vremenskih oznaka.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Izvucite ugrađene titlove iz MKV / MP4 u SRT | AI-SRTSub",
-    "desc": "Izvucite ugrađene titlove iz MKV, WebM, MP4, MOV formata; izvezite kao SRT / VTT / ASS / TXT. Bez učitavanja ili ponovnog kodiranja — datoteke se čitaju u vašem pregledniku; podržane su i datoteke veće od nekoliko GB.",
-    "kw": "izvuci ugrađene titlove,mkv u srt,mp4 izvlačenje titlova,izvucite titlove iz videozapisa,izvlačič ugrađenih titlova,srt iz mkv,mov izvlačenje titlova,izvoz zapisa titlova,vtt iz mkv,izvucite meke titlove,mkv ripovanje titlova",
-    "intro": "Izvucite zapis titla zapečaćen unutar MKV ili MP4 datoteke izravno u SRT — bez učitavanja, sve se događa u vašem pregledniku.",
-    "feat": "Čita tekstualne, ASS, WebVTT i mov_text / tx3g zapise, zadržava izvorno ASS zaglavlje i razlučivost te čita u malim dijelovima prema pomaku tako da velika datoteka nikada ne popuni memoriju.",
-    "who": "Svatko tko ima film s mekim titlovima i želi izvući tekst, grupe za kodiranje i fan subbing timovi koji kreću od izvornog zapisa.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Kineski pretvarač titlova – Pojednostavljeni ⇄ Tradicionalni | AI-SRTSub",
-    "desc": "Besplatni kineski pretvarač titlova: Pojednostavljeni ⇄ Tradicionalni (Tajvan / Hong Kong) i obratno. Mijenja se samo dijalog — vremenske oznake i ASS oznake ostaju. Temelji se na OpenCC-u.",
-    "kw": "kineski pretvarač titlova,pojednostavljeni u tradicionalni,tradicionalni u pojednostavljeni,srt tradicionalni kineski,pretvori kineski titl,tajvanski tradicionalni kineski,hongkonški tradicionalni kineski,han pretvorba,pretvori srt u tradicionalni kineski,pojednostavljeni kineski srt,opencc titl",
-    "intro": "Pretvorite cijelu datoteku titlova između Pojednostavljenog i Tradicionalnog pisma, mijenjajući samo dijalog.",
-    "feat": "Devet smjerova: opći Tradicionalni, tajvanski rječnik, tajvanski oblici, Hong Kong, natrag na Pojednostavljeni i regionalni oblici Tradicionalnog u Tradicionalni. Koristi OpenCC rječnik s razrješavanjem fraza po principu najdužeg podudaranja.",
-    "who": "Svatko tko isporučuje titlove tajvanskoj ili hongkonškoj publika, distributeri koji pripremaju regionalne verzije i urednici koji su primili Tradicionalnu datoteku, a žele Pojednostavljenu.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Razdjelnik i spajač titlova – SRT / VTT | AI-SRTSub",
-    "desc": "Razdvojite titlove prema trajanju ili broju, ili spojite mnogo datoteka po redu ili prema vremenskoj oznaki. Renumeriranje je automatsko, dijalog netaknut. SRT i VTT.",
-    "kw": "razdjelnik titlova,razdvoji titlove,spoji srt datoteke,srt spajač,kombiniraj titlove,razdvoji srt,spoji srt datoteke,izreži titlove,razdvoji vtt,spajač titlova",
-    "intro": "Izrežite jedan dugi titl na dijelove ili spojite mnogo datoteka u jednu. Pokreće se u potpunosti u vašem pregledniku — ništa se ne učitava.",
-    "feat": "Razdvojite prema trajanju ili broju uz ponovno numeriranje po dijelu i opcionalni tajming počevši od nule; spojite uzastopno s razmakom ili isprepletite prema izvornim vremenskim oznakama. SRT i VTT.",
-    "who": "Kreatori koji dijele epizode za prijenos, timovi koji pregledavaju u dijelovima i urednici koji spajaju višedijelne titlove.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Titlovi u Excel/CSV i natrag | AI-SRTSub",
-    "desc": "Pretvorite SRT ili VTT u Excel ili CSV tablicu za pregled i prijevod, a zatim je vratite natrag. Vremenske oznake ostaju točne, prijelomi redaka opstaju. Ništa se ne učitava.",
-    "kw": "titlovi u excel,srt u csv,srt u excel,excel u srt,csv u srt,proračunska tablica titlova,pretvarač tablica titlova",
-    "intro": "Izvezite titlove u proračunsku tablicu radi pregleda i prijevoda, a zatim ponovno uvezite tablicu. Pokreće se u potpunosti u vašem pregledniku.",
-    "feat": "Jedan klik od SRT-a ili VTT-a do xlsx-a ili CSV-a; uređujte vrijeme, tekst i bilješke u svojoj proračunskoj tablici, a zatim izvezite natrag u SRT ili VTT. Stupci s vremenom zadržavaju punu preciznost u milisekundama; prijelomi redaka unutar ćelija su očuvani. Kineski i engleski zaglavlja jednako dobro funkcioniraju.",
-    "who": "Prevoditelji, fan subbing timovi i urednici koji pregledavaju, dodaju bilješke ili serijski ispravljaju titlove u proračunskoj tablici.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Serijska pretvorba titlova u SRT/VTT | AI-SRTSub",
-    "desc": "Spustite desetine ili stotine SRT/VTT datoteka, sve ih pretvorite u jedan format i preuzmite jedan ZIP. Renumeriranje i vremenske oznake normalizirane; nečitljive datoteke označene.",
-    "kw": "serijska pretvorba titlova,srt u vtt,serijski pretvarač titlova,skupni srt,pretvori više titlova,zip titlova",
-    "intro": "Povucite stotine datoteka titlova, sve ih pretvorite i preuzmite jedan ZIP. Pokreće se u potpunosti u vašem pregledniku — ništa se ne učitava.",
-    "feat": "SRT u VTT i obratno u skupnom načinu rada; redni brojevi ponovno poredani, a vremenske oznake normalizirane prema ciljnom formatu. Datoteke koje se ne mogu analizirati označene su i izostavljene iz ZIP-a. Izvorni nazivi datoteka zadržani su s novom ekstenzijom; u slučaju preklapanja dodaje se sufiks.",
-    "who": "Urednici i stvaratelji titlova koji pretvaraju cijele mape sa serijama te vlasnici stranica koji playerima dostavljaju jedan format.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "Uređivač LRC stihova – Dodirnite tajming tijekom slušanja | AI-SRTSub",
-    "desc": "Učitajte pjesmu, zalijepite stihove i dodirnite vrijeme svakog retka tijekom slušanja; izvezite LRC ili SRT. Uvezite postojeći LRC za fino podešavanje. Upravljanje tipkovnicom, u potpunosti u pregledniku.",
-    "kw": "lrc uređivač online,izradi lrc,tajming stihova,lrc izrađivač,stvori lrc,sinkronizator stihova,lrc u srt",
-    "intro": "Učitajte glazbu, zalijepite stihove, dodirnite tajming redak po redak dok slušate i izvezite LRC ili SRT. Ništa se ne učitava.",
-    "feat": "Radi s MP3, M4A, FLAC, WAV i OGG formatima. Jedan redak po retku; postojeći LRC fajlovi mogu se uvesti i prilagoditi. Razmak pokreće/pauzira, Enter označava trenutni redak, Z poništava — ruke ostaju na tipkovnici.",
-    "who": "Glazbenici koji sinkroniziraju obrade, kreatori koji dodaju pjesme u videozapise i svi koji izrađuju titlove stihova za player.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "AI-SRTSub - Usklađivač YouTube titlova - Spojite prekinute rečenice",
-    "desc": "YouTube automatski titlovi režu rečenice svake 3-4 sekunde. Ovaj alat ne mijenja riječi, već pomiče granice tamo gdje rečenice stvarno završavaju. Besplatno, 100 jezika.",
-    "kw": "popravak youtube titlova,youtube automatski titlovi,usklađivanje titlova,usklađivanje rečenica u titlovima,popravak slomljenih titlova,srt usklađivanje rečenica,ponovna segmentacija titlova,popravak youtube titlova,titlovi prilagođeni rečenicama",
-    "intro": "Učitajte datoteku s automatski generiranim YouTube titlovima, odaberite jezik, i alat će spojiti rečenice preko granica isječaka te ponovno izrezati datoteku rečenicu po rečenicu. Nijedna riječ nije promijenjena, a vremena ostaju što bliža izvornima.",
-    "feat": "YouTube automatski titlovi izrezani su na isječke od 3-4 sekundi bez obzira na kraj rečenica, pa jedan isječak često sadrži kraj prethodne i početak sljedeće rečenice. Alat koristi izvorne vremenske oznake kao sidra, prepoznaje krajeve rečenica prema interpunkciji te dinamičkim programiranjem pronalazi najbolju točku prekida. Svaki od 100 jezika ima vlastita pravila za rečenice: kineski i japanski nemaju razmake, tajanski jedva označava rubove riječi, hindski završava rečenice s ।, arapski s ؟, armenski s ։. Širina retka i brzina čitanja prate pismo - 16 znakova puna širina po retku za kineski, 42 znakova za latinična pisma. Prije izvoza tekst se uspoređuje znak po znak.",
-    "who": "Timovi za titlovanje koji pretvaraju YouTube, podcast i automatske titlove tečajeva u završne titlove, te autori koji uređuju vlastite videozapise i umorni su od rečenica koje staju na pola.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio u titlove — pretvorite govor u SRT u pregledniku | AI-SRTSub",
-    "desc": "Pretvorite audio ili video u titlove: prepoznavanje govora radi u pregledniku, dijeli tekst u cue-ove i izvozi SRT ili VTT datoteke besplatno.",
-    "kw": "audio u srt,govor u titlove,generiranje titlova iz audija,automatski generator titlova,transkripcija audija u srt,whisper titlovi,prepoznavanje govora u pregledniku,offline generiranje titlova",
-    "intro": "Učitajte audio ili video datoteku, odaberite jezik i model, a prepoznavanje će se izvršiti izravno u vašem pregledniku. Rezultat je nacrt titlova s vremenskim oznakama, podijeljen u rečenice i prilagođen širini retka.",
-    "feat": "Alat automatski dijeli tekst na temelju interpunkcije, prilagođava duljinu redaka prema pismu, osigurava optimalno vrijeme prikaza bez preklapanja i koristi lokalnu ASR obradu bez prijenosa datoteka na poslužitelj.",
-    "who": "Kreatori koji dodaju titlove svojim videozapisima, timovi koji pretvaraju podcaste u tekst te svi kojima je potreban brz nacrt titlova za daljnju obradu."
-  },
-  "ocrsub": {
-    "title": "OCR za ugrađene titlove — čitanje teksta sa slike | AI-SRTSub",
-    "desc": "Ugrađeni titlovi nemaju zaseban zapis. Označite područje, a alat će ih očitati kadar po kadar, spojiti identične okvire i izvesti SRT ili VTT datoteku.",
-    "kw": "ekstrakcija ugrađenih titlova,ocr titlova,ekstrakcija titlova iz videa,hardcoded titlovi,ocr titlova iz videa,video u srt,titlovi iz videa,ocr za ugrađene natpise",
-    "intro": "Učitajte video, označite područje gdje se nalaze titlovi, a alat će ih očitati kadar po kadar i spojiti identične uzastopne okvire u jedan vremenski definiran cue.",
-    "feat": "Alat koristi OCR tehnologiju za prepoznavanje teksta iz fiksiranog područja slike, pretvarajući vizualne podatke u tekstualni zapis s vremenskim oznakama bez potrebe za izvornom datotekom titlova.",
-    "who": "Timovi za lokalizaciju stranih videozapisa, osobe koje rade na ponovnom titlovanju starih izdanja te montažeri koji raspolažu samo gotovim videozapisom bez izvornog SRT-a."
-  }
+ "index": {
+  "htmlLang": "hr",
+  "ogLocale": "hr_HR",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub – Globalni filmovi i serije, titlovi na vašem jeziku",
+  "desc": "Besplatni AI prevoditelj titlova — bez registracije, bez ograničenja, bez vodenog žiga. Jednim klikom prevedite titlove stranih filmova, serija i dokumentaraca na svoj jezik.",
+  "kw": "AI prevoditelj titlova,prevođenje titlova,besplatni prevoditelj titlova,prevedi SRT datoteku,prevedi VTT,prevedi ASS,prijevod filmskih titlova,titlovi za TV serije,Netflix titlovi,KDrama titlovi,anime titlovi,dvojezični titlovi,titlovi stranih filmova,prevedi titlove online,YouTube titlovi,besplatni alat za prijevod titlova,prevedi titlove besplatno,besplatni SRT prevoditelj",
+  "ogTitle": "AI-SRTSub – Globalni filmovi i serije, titlovi na vašem jeziku",
+  "ogDesc": "100% besplatni AI prevoditelj titlova za ljubitelje filmova: jednim klikom pretvara titlove stranih filmova, serija i dokumentaraca na vaš materinski jezik, uz automatsko poravnanje vremenske trake. Uživajte u globalnom sadržaju bez prepreka.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "100% besplatni AI prevoditelj titlova za ljubitelje filmova: jednim klikom pretvara titlove stranih filmova, serija i dokumentaraca na vaš materinski jezik, uz automatsko poravnanje vremenske trake. Uživajte u globalnom sadržaju bez prepreka.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"O ovom alatu\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Besplatni AI prevoditelj automatskih titlova</h2>\n    <p data-i18n-html=\"seoIntro\">Ovo je <strong>besplatni mrežni alat za prevođenje titlova koji pokreću jezični modeli velikog kapaciteta</strong>. Prenesite SRT, VTT ili ASS datoteke i prevedite titlove između engleskog, kineskog, japanskog, korejskog, španjolskog, francuskog i 15+ drugih jezika. Bez registracije, bez instalacije, bez vodenog žiga — otvorite ga u pregledniku i počnite prevoditi. Podaci titlova ostaju u vašem pregledniku osim ako ne omogućite prijevod u oblaku.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Ključne značajke:</strong> analiza i AI prijevod SRT, VTT i ASS datoteka, pametno spajanje rečenica (kada jedna rečenica obuhvaća više dijelova, dijelovi se spajaju, prevode, a zatim ponovno dijele kroz izvornu vremensku traku), poravnanje vremenske trake, automatsko prelamanje redaka za CJK i zapadni tekst, uklanjanje poštapalica, prilagođeno rukovanje terminologijom i odabrani stilovi prevođenja. Izvezite standardne SRT, VTT, ASS ili TXT datoteke spremne za ugradnju u videozapis.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Tko ga koristi:</strong> prevoditelji videozapisa, YouTube kreatori i lokalizatori, učenici jezika, grupe za titlovanje i timovi kojima je potrebno brzo lokalizirati video sadržaj.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Ovaj alat zahtijeva JavaScript. Molimo omogućite JavaScript u svom pregledniku, a zatim prenijeti datoteku titlova (SRT / VTT / ASS) kako biste besplatno preveli titlove pomoću AI-ja.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Izrađivač stiliziranih titlova – Spojite dvojezične, ASS i VTT efekte",
+  "desc": "Besplatni alat za stilizirane titlove: spojite dvije datoteke u dvojezične, promijenite stil dvojezičnog zapisa ili dodajte efekte. 5 ASS / 6 VTT predložaka; izvoz u SRT / VTT / ASS.",
+  "kw": "spajanje titlova,dvojezični titlovi,kombiniranje datoteka titlova,stilizirani titlovi,ASS stilovi titlova,VTT stilovi titlova,efekti titlova,izrađivač dvostrukih titlova,ASS predlošci,predložak titlova,besplatni alat za titlove",
+  "intro": "Spojite dvije datoteke titlova u dvojezične ili stilizirajte zapis: font, boja, obris i položaj, sve u vizualnom obliku (WYSIWYG).",
+  "feat": "Dvojezično spajanje i prilagodba, ASS / VTT predlošci stilova, utori za stilove po vrijednostima, popravci vremenske trake na licu mjesta i u paketu te pregled uživo koji je doslovno izvezena datoteka.",
+  "who": "Kreatori koji izrađuju dvojezične ili stilizirane titlove, grupe za kodiranje i timovi kojima su potrebni pristupačni titlovi."
+ },
+ "clean": {
+  "title": "Čistač titlova – Uklonite vodene žigove, SDH dijelove i HTML oznake",
+  "desc": "Besplatni mrežni čistač titlova: uklonite vodene žigove, oglase, SDH, HTML oznake, ASS efekte; ispravite velika slova, greške u kodiranju. 13 pravila s mogućnošću uključivanja/isključivanja, poništavanje po promjeni, vremenska traka netaknuta.",
+  "kw": "čistač titlova,očisti srt datoteku,ukloni vodeni žig s titlova,ukloni SDH titlove,ukloni HTML oznake s titlova,ispravi titlove s velikim slovima,ispravi pogrešno kodiranje,ukloni titlove za nagluhe,ukloni ASS efekte",
+  "intro": "Rječnik pravila \"stari pojam → novi pojam\" primijenjen na cijelu datoteku titlova odjednom, pri čemu tajming, ASS stilovi i VTT blokovi napomena ostaju bitno identični.",
+  "feat": "13 pravila u četiri grupe (9 uključeno zadano), uklanjanje vodenih žigova i SDH-a, ispravci velikih slova i kodiranja, popis promjena po dijelu s pojedinačnim vraćanjem na staro, a tajming se nikada ne dira.",
+  "who": "Svatko tko je preuzeo postojeći titl i želi ga učiniti upotrebljivim, te grupe koje serijski čiste materijal."
+ },
+ "glossary": {
+  "title": "Skupna zamjena pojmova u titlovima - Jedan rojnik, cijela datoteka | AI-SRTSub",
+  "desc": "Zamjena iz rječnika za titlove: jednom unesite popis \"staro → novo\" i cijela SRT / VTT / ASS / TXT datoteka se ažurira. Tajming, stilovi i NOTE blokovi ostaju; mogućnost vraćanja po retku.",
+  "kw": "rječnik titlova,serijska zamjena srt,traži i zamijeni u titlovima,zamjena pojmova u titlovima,srt serijsko uređivanje,zamijeni riječi u titlovima,ujednači nazive titlova,terminologija titlova,zamijeni tekst u vtt,srt alat za rječnik,serijska zamjena terminologije",
+  "intro": "Rječnik pravila \"stari pojam → novi pojam\" primijenjen na cijelu datoteku titlova odjednom, pri čemu tajming, ASS stilovi i VTT blokovi napomena ostaju bitno identični.",
+  "feat": "Jedno pravilo po retku, odvojeno s -> , => , → ili tabulatorom; retci koji počinju s # su komentari. Podudaranje cijelih riječi čuva riječ \"art\" izvan riječi \"start\", razlikovanje malih i velikih slova je opcionalno, a zamjenu možete ograničiti na 1. ili 2. redak dvojezičnih dijelova. Svaki promijenjeni dio je navedeno na popisu, a svaki pojedinačni se može vratiti.",
+  "who": "Svatko tko ujednačava imena i terminologiju kroz cijelu sezonu, masovno ispravlja strojni prijevod ili prilagođava tuđe titlove vlastitom stilu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Kontrola kvalitete titlova – Provjerite tajming i izgled po jeziku | AI-SRTSub",
+  "desc": "Besplatna mrežna kontrola kvalitete titlova: prenesite SRT, VTT ili ASS i provjerite preklapanja, trajanje, brzinu čitanja, širinu redaka, prijelome redaka, numeriranje i kodiranje u odnosu na pravila tog jezika. 27 jezika, 27 skupova pragova, plus pravila specifična za jezik.",
+  "kw": "provjera titlova,kontrola kvalitete titlova,srt validator,provjera kvalitete titlova,srt provjera,provjera tajminga titlova,validator titlova,provjeri srt datoteku,lektura titlova,linter titlova",
+  "intro": "Prenesite datoteku titlova i provjerite je u odnosu na pravila njenog jezika – svaki nalaz dolazi s izmjerenom vrijednošću i pragom. Pokreće se u potpunosti u vašem pregledniku, ništa se ne učitava na poslužitelj.",
+  "feat": "Provjerava preklapajuće dijelove, prekratsko ili predugo prikazivanje na ekranu, brzinu čitanja, širinu retka, broj redaka, nespretne prijelome redaka, numeriranje, prazne dijelove, pogrešno kodiranje i kontrolne znakove. Širina i brzina čitanja prate sustav pisanja: kineski se mjeri u znakovima pune širine, tajlandski i arapski kombinirajući znakovi računaju se kao nulta širina. Pravila specifična za jezik pokrivaju španjolski otvarajući ¿, francuski neprekidni razmak prije ? ! ; :, grčki upitnik, interpunkciju pune širine u kineskom i japanskom te arapski upitnik i zarez. Stavke koje se mogu automatski ispraviti navedene su zasebno, a sve što pomiče vremenske oznake prema zadanim postavkama nije označeno.",
+  "who": "Grupe za titlovanje, dobavljači lokalizacije, urednici i svi koji žele provjeriti datoteku prije isporuke.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Prevoditelj titlova — SRT/VTT/ASS na vaš jezik",
+  "desc": "Ubacite SRT / VTT / ASS datoteku, odaberite ciljni jezik i dobijte prijevod zaključan na vremensku traku. 100 jezika, besplatno, bez registracije."
+ },
+ "convert": {
+  "title": "Pretvarač titlova - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub",
+  "desc": "Besplatni mrežni pretvarač titlova: pretvarajte između SRT, VTT, ASS, SBV, LRC i TXT formata uz očuvanu vremensku traku, dok se oznake ASS efekata automatski čiste.",
+  "kw": "pretvarač titlova,srt u vtt,vtt u srt,ass u srt,sbv u srt,srt u lrc,titl u txt,pretvori titlove,srt pretvarač,vtt pretvarač",
+  "intro": "Pretvarajte između SRT, VTT, ASS, SBV, LRC i TXT formata uz očuvanu vremensku traku.",
+  "feat": "Ulazni format se detektira automatski, a vremenske oznake se prepisuju za ciljni format; oznake ASS efekata i prisilni prijelomi redaka postaju čitljiv tekst kada izvozite u običan format; datoteke s tekstovima pjesama nemaju polje za sat, pa se sve nakon jednog sata računa u minutama.",
+  "who": "Svatko čiji uređaj za reprodukciju odbija datoteku s titlovima i svatko tko premješta materijal između uređaja za uređivanje i web playera.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Razdjelnik dvojezičnih titlova – Zadržite samo jedan jezik | AI-SRTSub",
+  "desc": "Besplatni mrežni razdjelnik dvojezičnih titlova: razdvojite dvojezičnu datoteku titlova na izvorni i prevedeni zapis, ili zadržite samo jedan.",
+  "kw": "razdjelnik dvojezičnih titlova,razdvoji dvojezični srt,ukloni titl na drugom jeziku,zadrži samo engleski titl,izdvoji prevedeni titl,srt dvojezično razdvajanje,ass dvojezično razdvajanje",
+  "intro": "Razdvojite dvojezičnu datoteku titlova na izvorni i prevedeni zapis, ili zadržite samo jedan od njih.",
+  "feat": "Obrađuje oba uobičajena rasporeda – jedan dio koji nosi dva retka i dva dijela koji dijele istu vremensku traku. Zapisi se dijele prema redoslijedu i vrsti pisma, vremenska traka ostaje točno kakva jest, a datoteka s jednim jezikom se označava umjesto da se tiho isprazni.",
+  "who": "Svatko kome je predana gotova dvojezična datoteku i želi samo jedan jezik, te timovi za titlovanje koji arhiviraju izvor i prijevod odvojeno.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Pomak vremenske trake titlova – Sinkronizacija i uređivanje | AI-SRTSub",
+  "desc": "Besplatni mrežni alat za tajming titlova: pomaknite sve odjednom, promijenite ljestvicu prema omjeru ili ispravite odstupanje s dvije sidrišne točke. Radi sa SRT, VTT, ASS, SBV, LRC i TXT formatima.",
+  "kw": "pomak tajminga titlova,pomakni srt tajming,prilagodba sinkronizacije titlova,promijeni ljestvicu tajminga titlova,ispravi kašnjenje titlova,srt vremenski pomak,ispravak odstupanja titlova,spoji titlove,razdvoji titlove,kombiniraj srt,razdvoji dugi titl",
+  "intro": "Kada titl nije sinkroniziran, pomaknite cijelu vremensku traku, promijenite joj ljestvicu prema omjeru ili je ispravite s dvjema sidrišnim točkama. Također može spojiti retke koji su bili razdvojeni i razdvojiti one koji traju predugo.",
+  "feat": "Pomicanje pomiče svaki dio bez mijenjanja trajanja prikaza svakog dijela na ekranu. Promjena ljestvice množi oba kraja, pa se duljina dijela mijenja zajedno s tim – korisno između 24 i 25 fps. Ispravak u dvije točke rješava datoteke koje imaju pomak i pogrešnu brzinu izvođenja. Vremenske oznake koje ispadnu negativne ograničene su na nulu, a alat vam govori koliko ih je pogođeno. Isti format ulaza, isti format izlaza – bez pretvorbe, a ASS stilovi, stilovi po retku i oznake efekata zadržani su točno onakvima kakvi jesu. Dvojezični dijelovi ostaju u dva retka kada se spajaju i preskaču se prilikom razdvajanja.",
+  "who": "Svatko čiji titlovi odstupaju nakon promjene izvora, rade malo prebrzo ili presporo, ili dolaze od nekoga tko radi s drugačijom brzinom kadrova.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Popravite oštećene titlove – Popravite pogrešno kodiranje / mojibake | AI-SRTSub",
+  "desc": "Besplatni mrežni popravak za oštećene titlove: otkriva je li datoteka u formatu UTF-8, GBK, Big5, Shift_JIS ili EUC-KR, vraća pogrešno pročitani tekst i ponovno ga sprema za vaš uređaj za reprodukciju.",
+  "kw": "popravi oštećene titlove,mojibake titlova,popravak srt kodiranja,popravi kodiranje titlova,utf8 u gbk titl,srt prikazuje čudne znakove,krivo kodiranje titlova,ass oštećeno,vtt oštećeno,detektiraj kodiranje titlova",
+  "intro": "Titl koji se otvara kao zid besmislica gotovo se uvijek čita s pogrešnim kodiranjem. Ubacite datoteku i alat će otkriti u kojem je kodiranju datoteka doista napisana te vratiti pogrešno pročitane znakove.",
+  "feat": "Prenesene datoteke se ponovno dekodiraju iz izvornih bajtova, tako da se ništa ne gubi: ako se ispostavi da je datoteka u formatu GBK, to će i pisati, a ako vaš uređaj za reprodukciju pogrešno čita, spremanje kopije kao \"UTF-8 s BOM-om\" obično to rješava. Zalijepljeni tekst više nije u izvornim bajtovima, stoga se može oporaviti puno manje; ako već sadrži zamjenske znakove, to je neoporavljivo i alat to jasno kaže umjesto da se pretvara drugačije. Brojevi redaka i vremenske oznake se nikada ne diraju, a oznake ASS stila ostaju točno onakvima kakve jesu.",
+  "who": "Svatko tko je preuzeo titlove koji se otvaraju kao gibberish, vidi pravokutnike umjesto kineskih znakova u playeru ili mu je predana datoteka s nepoznatim kodiranjem.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Izvucite tekst iz titlova – SRT/ASS/VTT u običan tekst | AI-SRTSub",
+  "desc": "Besplatni mrežni izvlačič teksta iz titlova: čita SRT, VTT, ASS, SBV, LRC i TXT, uklanja vremenske oznake i brojeve redaka te ispisuje čist dijalog kao odlomke ili jedan redak po dijelu.",
+  "kw": "izvuci tekst iz titlova,titl u tekst,srt u txt,srt u običan tekst,ass u txt,vtt u txt,transkript titlova,izvuci dijalog iz srta,srt ukloni vremenske oznake,izvlačič teksta iz titlova",
+  "intro": "Izvucite dijalog iz SRT / VTT / ASS / SBV / LRC / TXT titlova kao čist običan tekst: vremenske oznake, brojevi dijelova i oznake stila automatski se uklanjaju.",
+  "feat": "Dva rasporeda: neprekidni odlomci podijeljeni na stanke i interpunkciju na kraju rečenice, ili jedan redak po dijelu za popise dijaloga. Zvučni znakovi poput \"(telefon zvoni)\", vodeni žigovi izvora i ponovljeni uzastopni retci uklanjaju se prema zadanim postavkama; imena govornika poput \"TOM:\" i stihovi pjesama mogu se zadržati ili ukloniti. Prijelom redaka se ponovno spaja prema pismu — kineski se spaja izravno, korejski i latinični dodaju razmake — tako da se ništa ne lijepi zajedno.",
+  "who": "Svatko tko želi tekst titla za bilješke, skripte, vježbu prevođenja ili napajanje drugog alata, bez ručnog brisanja stotina vremenskih oznaka.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Izvucite ugrađene titlove iz MKV / MP4 u SRT | AI-SRTSub",
+  "desc": "Izvucite ugrađene titlove iz MKV, WebM, MP4, MOV formata; izvezite kao SRT / VTT / ASS / TXT. Bez učitavanja ili ponovnog kodiranja — datoteke se čitaju u vašem pregledniku; podržane su i datoteke veće od nekoliko GB.",
+  "kw": "izvuci ugrađene titlove,mkv u srt,mp4 izvlačenje titlova,izvucite titlove iz videozapisa,izvlačič ugrađenih titlova,srt iz mkv,mov izvlačenje titlova,izvoz zapisa titlova,vtt iz mkv,izvucite meke titlove,mkv ripovanje titlova",
+  "intro": "Izvucite zapis titla zapečaćen unutar MKV ili MP4 datoteke izravno u SRT — bez učitavanja, sve se događa u vašem pregledniku.",
+  "feat": "Čita tekstualne, ASS, WebVTT i mov_text / tx3g zapise, zadržava izvorno ASS zaglavlje i razlučivost te čita u malim dijelovima prema pomaku tako da velika datoteka nikada ne popuni memoriju.",
+  "who": "Svatko tko ima film s mekim titlovima i želi izvući tekst, grupe za kodiranje i fan subbing timovi koji kreću od izvornog zapisa.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Kineski pretvarač titlova – Pojednostavljeni ⇄ Tradicionalni | AI-SRTSub",
+  "desc": "Besplatni kineski pretvarač titlova: Pojednostavljeni ⇄ Tradicionalni (Tajvan / Hong Kong) i obratno. Mijenja se samo dijalog — vremenske oznake i ASS oznake ostaju. Temelji se na OpenCC-u.",
+  "kw": "kineski pretvarač titlova,pojednostavljeni u tradicionalni,tradicionalni u pojednostavljeni,srt tradicionalni kineski,pretvori kineski titl,tajvanski tradicionalni kineski,hongkonški tradicionalni kineski,han pretvorba,pretvori srt u tradicionalni kineski,pojednostavljeni kineski srt,opencc titl",
+  "intro": "Pretvorite cijelu datoteku titlova između Pojednostavljenog i Tradicionalnog pisma, mijenjajući samo dijalog.",
+  "feat": "Devet smjerova: opći Tradicionalni, tajvanski rječnik, tajvanski oblici, Hong Kong, natrag na Pojednostavljeni i regionalni oblici Tradicionalnog u Tradicionalni. Koristi OpenCC rječnik s razrješavanjem fraza po principu najdužeg podudaranja.",
+  "who": "Svatko tko isporučuje titlove tajvanskoj ili hongkonškoj publika, distributeri koji pripremaju regionalne verzije i urednici koji su primili Tradicionalnu datoteku, a žele Pojednostavljenu.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Razdjelnik i spajač titlova – SRT / VTT | AI-SRTSub",
+  "desc": "Razdvojite titlove prema trajanju ili broju, ili spojite mnogo datoteka po redu ili prema vremenskoj oznaki. Renumeriranje je automatsko, dijalog netaknut. SRT i VTT.",
+  "kw": "razdjelnik titlova,razdvoji titlove,spoji srt datoteke,srt spajač,kombiniraj titlove,razdvoji srt,spoji srt datoteke,izreži titlove,razdvoji vtt,spajač titlova",
+  "intro": "Izrežite jedan dugi titl na dijelove ili spojite mnogo datoteka u jednu. Pokreće se u potpunosti u vašem pregledniku — ništa se ne učitava.",
+  "feat": "Razdvojite prema trajanju ili broju uz ponovno numeriranje po dijelu i opcionalni tajming počevši od nule; spojite uzastopno s razmakom ili isprepletite prema izvornim vremenskim oznakama. SRT i VTT.",
+  "who": "Kreatori koji dijele epizode za prijenos, timovi koji pregledavaju u dijelovima i urednici koji spajaju višedijelne titlove.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Titlovi u Excel/CSV i natrag | AI-SRTSub",
+  "desc": "Pretvorite SRT ili VTT u Excel ili CSV tablicu za pregled i prijevod, a zatim je vratite natrag. Vremenske oznake ostaju točne, prijelomi redaka opstaju. Ništa se ne učitava.",
+  "kw": "titlovi u excel,srt u csv,srt u excel,excel u srt,csv u srt,proračunska tablica titlova,pretvarač tablica titlova",
+  "intro": "Izvezite titlove u proračunsku tablicu radi pregleda i prijevoda, a zatim ponovno uvezite tablicu. Pokreće se u potpunosti u vašem pregledniku.",
+  "feat": "Jedan klik od SRT-a ili VTT-a do xlsx-a ili CSV-a; uređujte vrijeme, tekst i bilješke u svojoj proračunskoj tablici, a zatim izvezite natrag u SRT ili VTT. Stupci s vremenom zadržavaju punu preciznost u milisekundama; prijelomi redaka unutar ćelija su očuvani. Kineski i engleski zaglavlja jednako dobro funkcioniraju.",
+  "who": "Prevoditelji, fan subbing timovi i urednici koji pregledavaju, dodaju bilješke ili serijski ispravljaju titlove u proračunskoj tablici.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Serijska pretvorba titlova u SRT/VTT | AI-SRTSub",
+  "desc": "Spustite desetine ili stotine SRT/VTT datoteka, sve ih pretvorite u jedan format i preuzmite jedan ZIP. Renumeriranje i vremenske oznake normalizirane; nečitljive datoteke označene.",
+  "kw": "serijska pretvorba titlova,srt u vtt,serijski pretvarač titlova,skupni srt,pretvori više titlova,zip titlova",
+  "intro": "Povucite stotine datoteka titlova, sve ih pretvorite i preuzmite jedan ZIP. Pokreće se u potpunosti u vašem pregledniku — ništa se ne učitava.",
+  "feat": "SRT u VTT i obratno u skupnom načinu rada; redni brojevi ponovno poredani, a vremenske oznake normalizirane prema ciljnom formatu. Datoteke koje se ne mogu analizirati označene su i izostavljene iz ZIP-a. Izvorni nazivi datoteka zadržani su s novom ekstenzijom; u slučaju preklapanja dodaje se sufiks.",
+  "who": "Urednici i stvaratelji titlova koji pretvaraju cijele mape sa serijama te vlasnici stranica koji playerima dostavljaju jedan format.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "Uređivač LRC stihova – Dodirnite tajming tijekom slušanja | AI-SRTSub",
+  "desc": "Učitajte pjesmu, zalijepite stihove i dodirnite vrijeme svakog retka tijekom slušanja; izvezite LRC ili SRT. Uvezite postojeći LRC za fino podešavanje. Upravljanje tipkovnicom, u potpunosti u pregledniku.",
+  "kw": "lrc uređivač online,izradi lrc,tajming stihova,lrc izrađivač,stvori lrc,sinkronizator stihova,lrc u srt",
+  "intro": "Učitajte glazbu, zalijepite stihove, dodirnite tajming redak po redak dok slušate i izvezite LRC ili SRT. Ništa se ne učitava.",
+  "feat": "Radi s MP3, M4A, FLAC, WAV i OGG formatima. Jedan redak po retku; postojeći LRC fajlovi mogu se uvesti i prilagoditi. Razmak pokreće/pauzira, Enter označava trenutni redak, Z poništava — ruke ostaju na tipkovnici.",
+  "who": "Glazbenici koji sinkroniziraju obrade, kreatori koji dodaju pjesme u videozapise i svi koji izrađuju titlove stihova za player.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "AI-SRTSub - Usklađivač YouTube titlova - Spojite prekinute rečenice",
+  "desc": "YouTube automatski titlovi režu rečenice svake 3-4 sekunde. Ovaj alat ne mijenja riječi, već pomiče granice tamo gdje rečenice stvarno završavaju. Besplatno, 100 jezika.",
+  "kw": "popravak youtube titlova,youtube automatski titlovi,usklađivanje titlova,usklađivanje rečenica u titlovima,popravak slomljenih titlova,srt usklađivanje rečenica,ponovna segmentacija titlova,popravak youtube titlova,titlovi prilagođeni rečenicama",
+  "intro": "Učitajte datoteku s automatski generiranim YouTube titlovima, odaberite jezik, i alat će spojiti rečenice preko granica isječaka te ponovno izrezati datoteku rečenicu po rečenicu. Nijedna riječ nije promijenjena, a vremena ostaju što bliža izvornima.",
+  "feat": "YouTube automatski titlovi izrezani su na isječke od 3-4 sekundi bez obzira na kraj rečenica, pa jedan isječak često sadrži kraj prethodne i početak sljedeće rečenice. Alat koristi izvorne vremenske oznake kao sidra, prepoznaje krajeve rečenica prema interpunkciji te dinamičkim programiranjem pronalazi najbolju točku prekida. Svaki od 100 jezika ima vlastita pravila za rečenice: kineski i japanski nemaju razmake, tajanski jedva označava rubove riječi, hindski završava rečenice s ।, arapski s ؟, armenski s ։. Širina retka i brzina čitanja prate pismo - 16 znakova puna širina po retku za kineski, 42 znakova za latinična pisma. Prije izvoza tekst se uspoređuje znak po znak.",
+  "who": "Timovi za titlovanje koji pretvaraju YouTube, podcast i automatske titlove tečajeva u završne titlove, te autori koji uređuju vlastite videozapise i umorni su od rečenica koje staju na pola.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio u titlove — pretvorite govor u SRT u pregledniku | AI-SRTSub",
+  "desc": "Pretvorite audio ili video u titlove: prepoznavanje govora radi u pregledniku, dijeli tekst u cue-ove i izvozi SRT ili VTT datoteke besplatno.",
+  "kw": "audio u srt,govor u titlove,generiranje titlova iz audija,automatski generator titlova,transkripcija audija u srt,whisper titlovi,prepoznavanje govora u pregledniku,offline generiranje titlova",
+  "intro": "Učitajte audio ili video datoteku, odaberite jezik i model, a prepoznavanje će se izvršiti izravno u vašem pregledniku. Rezultat je nacrt titlova s vremenskim oznakama, podijeljen u rečenice i prilagođen širini retka.",
+  "feat": "Alat automatski dijeli tekst na temelju interpunkcije, prilagođava duljinu redaka prema pismu, osigurava optimalno vrijeme prikaza bez preklapanja i koristi lokalnu ASR obradu bez prijenosa datoteka na poslužitelj.",
+  "who": "Kreatori koji dodaju titlove svojim videozapisima, timovi koji pretvaraju podcaste u tekst te svi kojima je potreban brz nacrt titlova za daljnju obradu."
+ },
+ "ocrsub": {
+  "title": "OCR za ugrađene titlove — čitanje teksta sa slike | AI-SRTSub",
+  "desc": "Ugrađeni titlovi nemaju zaseban zapis. Označite područje, a alat će ih očitati kadar po kadar, spojiti identične okvire i izvesti SRT ili VTT datoteku.",
+  "kw": "ekstrakcija ugrađenih titlova,ocr titlova,ekstrakcija titlova iz videa,hardcoded titlovi,ocr titlova iz videa,video u srt,titlovi iz videa,ocr za ugrađene natpise",
+  "intro": "Učitajte video, označite područje gdje se nalaze titlovi, a alat će ih očitati kadar po kadar i spojiti identične uzastopne okvire u jedan vremenski definiran cue.",
+  "feat": "Alat koristi OCR tehnologiju za prepoznavanje teksta iz fiksiranog područja slike, pretvarajući vizualne podatke u tekstualni zapis s vremenskim oznakama bez potrebe za izvornom datotekom titlova.",
+  "who": "Timovi za lokalizaciju stranih videozapisa, osobe koje rade na ponovnom titlovanju starih izdanja te montažeri koji raspolažu samo gotovim videozapisom bez izvornog SRT-a."
+ },
+ "multilang": {
+  "title": "Više jezika odjednom — prenesi cijelu sezonu, uredi red čekanja | AI-SRTSub",
+  "desc": "Prenesi cijelu sezonu, odaberi željene jezike i pokreni jednom. Epizode i jezici čine jedan red čekanja koji se izvršava redom; rezultati stižu u jednoj zip datoteci. Nastavlja gdje je stalo, stane kad zatvoriš karticu.",
+  "kw": "skupno prevođenje titlova,prevedi titlove na više jezika,višjezični titlovi,titlovi za cijelu sezonu,skupni izvoz titlova,prevedi srt na mnogo jezika,jedna sezona mnogo jezika",
+  "intro": "Prenesi cijelu sezonu odjednom, označi ciljne jezike i pritisni pokreni. Epizode i jezici postaju jedan red čekanja: svaki jezik se izvodi do kraja prije nego što počne sljedeći, a sve je upakirano u jednu zip datoteku.",
+  "feat": "Ono što pođe po zlu kod skupnog prevođenja jest istovremenost. Dvadeset epizoda puta pet jezika odjednom znači stotine zahtjeva koji stižu zajedno, što tiho ruši red čekanja na poslužitelju — rani i kasni zahtjevi se prepliću i nitko ne zna koje je polje doista završeno. Zbog toga se ova stranica namjerno izvodi kao jedan red čekanja: jedna serija u isto vrijeme, jedan jezik do kraja prije sljedećeg. Napredak se sprema po epizodi i jeziku na vašem računalu, pa ako pukne na trećoj epizodi, ponovno otvorite stranicu, učitate iste datoteke i nastavlja se u toj seriji bez ponovnog slanja onoga što je već učinjeno. Ono što odaje sezonu jesu imena: prevedite dvadeset epizoda odvojeno i isti lik na kraju ima tri različita načina pisanja. Zato je rječnik ovdje zasebna ploča — učitava se jednom, dijeli ga cijela sezona — i govori vam koliko se unosa doista podudaralo prije nego što počnete. Zatvorite karticu i zadatak odmah staje umjesto da troši kvotu u pozadini.",
+  "who": "Timovi za titlovanje koji prevode cijelu sezonu na nekoliko jezika, kanali koji redistribuiraju istu seriju epizoda na različita tržišta i samostalni prevoditelji koji radije jednom pritisnu pokreni i vrate se kasnije.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Skupni višejezični prevoditelj titlova"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Sinkroniziraj svaki znak, izvezi ASS | AI-SRTSub",
+  "desc": "Besplatni mrežni alat za izradu karaoke titlova: učitaj pjesmu, zalijepi tekst, tapni svaki redak, a zatim ga automatski podijeli na znakove ili ih tapkaj uz glazbu i fino ih dotjeraj povlačenjem. Izvezi ASS s \\\\kf oznakama.",
+  "kw": "izrađivač karaoke titlova,ass karaoke,tekst na razini riječi,kf oznake,karaoke lrc,pomični tekst,ass karaoke maker,ai srtsub",
+  "intro": "Učitajte pjesmu, zalijepite stihove, dodirnite svaki redak, a zatim rasporedite svaki redak po njegovim znakovima — automatski prema širini, prateći glazbu ili povlačenjem granica. Gledajte kako riječi svijetle dok se pjevaju.",
+  "feat": "Kineski se dijeli po znakovima, engleski po riječima, interpunkcija putuje s njima. Podesivi razmak na kraju sprječava da posljednji znak nadjača vokal. Izvezite ASS za CapCut / Premiere / Aegisub s \\\\kf oznakama, poboljšani LRC za uređaje koji podržavaju riječi ili cijeli SRT redak kao rezervnu opciju. Sve se izvodi u vašem pregledniku — bez prijenosa datoteka.",
+  "who": "Kreatori koji dodaju stihove u obrade pjesama i snimke s koncerata, autori glazbenih spotova i svi koji izrađuju karaoke titlove.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }

@@ -1,207 +1,229 @@
 {
-  "index": {
-    "htmlLang": "ceb",
-    "ogLocale": "ceb_PH",
-    "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Kalibotanong mga Salida ug Serye, mga Subtitle sa Imong Pinulongan",
-    "desc": "Libreng AI subtitle translator — walay pag-sign up, walay limitasyon, walay watermark. Hubad ang mga subtitle sa langyawng mga salida, serye ug dokumentaryo sa imong pinulongan sa usa ka click.",
-    "kw": "AI subtitle translator,maghuhubad sa subtitle,libreng subtitle translator,paghubad sa SRT file,hubad sa VTT,hubad sa ASS,paghubad sa subtitle sa salida,mga subtitle sa TV serye,mga subtitle sa Netflix,mga subtitle sa KDrama,mga subtitle sa anime,bilingual nga mga subtitle,mga subtitle sa langyawng salida,paghubad sa subtitle online,mga subtitle sa YouTube,libreng himan sa paghubad sa subtitle,paghubad sa subtitle nga libre,libreng SRT translator",
-    "ogTitle": "AI-SRTSub - Kalibotanong mga Salida ug Serye, mga Subtitle sa Imong Pinulongan",
-    "ogDesc": "100% libre nga AI subtitle translator para sa mga fans sa salida: ang usa ka click mag-convert sa mga subtitle sa langyawng mga salida, serye ug dokumentaryo ngadto sa imong lumad nga pinulongan, uban ang awtomatikong pag-align sa timeline. Pagpahimulos sa global nga sulod nga walay babag.",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "随心字幕 AI",
-    "jsonldDesc": "100% libre nga AI subtitle translator para sa mga fans sa salida: ang usa ka click mag-convert sa mga subtitle sa langyawng mga salida, serye ug dokumentaryo ngadto sa imong lumad nga pinulongan, uban ang awtomatikong pag-align sa timeline. Pagpahimulos sa global nga sulod nga walay babag.",
-    "currency": "USD",
-    "copy": "<section class=\"seo\" aria-label=\"Mahitungod niini nga himan\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Libreng AI Auto Subtitle Translator</h2>\n    <p data-i18n-html=\"seoIntro\">Kini usa ka <strong>libreng online nga himan sa paghubad sa subtitle nga gipaandar sa dagkong mga modelo sa pinulongan</strong>. Pag-upload og mga file nga SRT, VTT o ASS ug hubada ang mga subtitle tali sa Ingles, Intsik, Hapon, Koreano, Espanyol, Pranses ug 15+ pa ka ubang mga pinulongan. Walay pag-sign up, walay pag-instalar, walay watermark — ablihi kini sa browser ug sugdi ang paghubad. Ang datos sa subtitle magpabilin sa imong browser gawas kon imong i-enable ang cloud translation.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Pangunang mga bahin:</strong> SRT, VTT ug ASS parsing ug AI translation, maalamong paghiusa sa sentensiya (kung ang usa ka sentensiya mokabat sa daghang mga cue, ang mga cue gihiusa, gihubad, dayon gibahin balik sa orihinal nga timeline), pag-align sa timeline, awtomatikong pagputos sa linya para sa CJK ug Western nga teksto, pagtangtang sa filler-word, pagdumala sa kostumbre nga terminolohiya, ug mapili nga mga estilo sa paghubad. Pag-export sa standard nga mga file nga SRT, VTT, ASS o TXT nga andam i-hard-sub sa imong video.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kinsa ang gumagamit niini:</strong> mga maghuhubad sa video, mga maglalalang sa YouTube ug mga localizer, mga nagkat-on sa pinulongan, mga grupo sa subtitle ug mga team nga kinahanglan mag-localize sa sulod sa video dayon.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Kini nga himan nanginahanglan og JavaScript. Palihug i-enable ang JavaScript sa imong browser, dayon pag-upload og subtitle file (SRT / VTT / ASS) aron hubaron ang mga subtitle gamit ang AI nga libre.</p>\n  </noscript>"
-  },
-  "merge": {
-    "title": "Styled Subtitle Maker - Hiusa ang Bilingual, ASS & VTT Epekto",
-    "desc": "Libreng himan para sa mga giestilo nga subtitle: hiusa ang duha ka file ngadto sa bilingual, usba ang estilo sa bilingual nga track, o pagdugang og mga epekto. 5 ASS / 6 VTT presets; i-export isip SRT / VTT / ASS.",
-    "kw": "paghiusa sa mga subtitle,bilingual nga mga subtitle,paghiusa sa mga subtitle file,mga giestilo nga subtitle,ASS subtitle styles,VTT subtitle styles,mga epekto sa subtitle,dual subtitle maker,ASS presets,subtitle template,libreng himan sa subtitle",
-    "intro": "Hiusa ang duha ka subtitle file ngadto sa bilingual, o i-estilo ang usa ka track: font, kolor, outline ug posisyon, tanan WYSIWYG.",
-    "feat": "Bilingual nga paghiusa ug pag-adjust, ASS / VTT style presets, per-value style slots, in-place ug bulk timeline fixes, ug live preview nga mao gyud ang gi-export nga file.",
-    "who": "Mga maglalalang nga naghimo og bilingual o giestilo nga subtitle, mga grupo sa pag-encode, ug mga team nga kinahanglan og dali makuha nga mga kapsiyon."
-  },
-  "clean": {
-    "title": "Subtitle Cleaner - Kuhaa ang Watermarks, SDH Cues ug HTML Tags",
-    "desc": "Libreng online subtitle cleaner: kuhaa ang watermarks, ads, SDH, HTML tags, ASS effects; ayuhon ang caps, mojibake. 13 ka switchable rules, undo per change, timeline wala maanggihi.",
-    "kw": "subtitle cleaner,limpyohi ang srt file,kuhaa ang watermark sa subtitle,kuhaa ang SDH subtitles,kuhaa ang HTML tags gikan sa subtitles,ayuhon ang all caps subtitles,ayuhon ang mojibake,kuhaa ang hearing impaired subtitles,kuhaa ang ASS effects",
-    "intro": "I-run ang gi-download nga subtitle dinhi una: watermarks, ads, SDH cues ug HTML tags, nawala sa usa ka agi.",
-    "feat": "13 ka lagda sa upat ka grupo (9 ang naka-on sa default), pagtangtang sa watermark ug SDH, pag-ayo sa all-caps ug mojibake, listahan sa kausaban sa matag cue nga adunay indibidwal nga pagbalik, ug ang timing wala gyud hikapa.",
-    "who": "Bisan kinsa nga nakakuha og kasamtangang subtitle ug gusto lang kini magamit, ug mga grupo nga nag-batch-clean sa materyal."
-  },
-  "glossary": {
-    "title": "Batch Subtitle Term Replace - Usa ka Glossary, Tibuok File",
-    "desc": "Pag-ilis sa glossary para sa mga subtitle: lista ang \"dumaan → bag-o\" kausa ug ang tibuok SRT / VTT / ASS / TXT file ma-update. Ang timing, mga estilo ug NOTE blocks magpabilin; i-revert matag linya.",
-    "kw": "subtitle glossary,batch replace srt,pangitaa ug pulihan ang subtitle,subtitle term replace,srt batch edit,pulihan ang mga pulong sa subtitles,hiusa ang mga ngalan sa subtitle,subtitle terminology,pulihan ang teksto sa vtt,glossary srt tool,batch terminology replace",
-    "intro": "Usa ka glossary sa \"daang termino → bag-ong termino\" nga mga lagda nga gipadapat sa tibuok subtitle file sa usa ka higayon, uban ang timing, ASS styles ug VTT note blocks nga nagpabilin nga byte-identical.",
-    "feat": "Usa ka lagda matag linya, gibulag sa -> , => , → o tab; ang mga linya nga nagsugod sa # maoy mga komento. Ang whole-word matching nagpuyo sa \"art\" gikan sa \"start\", ang case sensitivity kay optional, ug mahimo nimong limitahan ang pag-ilis sa linya 1 o linya 2 sa bilingual cues. Ang matag giusab nga cue gilista, ug bisan kinsa nga usa mahimong mabalik.",
-    "who": "Bisan kinsa nga naghiusa sa mga ngalan ug terminolohiya sa usa ka season, nag-ayo sa machine-translation wording sa bulk, o nag-angkop sa subtitle sa uban sa ilang kaugalingong balay nga estilo.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Glossary Batch Replace"
-  },
-  "qc": {
-    "title": "Subtitle QC - Susiha ang Timing ug Layout matag Pinulongan",
-    "desc": "Libreng online subtitle QC: i-upload ang SRT, VTT o ASS ug susiha ang mga overlap, gidugayon, gikusgon sa pagbasa, gilapdon sa linya, pagbuak sa linya, pag-numero ug pag-encode sumala sa mga lagda sa maong pinulongan. 27 ka pinulongan, 27 ka set sa mga threshold, ug mga lagda sa partikular nga pinulongan.",
-    "kw": "pagsusi sa subtitle,qc sa subtitle,tig-validate sa srt,pagsusi sa kalidad sa subtitle,pagsusi sa srt,pagsusi sa oras sa subtitle,tig-validate sa subtitle,susiha ang file sa srt,pagtul-id sa subtitle,linter sa subtitle",
-    "intro": "Pag-upload og subtitle file ug susiha kini batok sa mga lagda sa kaugalingong pinulongan niini - ang matag nakit-an adunay gisukod nga bili ug threshold. Nagdagan sa imong browser, walay gi-upload.",
-    "feat": "Gisusi ang nag-overlap nga mga cue, sobra ka mubo o sobra ka taas sa screen, gikusgon sa pagbasa, gilapdon sa linya, ihap sa linya, awkward nga pagbuak sa linya, pag-numero, walay sulod nga mga cue, mojibake ug control characters. Ang gilapdon ug gikusgon sa pagbasa mosunod sa sistema sa pagsulat: ang Chinese gisukod sa full-width nga mga karakter, ang Thai ug Arabic combining marks giisip nga zero width. Ang mga lagda nga piho sa pinulongan naglangkob sa Espanyol nga abli ¿, ang Pranses nga non-breaking space sa wala pa ang ? ! ; :, ang Greek question mark, full-width punctuation sa Chinese ug Japanese, ug ang Arabic question mark ug comma. Ang mga butang nga mahimong i-auto-fix gilista nga bulag, ug ang bisan unsa nga mag-ilis sa mga timecode wala tseke sa default.",
-    "who": "Mga grupo sa subtitle, mga vendor sa localization, mga editor ug bisan kinsa nga gustong mosusi sa file sa dili pa ihatod.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle QC Checker"
-  },
-  "translate": {
-    "title": "Subtitle Translator — SRT/VTT/ASS sa Imong Pinulongan",
-    "desc": "Paghulog og SRT / VTT / ASS file, pagpili og target nga pinulongan, ug pagkuha og timeline-locked nga paghubad. 100 ka pinulongan, libre, walay pag-sign up."
-  },
-  "convert": {
-    "title": "Subtitle Converter - SRT / VTT / ASS / SBV / LRC / TXT",
-    "desc": "Libreng online subtitle converter: i-convert tali sa SRT, VTT, ASS, SBV, LRC ug TXT nga ang timeline nagpabilin nga intact, ang ASS effect tags gilimpyohan awtomatiko.",
-    "kw": "tig-convert sa subtitle,srt ngadto sa vtt,vtt ngadto sa srt,ass ngadto sa srt,sbv ngadto sa srt,srt ngadto sa lrc,subtitle ngadto sa txt,i-convert ang mga subtitle,tig-convert sa srt,tig-convert sa vtt",
-    "intro": "I-convert tali sa SRT, VTT, ASS, SBV, LRC ug TXT nga ang timeline nagpabilin nga intact.",
-    "feat": "Ang input format nakit-an nga awtomatiko ug ang mga timestamp gisulat pag-usab para sa target format; ang ASS effect tags ug gipugos nga pagbuak sa linya nahimong mabasa nga teksto kung mag-export ka sa plain format; ang mga file sa lyrics walay oras nga field, busa ang bisan unsa nga milabay sa usa ka oras giihap sa mga minuto.",
-    "who": "Bisan kinsa kansang player nagsalikway sa subtitle file, ug bisan kinsa nga nagbalhin og materyal tali sa editor ug web player.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Converter"
-  },
-  "bilingual": {
-    "title": "Bilingual Subtitle Splitter - Kuhaa ang Usa ra ka Pinulongan",
-    "desc": "Libreng online bilingual subtitle splitter: bahina ang bilingual subtitle file ngadto sa orihinal ug nahubad nga track, o ipabilin ang usa ra.",
-    "kw": "bilingual subtitle splitter,bahina ang bilingual srt,kuhaa ang ikaduhang pinulongan nga subtitle,ipabilin ang english subtitle ra,kuhaa ang nahubad nga subtitle,srt bilingual split,ass bilingual split",
-    "intro": "Bahina ang usa ka bilingual subtitle file ngadto sa orihinal nga track ug nahubad nga track, o ipabilin ang usa ra niini.",
-    "feat": "Gidumala ang duha ka kasagarang layout - ang usa ka cue nagdala og duha ka linya, ug duha ka cue nag-ambit sa parehas nga timeline. Ang mga track gibahin sa han-ay ug klase sa script, ang timeline gipabilin nga eksakto kung unsa kini, ug ang usa ka pinulongan nga file gimarkahan imbes nga hilom nga gihaw-an.",
-    "who": "Bisan kinsa nga gihatagan og ready-made nga bilingual file ug gusto og usa ra ka pinulongan, ug mga subtitle team nga nag-archive sa orihinal ug sa paghubad nga gilain.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Bilingual Subtitle Splitter"
-  },
-  "shift": {
-    "title": "Subtitle Timeline Shift - Ibalhin, Rescale, Hiusa ug Bahina",
-    "desc": "Libreng online subtitle timing tool: ibalhin ang tanan sa usa ka higayon, i-rescale pinaagi sa ratio, o ayuhon ang drift gamit ang duha ka anchor points. Nagtrabaho sa SRT, VTT, ASS, SBV, LRC ug TXT.",
-    "kw": "pagbalhin sa oras sa subtitle,pagbalhin sa oras sa srt,pag-adjust sa sync sa subtitle,pag-scale usab sa oras sa subtitle,pag-ayo sa pagkalangan sa subtitle,offset sa oras sa srt,pag-ayo sa pag-slide sa subtitle,i-merge ang mga subtitle,i-split ang mga subtitle,i-kombinar ang srt,i-split ang taas nga subtitle",
-    "intro": "Kung ang mga subtitle out of sync, ibalhin ang tibuok timeline, i-rescale kini pinaagi sa ratio, o ayuhon kini gamit ang duha ka anchor points. Mahimo usab niini hiusahon ang mga linya nga gibahin, ug bahinon kadtong sobra ka dugay.",
-    "feat": "Ang pagbalhin naglihok sa matag cue nga dili usbon kung unsa ka dugay ang matag usa sa screen. Ang pag-rescale nagpadaghan sa duha ka tumoy, busa ang gitas-on sa cue nagbag-o uban niini - mapuslanon tali sa 24 ug 25 fps. Ang two-point fix nagdumala sa mga file nga parehong naay offset ug nagdagan sa sayop nga katulin. Ang mga oras nga mogawas nga negatibo gi-clamp sa zero, ug ang himan nagsulti kanimo kung pila ang naapektuhan. Parehas nga format ang sulod, parehas ang gawas - walay conversion, ug ang ASS styles, per-line styling ug effect tags gitagoan gyud sama sa kaniadto. Ang mga bilingual cue nagpabilin sa duha ka linya kung gihiusa ug gipalta kung nagbahin.",
-    "who": "Bisan kinsa kansang mga subtitle nag-drift human sa pagbag-o sa gigikanan, nagdagan nga medyo paspas o hinay, o gikan sa usa ka tawo nga nagtrabaho sa lain nga frame rate.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Timeline Shift"
-  },
-  "repair": {
-    "title": "Ayuhon ang mga Gubot nga Subtitle - Pag-ayo sa Mojibake",
-    "desc": "Libreng online repair para sa mga gubot nga subtitle: makita kung ang file kay UTF-8, GBK, Big5, Shift_JIS o EUC-KR, iuli ang sayop nga basahon nga teksto, i-save pag-usab para sa imong player.",
-    "kw": "ayoha ang gidaot nga mga subtitle,mojibake sa subtitle,pag-ayo sa pag-encode sa srt,pag-ayo sa pag-encode sa subtitle,utf8 ngadto sa gbk sa subtitle,ang srt nagpakita og katingalahang mga karakter,sayop nga pag-encode sa subtitle,gidaot ang ass,gidaot ang vtt,ilha ang pag-encode sa subtitle",
-    "intro": "Ang mga subtitle nga moabli isip bungbong sa walay hinungdan nga mga pulong kasagarang nabasa sa sayop nga encoding. Ihulog ang file sa sulod, ug kini mahibal-an kung unsang encoding ang tinuod nga gigamit sa file ug ibalik ang mga sayop nga karakter.",
-    "feat": "Ang gi-upload nga mga file gi-re-decode gikan sa orihinal nga mga byte, busa walay nawala: kung ang file nahimo nga GBK, giingon kini, ug kung ang imong player ang nagbasa niini sa sayop, ang pag-save sa usa ka kopya isip \"UTF-8 with BOM\" kasagarang makapahusay niini. Ang gi-paste nga teksto dili na ang orihinal nga mga byte, busa gamay na kaayo ang maulian; kung kini adunay mga replacement characters, dili na kini mabalik ug ang himan moingon niana nga klaro imbes nga magpakaaron-ingnon. Ang mga numero sa linya ug timecodes wala gyud hikapa, ug ang ASS style tags gibilin nga eksakto kung unsa kini.",
-    "who": "Bisan kinsa nga nag-download sa mga subtitle nga moabli isip gibberish, nakakita og mga kahon imbes nga Chinese sa player, o gihatagan og file nga adunay wala mailhi nga encoding.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Mojibake Repair"
-  },
-  "extract": {
-    "title": "Kuhaa ang Teksto Gikan sa mga Subtitle - SRT/ASS/VTT ngadto sa Plain Text",
-    "desc": "Libreng online subtitle-to-text extractor: nagbasa sa SRT, VTT, ASS, SBV, LRC ug TXT, nagtangtang sa timecodes ug line numbers, ug nag-output sa limpyo nga dayalogo isip mga parapo o usa ka linya matag cue.",
-    "kw": "kuhaa ang teksto gikan sa mga subtitle,subtitle ngadto sa teksto,srt ngadto sa txt,srt ngadto sa ordinaryong teksto,ass ngadto sa txt,vtt ngadto sa txt,transcript sa subtitle,kuhaa ang dayalogo gikan sa srt,kuhaa ang mga timecode sa srt,tigkuha sa teksto sa subtitle",
-    "intro": "Kuhaa ang dayalogo gikan sa SRT / VTT / ASS / SBV / LRC / TXT nga mga subtitle isip limpyo nga plain text: ang timecodes, cue numbers ug style tags gitangtang sa awtomatiko.",
-    "feat": "Duha ka layout: nagpadayon nga mga parapo nga gibahin sa mga hunonganan ug katapusan sa sentensiya nga bantas, o usa ka linya matag cue para sa mga lista sa dayalogo. Ang mga sound cue sama sa \"(phone ringing)\", source watermarks ug gibalik-balik nga mga linya gikuha sa default; ang mga ngalan sa speaker sama sa \"TOM:\" ug mga linya sa lyrics mahimong tipigan o i-drop. Ang line-wrapping gihiusa pag-usab matag script — ang CJK nag-apil direkta, ang Korean ug Latin nagdugang og mga espasyo — busa walay bisan unsa nga natapot.",
-    "who": "Bisan kinsa nga gusto og subtitle text para sa mga nota, mga iskrip, praktis sa paghubad o pagpaka sa laing himan, nga dili kinahanglan tangtangon ang gatusan ka timecodes pinaagi sa kamot.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Text Extractor"
-  },
-  "videosub": {
-    "title": "Kuhaa ang Embedded Subtitles gikan sa MKV / MP4 ngadto sa SRT",
-    "desc": "Kuhaa ang embedded subtitles gikan sa MKV, WebM, MP4, MOV; i-export isip SRT / VTT / ASS / TXT. Walay pag-upload o re-encode — ang mga file gibasa sa imong browser; OK ang dagkong file.",
-    "kw": "kuhaa ang gi-embed nga mga subtitle,mkv ngadto sa srt,pagkuha sa subtitle sa mp4,kuhaa ang mga subtitle gikan sa video,tigkuha sa gi-embed nga subtitle,srt gikan sa mkv,pagkuha sa subtitle sa mov,pag-export sa track sa subtitle,vtt gikan sa mkv,kuhaa ang humok nga mga subtitle,pag-rip sa subtitle sa mkv",
-    "intro": "Kuhaa ang subtitle track nga naa sa sulod sa MKV o MP4 direkta ngadto sa SRT — walay pag-upload, mahitabo kini tanan sa imong browser.",
-    "feat": "Nagbasa sa plain-text, ASS, WebVTT ug mov_text / tx3g tracks, nagtipig sa orihinal nga ASS header ug resolusyon, ug nagbasa sa gagmay nga mga bahin pinaagi sa offset aron ang dako nga file dili mapuno ang memorya.",
-    "who": "Bisan kinsa nga adunay salida nga nagdala og soft subtitles nga gusto kuhaon ang teksto, mga grupo sa pag-encode, ug mga fansub team nga nagsugod gikan sa orihinal nga track.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Video Embedded Subtitle Extractor"
-  },
-  "hanconv": {
-    "title": "Chinese Subtitle Converter - Simplified ⇄ Traditional",
-    "desc": "Libreng Chinese subtitle converter: Simplified ⇄ Traditional (Taiwan / Hong Kong) ug vice versa. Dayalogo ra ang nausab — ang timecodes ug ASS tags nagpabilin. Gibase sa OpenCC.",
-    "kw": "tig-convert sa subtitle sa Intsik,gikapoy ngadto sa tradisyonal,tradisyonal ngadto sa gikapoy,tradisyonal nga Intsik sa srt,i-convert ang subtitle sa Intsik,tradisyonal nga Intsik sa Taiwan,tradisyonal nga Intsik sa Hong Kong,pag-convert sa han,i-convert ang srt ngadto sa tradisyonal nga Intsik,gikapoy nga Intsik srt,subtitle sa opencc",
-    "intro": "I-convert ang tibuok subtitle file tali sa Simplified ug Traditional, nga walay giusab gawas sa dayalogo.",
-    "feat": "Siyam ka direksyon: kinatibuk-ang Traditional, bokabularyo sa Taiwan, mga porma sa Taiwan, Hong Kong, balik sa Simplified, ug Traditional-to-Traditional nga rehiyonal nga mga porma. Gigamit ang OpenCC dictionary nga adunay longest-match-first phrase resolution.",
-    "who": "Bisan kinsa nga naghatod og mga subtitle sa mga tumatan-aw sa Taiwan o Hong Kong, mga distributor nga nag-andam og rehiyonal nga mga bersyon, ug mga editor nga nakadawat og Traditional file ug gusto og Simplified.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Chinese Simplified Traditional Converter"
-  },
-  "split": {
-    "title": "Tigbahin ug Tig-merge sa Subtitle - SRT / VTT | AI-SRTSub",
-    "desc": "Bahina ang mga subtitle pinaagi sa gidugayon o ihap, o hiusa ang daghang mga file sa han-ay o sa timestamp. Ang pag-renumber awtomatiko, ang dayalogo wala hikapa. SRT & VTT.",
-    "kw": "tigbahin sa subtitle,i-split ang mga subtitle,i-merge ang mga file sa srt,tig-merge sa srt,i-kombinar ang mga subtitle,i-split ang srt,i-apil ang mga file sa srt,i-cut ang mga subtitle,i-split ang vtt,tig-merge sa subtitle",
-    "intro": "Putla ang usa ka taas nga subtitle ngadto sa mga bahin, o hiusa ang daghang mga file ngadto sa usa. Nagdagan sa imong browser — walay gi-upload.",
-    "feat": "Bahina pinaagi sa gidugayon o ihap nga adunay renumbering sa matag bahin ug opsyonal nga zero-based timing; hiusa sa sunod-sunod nga adunay espasyo o interleave pinaagi sa orihinal nga timestamps. SRT ug VTT.",
-    "who": "Mga tigbuhat nga nagbahin sa mga episode para sa pag-upload, mga team nga nagrepaso sa mga bahin, ug mga editor nga naghiusa sa multi-part subtitles.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Splitter and Merger"
-  },
-  "table": {
-    "title": "Subtitles ngadto sa Excel/CSV ug Balik",
-    "desc": "Himua ang SRT o VTT nga Excel o CSV sheet para sa pagrepaso ug paghubad, dayon iuli kini. Ang mga timecodes nagpabilin nga eksakto, ang line breaks mabuhi. Walay gi-upload.",
-    "kw": "subtitle ngadto sa excel,srt ngadto sa csv,srt ngadto sa excel,excel ngadto sa srt,csv ngadto sa srt,spreadsheet sa subtitle,tig-convert sa subtitle sa tabla",
-    "intro": "I-export ang mga subtitle ngadto sa spreadsheet para sa pagrepaso ug paghubad, dayon i-import ang sheet balik. Nagdagan sa imong browser.",
-    "feat": "Usa ka click gikan sa SRT o VTT ngadto sa xlsx o CSV; usba ang mga oras, teksto ug mga nota sa imong spreadsheet, dayon i-export balik sa SRT o VTT. Ang mga kolum sa oras nagtipig sa tibuok millisecond precision; ang in-cell line breaks gipreserbar. Ang Chinese ug English headers parehong nagtrabaho.",
-    "who": "Mga translator, fansub teams ug editors nga nagrepaso, nag-annotate o nag-batch-fix sa mga subtitle sa spreadsheet.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Subtitle Excel CSV Converter"
-  },
-  "batch": {
-    "title": "Batch Convert Subtitles sa SRT/VTT",
-    "desc": "Ihulog ang napulo o gatosan ka SRT/VTT files, i-convert silang tanan sa usa ka format ug i-download ang usa ka ZIP. Ang pag-renumber ug timestamps gi-normalize; ang dili mabasa nga mga file gimarkahan.",
-    "kw": "batch nga i-convert ang mga subtitle,srt ngadto sa vtt,batch nga tig-convert sa subtitle,bulk srt,i-convert ang daghang mga subtitle,zip sa subtitle",
-    "intro": "I-drag ang gatosan ka subtitle files, i-convert silang tanan, kuhaa ang usa ka ZIP. Nagdagan sa imong browser — walay gi-upload.",
-    "feat": "SRT ngadto sa VTT ug balik sa bulk; ang sequence numbers gi-re-order ug timestamps gi-normalize kada target format. Ang mga file nga dili ma-parse gimarkahan ug giluwas gawas sa ZIP. Ang original filenames gitago sa bag-ong extension; ang collisions nakakuha og suffix.",
-    "who": "Mga editor ug subtitlers nga nag-convert sa tibuok serye folders, ug site owners nga nagpaka sa mga player og usa ka format.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "Batch Subtitle Converter"
-  },
-  "lrc": {
-    "title": "LRC Lyric Editor - Tap Timing Samtang Namati",
-    "desc": "Pag-load og kanta, i-paste ang mga lyrics, ug i-tap ang oras sa matag linya samtang namati; i-export ang LRC o SRT. I-import ang kasamtangang LRC aron ma-fine-tune. Keyboard-driven, sa sulod sa browser.",
-    "kw": "editor sa lrc sa online,paghimo og lrc,oras sa liriko,tigbuhat sa lrc,paghimo og lrc,tig-sync sa liriko,lrc ngadto sa srt",
-    "intro": "Pag-load og musika, i-paste ang mga lyrics, i-tap ang timing linya sa linya samtang namati, ug i-export ang LRC o SRT. Walay gi-upload.",
-    "feat": "Nagtrabaho sa MP3, M4A, FLAC, WAV ug OGG. Usa ka linya kada row; ang kasamtangang LRC files mahimong i-import ug i-adjust. Ang Space nag-play/pause, ang Enter nag-stamp sa kasamtangang linya, ang Z nag-undo — ang mga kamot nagpabilin sa keyboard.",
-    "who": "Mga musikero nga nag-sync sa mga cover, mga creator nga nagdugang og mga kanta sa mga video, ug bisan kinsa nga nagtukod og lyric subtitles para sa player.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "LRC Lyric Timing Editor"
-  },
-  "ytfix": {
-    "title": "YouTube Subtitle Realigner - Iuli ang mga Naputol nga Sentensya | AI-SRTSub",
-    "desc": "Ang auto-captions sa YouTube nagputol sa mga sentence matag 3-4 segundos. Ang himan nga kini walay gibag-o nga pulong, gibalhin lang ang hangganan. Libre, 100 ka pinulongan.",
-    "kw": "ayuhon ang youtube subtitle,awtomatikong caption sa youtube,i-realign ang subtitle,pag-align sa sentence sa subtitle,ayuhon ang guba nga subtitle,pag-align sa sentence sa srt,pag-resegment sa subtitle,pag-ayo sa caption sa youtube,subtitle nga nakasabot sa sentence",
-    "intro": "I-drop ang YouTube auto-generated nga subtitle file, pilia ang pinulongan, ug ang himan magtahi pag-usab sa mga sentensya tabok sa mga cue, dayon putlon pag-usab ang file matag sentensya. Walay bisan usa ka pulong nga giusab, ug ang mga oras sa cue magpabilin nga duol kutob sa mahimo sa orihinal nga mga timestamp.",
-    "feat": "Ang YouTube auto-captions giputol ngadto sa halos fixed nga 3-4 segundos nga cues bisan asa pa matapos ang mga sentensya, mao nga ang usa ka cue sagad magdala sa tumoy sa miaging sentensya ug sa sinugdanan sa sunod. Ang himan nagtratar sa orihinal nga mga timestamp isip mga angkla - kadtong mga orasa mao ang tinuod nga mga utlanan sa pulong nga gihimo sa speech recogniser - nagdesisyon kung asa matapos ang matag sentensya base sa punctuation, ug naggamit og dynamic programming aron pilion ang labing maayo nga break point tali sa katapusan sa sentensya, koma, conjunction, ug hard cut, dayon gipalugway ang oras sa screen aron mohaom sa gikusgon sa pagbasa. Ang matag usa sa 100 ka mga pinulongan adunay kaugalingong mga lagda sa sentensya: ang Chinese ug Japanese walay mga espasyo tali sa mga pulong, ang Thai panagsa ra magmarka sa mga utlanan sa pulong, ang Hindi motapos sa mga sentensya gamit ang ।, Arabic gamit ang ؟, Armenian gamit ang ։. Ang gilapdon sa linya ug gikusgon sa pagbasa nagsunod sa sistema sa pagsulat - 16 ka full-width nga mga karakter matag linya para sa Chinese, 42 ka karakter para sa Latin nga mga script. Sa dili pa i-export, ang teksto itandi matag karakter, ug bisan unsang nawala o nadugang nga pulong markahan dayon.",
-    "who": "Mga team sa subtitle nga naghimo sa YouTube, podcast, ug course auto-captions nga mahimong kompleto nga mga subtitle, ug mga creator nga nag-edit sa ilang kaugalingong mga video nga gikapoy na sa mga sentensya nga mohunong sa tunga-tunga.",
-    "siteName": "AI-SRTSub",
-    "jsonldName": "AI-SRTSub",
-    "jsonldAlt": "YouTube Subtitle Realigner"
-  },
-  "autosub": {
-    "title": "Audio ngadto sa Subtitles — himoong SRT sa browser | AI-SRTSub",
-    "desc": "I-convert ang audio o video ngadto sa subtitles gamit ang browser. Awtomatikong pag-ila sa sinultihan, pag-cut sa cues, ug pag-export sa SRT / VTT.",
-    "kw": "audio ngadto sa srt,speech ngadto sa subtitle,paghimo og subtitles gikan sa audio,awtomatikong subtitle generator,transcribe audio ngadto sa srt,whisper subtitles,browser speech recognition,offline nga paghimo og subtitle",
-    "intro": "I-drop ang audio o video file, pilia ang pinulongan ug modelo, ug ang pag-ila sa sinultihan modagan sulod sa imong browser. Makakuha ka og subtitle draft nga kompleto sa timing ug hustong pagkabahin sa mga sentence.",
-    "feat": "Kini nga himan awtomatikong nag-cut sa mga sentence base sa punctuation, nag-adjust sa line width, ug nag-set sa hustong oras sa pagpakita sa screen nga walay overlap.",
-    "who": "Para sa mga content creator, podcast team, ug bisan kinsa nga nagkinahanglan og subtitle draft alang sa ilang mga video."
-  },
-  "ocrsub": {
-    "title": "Hardcoded Subtitle OCR — basaha ang subtitles sa video | AI-SRTSub",
-    "desc": "Kuhaa ang mga subtitle nga permanenteng nakapilit sa video. Markahi ang area, basaha kini frame-by-frame, ug i-export isip SRT / VTT nga libre.",
-    "kw": "pagkuha og hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles gikan sa video,video ngadto sa srt,subtitle gikan sa video,hardcoded caption ocr",
-    "intro": "I-drop ang video, markahi ang bahin diin makita ang subtitles, ug ang himan mobasa niini frame-by-frame aron mahimong usa ka timed cue.",
-    "feat": "Ang himan nag-crop sa strip diin nahimutang ang subtitles, nag-binarize sa brightness aron makuha ang teksto, ug naghiusa sa managsama nga frames ngadto sa usa ka cue.",
-    "who": "Para sa mga subtitle team nga nag-localize og foreign videos, mga editor, ug kadtong nagkinahanglan og subtitle file gikan sa video nga walay orihinal nga source."
-  }
+ "index": {
+  "htmlLang": "ceb",
+  "ogLocale": "ceb_PH",
+  "siteName": "AI-SRTSub",
+  "title": "AI-SRTSub - Kalibotanong mga Salida ug Serye, mga Subtitle sa Imong Pinulongan",
+  "desc": "Libreng AI subtitle translator — walay pag-sign up, walay limitasyon, walay watermark. Hubad ang mga subtitle sa langyawng mga salida, serye ug dokumentaryo sa imong pinulongan sa usa ka click.",
+  "kw": "AI subtitle translator,maghuhubad sa subtitle,libreng subtitle translator,paghubad sa SRT file,hubad sa VTT,hubad sa ASS,paghubad sa subtitle sa salida,mga subtitle sa TV serye,mga subtitle sa Netflix,mga subtitle sa KDrama,mga subtitle sa anime,bilingual nga mga subtitle,mga subtitle sa langyawng salida,paghubad sa subtitle online,mga subtitle sa YouTube,libreng himan sa paghubad sa subtitle,paghubad sa subtitle nga libre,libreng SRT translator",
+  "ogTitle": "AI-SRTSub - Kalibotanong mga Salida ug Serye, mga Subtitle sa Imong Pinulongan",
+  "ogDesc": "100% libre nga AI subtitle translator para sa mga fans sa salida: ang usa ka click mag-convert sa mga subtitle sa langyawng mga salida, serye ug dokumentaryo ngadto sa imong lumad nga pinulongan, uban ang awtomatikong pag-align sa timeline. Pagpahimulos sa global nga sulod nga walay babag.",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "随心字幕 AI",
+  "jsonldDesc": "100% libre nga AI subtitle translator para sa mga fans sa salida: ang usa ka click mag-convert sa mga subtitle sa langyawng mga salida, serye ug dokumentaryo ngadto sa imong lumad nga pinulongan, uban ang awtomatikong pag-align sa timeline. Pagpahimulos sa global nga sulod nga walay babag.",
+  "currency": "USD",
+  "copy": "<section class=\"seo\" aria-label=\"Mahitungod niini nga himan\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Libreng AI Auto Subtitle Translator</h2>\n    <p data-i18n-html=\"seoIntro\">Kini usa ka <strong>libreng online nga himan sa paghubad sa subtitle nga gipaandar sa dagkong mga modelo sa pinulongan</strong>. Pag-upload og mga file nga SRT, VTT o ASS ug hubada ang mga subtitle tali sa Ingles, Intsik, Hapon, Koreano, Espanyol, Pranses ug 15+ pa ka ubang mga pinulongan. Walay pag-sign up, walay pag-instalar, walay watermark — ablihi kini sa browser ug sugdi ang paghubad. Ang datos sa subtitle magpabilin sa imong browser gawas kon imong i-enable ang cloud translation.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Pangunang mga bahin:</strong> SRT, VTT ug ASS parsing ug AI translation, maalamong paghiusa sa sentensiya (kung ang usa ka sentensiya mokabat sa daghang mga cue, ang mga cue gihiusa, gihubad, dayon gibahin balik sa orihinal nga timeline), pag-align sa timeline, awtomatikong pagputos sa linya para sa CJK ug Western nga teksto, pagtangtang sa filler-word, pagdumala sa kostumbre nga terminolohiya, ug mapili nga mga estilo sa paghubad. Pag-export sa standard nga mga file nga SRT, VTT, ASS o TXT nga andam i-hard-sub sa imong video.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Kinsa ang gumagamit niini:</strong> mga maghuhubad sa video, mga maglalalang sa YouTube ug mga localizer, mga nagkat-on sa pinulongan, mga grupo sa subtitle ug mga team nga kinahanglan mag-localize sa sulod sa video dayon.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Kini nga himan nanginahanglan og JavaScript. Palihug i-enable ang JavaScript sa imong browser, dayon pag-upload og subtitle file (SRT / VTT / ASS) aron hubaron ang mga subtitle gamit ang AI nga libre.</p>\n  </noscript>"
+ },
+ "merge": {
+  "title": "Styled Subtitle Maker - Hiusa ang Bilingual, ASS & VTT Epekto",
+  "desc": "Libreng himan para sa mga giestilo nga subtitle: hiusa ang duha ka file ngadto sa bilingual, usba ang estilo sa bilingual nga track, o pagdugang og mga epekto. 5 ASS / 6 VTT presets; i-export isip SRT / VTT / ASS.",
+  "kw": "paghiusa sa mga subtitle,bilingual nga mga subtitle,paghiusa sa mga subtitle file,mga giestilo nga subtitle,ASS subtitle styles,VTT subtitle styles,mga epekto sa subtitle,dual subtitle maker,ASS presets,subtitle template,libreng himan sa subtitle",
+  "intro": "Hiusa ang duha ka subtitle file ngadto sa bilingual, o i-estilo ang usa ka track: font, kolor, outline ug posisyon, tanan WYSIWYG.",
+  "feat": "Bilingual nga paghiusa ug pag-adjust, ASS / VTT style presets, per-value style slots, in-place ug bulk timeline fixes, ug live preview nga mao gyud ang gi-export nga file.",
+  "who": "Mga maglalalang nga naghimo og bilingual o giestilo nga subtitle, mga grupo sa pag-encode, ug mga team nga kinahanglan og dali makuha nga mga kapsiyon."
+ },
+ "clean": {
+  "title": "Subtitle Cleaner - Kuhaa ang Watermarks, SDH Cues ug HTML Tags",
+  "desc": "Libreng online subtitle cleaner: kuhaa ang watermarks, ads, SDH, HTML tags, ASS effects; ayuhon ang caps, mojibake. 13 ka switchable rules, undo per change, timeline wala maanggihi.",
+  "kw": "subtitle cleaner,limpyohi ang srt file,kuhaa ang watermark sa subtitle,kuhaa ang SDH subtitles,kuhaa ang HTML tags gikan sa subtitles,ayuhon ang all caps subtitles,ayuhon ang mojibake,kuhaa ang hearing impaired subtitles,kuhaa ang ASS effects",
+  "intro": "I-run ang gi-download nga subtitle dinhi una: watermarks, ads, SDH cues ug HTML tags, nawala sa usa ka agi.",
+  "feat": "13 ka lagda sa upat ka grupo (9 ang naka-on sa default), pagtangtang sa watermark ug SDH, pag-ayo sa all-caps ug mojibake, listahan sa kausaban sa matag cue nga adunay indibidwal nga pagbalik, ug ang timing wala gyud hikapa.",
+  "who": "Bisan kinsa nga nakakuha og kasamtangang subtitle ug gusto lang kini magamit, ug mga grupo nga nag-batch-clean sa materyal."
+ },
+ "glossary": {
+  "title": "Batch Subtitle Term Replace - Usa ka Glossary, Tibuok File",
+  "desc": "Pag-ilis sa glossary para sa mga subtitle: lista ang \"dumaan → bag-o\" kausa ug ang tibuok SRT / VTT / ASS / TXT file ma-update. Ang timing, mga estilo ug NOTE blocks magpabilin; i-revert matag linya.",
+  "kw": "subtitle glossary,batch replace srt,pangitaa ug pulihan ang subtitle,subtitle term replace,srt batch edit,pulihan ang mga pulong sa subtitles,hiusa ang mga ngalan sa subtitle,subtitle terminology,pulihan ang teksto sa vtt,glossary srt tool,batch terminology replace",
+  "intro": "Usa ka glossary sa \"daang termino → bag-ong termino\" nga mga lagda nga gipadapat sa tibuok subtitle file sa usa ka higayon, uban ang timing, ASS styles ug VTT note blocks nga nagpabilin nga byte-identical.",
+  "feat": "Usa ka lagda matag linya, gibulag sa -> , => , → o tab; ang mga linya nga nagsugod sa # maoy mga komento. Ang whole-word matching nagpuyo sa \"art\" gikan sa \"start\", ang case sensitivity kay optional, ug mahimo nimong limitahan ang pag-ilis sa linya 1 o linya 2 sa bilingual cues. Ang matag giusab nga cue gilista, ug bisan kinsa nga usa mahimong mabalik.",
+  "who": "Bisan kinsa nga naghiusa sa mga ngalan ug terminolohiya sa usa ka season, nag-ayo sa machine-translation wording sa bulk, o nag-angkop sa subtitle sa uban sa ilang kaugalingong balay nga estilo.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Glossary Batch Replace"
+ },
+ "qc": {
+  "title": "Subtitle QC - Susiha ang Timing ug Layout matag Pinulongan",
+  "desc": "Libreng online subtitle QC: i-upload ang SRT, VTT o ASS ug susiha ang mga overlap, gidugayon, gikusgon sa pagbasa, gilapdon sa linya, pagbuak sa linya, pag-numero ug pag-encode sumala sa mga lagda sa maong pinulongan. 27 ka pinulongan, 27 ka set sa mga threshold, ug mga lagda sa partikular nga pinulongan.",
+  "kw": "pagsusi sa subtitle,qc sa subtitle,tig-validate sa srt,pagsusi sa kalidad sa subtitle,pagsusi sa srt,pagsusi sa oras sa subtitle,tig-validate sa subtitle,susiha ang file sa srt,pagtul-id sa subtitle,linter sa subtitle",
+  "intro": "Pag-upload og subtitle file ug susiha kini batok sa mga lagda sa kaugalingong pinulongan niini - ang matag nakit-an adunay gisukod nga bili ug threshold. Nagdagan sa imong browser, walay gi-upload.",
+  "feat": "Gisusi ang nag-overlap nga mga cue, sobra ka mubo o sobra ka taas sa screen, gikusgon sa pagbasa, gilapdon sa linya, ihap sa linya, awkward nga pagbuak sa linya, pag-numero, walay sulod nga mga cue, mojibake ug control characters. Ang gilapdon ug gikusgon sa pagbasa mosunod sa sistema sa pagsulat: ang Chinese gisukod sa full-width nga mga karakter, ang Thai ug Arabic combining marks giisip nga zero width. Ang mga lagda nga piho sa pinulongan naglangkob sa Espanyol nga abli ¿, ang Pranses nga non-breaking space sa wala pa ang ? ! ; :, ang Greek question mark, full-width punctuation sa Chinese ug Japanese, ug ang Arabic question mark ug comma. Ang mga butang nga mahimong i-auto-fix gilista nga bulag, ug ang bisan unsa nga mag-ilis sa mga timecode wala tseke sa default.",
+  "who": "Mga grupo sa subtitle, mga vendor sa localization, mga editor ug bisan kinsa nga gustong mosusi sa file sa dili pa ihatod.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle QC Checker"
+ },
+ "translate": {
+  "title": "Subtitle Translator — SRT/VTT/ASS sa Imong Pinulongan",
+  "desc": "Paghulog og SRT / VTT / ASS file, pagpili og target nga pinulongan, ug pagkuha og timeline-locked nga paghubad. 100 ka pinulongan, libre, walay pag-sign up."
+ },
+ "convert": {
+  "title": "Subtitle Converter - SRT / VTT / ASS / SBV / LRC / TXT",
+  "desc": "Libreng online subtitle converter: i-convert tali sa SRT, VTT, ASS, SBV, LRC ug TXT nga ang timeline nagpabilin nga intact, ang ASS effect tags gilimpyohan awtomatiko.",
+  "kw": "tig-convert sa subtitle,srt ngadto sa vtt,vtt ngadto sa srt,ass ngadto sa srt,sbv ngadto sa srt,srt ngadto sa lrc,subtitle ngadto sa txt,i-convert ang mga subtitle,tig-convert sa srt,tig-convert sa vtt",
+  "intro": "I-convert tali sa SRT, VTT, ASS, SBV, LRC ug TXT nga ang timeline nagpabilin nga intact.",
+  "feat": "Ang input format nakit-an nga awtomatiko ug ang mga timestamp gisulat pag-usab para sa target format; ang ASS effect tags ug gipugos nga pagbuak sa linya nahimong mabasa nga teksto kung mag-export ka sa plain format; ang mga file sa lyrics walay oras nga field, busa ang bisan unsa nga milabay sa usa ka oras giihap sa mga minuto.",
+  "who": "Bisan kinsa kansang player nagsalikway sa subtitle file, ug bisan kinsa nga nagbalhin og materyal tali sa editor ug web player.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Converter"
+ },
+ "bilingual": {
+  "title": "Bilingual Subtitle Splitter - Kuhaa ang Usa ra ka Pinulongan",
+  "desc": "Libreng online bilingual subtitle splitter: bahina ang bilingual subtitle file ngadto sa orihinal ug nahubad nga track, o ipabilin ang usa ra.",
+  "kw": "bilingual subtitle splitter,bahina ang bilingual srt,kuhaa ang ikaduhang pinulongan nga subtitle,ipabilin ang english subtitle ra,kuhaa ang nahubad nga subtitle,srt bilingual split,ass bilingual split",
+  "intro": "Bahina ang usa ka bilingual subtitle file ngadto sa orihinal nga track ug nahubad nga track, o ipabilin ang usa ra niini.",
+  "feat": "Gidumala ang duha ka kasagarang layout - ang usa ka cue nagdala og duha ka linya, ug duha ka cue nag-ambit sa parehas nga timeline. Ang mga track gibahin sa han-ay ug klase sa script, ang timeline gipabilin nga eksakto kung unsa kini, ug ang usa ka pinulongan nga file gimarkahan imbes nga hilom nga gihaw-an.",
+  "who": "Bisan kinsa nga gihatagan og ready-made nga bilingual file ug gusto og usa ra ka pinulongan, ug mga subtitle team nga nag-archive sa orihinal ug sa paghubad nga gilain.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Bilingual Subtitle Splitter"
+ },
+ "shift": {
+  "title": "Subtitle Timeline Shift - Ibalhin, Rescale, Hiusa ug Bahina",
+  "desc": "Libreng online subtitle timing tool: ibalhin ang tanan sa usa ka higayon, i-rescale pinaagi sa ratio, o ayuhon ang drift gamit ang duha ka anchor points. Nagtrabaho sa SRT, VTT, ASS, SBV, LRC ug TXT.",
+  "kw": "pagbalhin sa oras sa subtitle,pagbalhin sa oras sa srt,pag-adjust sa sync sa subtitle,pag-scale usab sa oras sa subtitle,pag-ayo sa pagkalangan sa subtitle,offset sa oras sa srt,pag-ayo sa pag-slide sa subtitle,i-merge ang mga subtitle,i-split ang mga subtitle,i-kombinar ang srt,i-split ang taas nga subtitle",
+  "intro": "Kung ang mga subtitle out of sync, ibalhin ang tibuok timeline, i-rescale kini pinaagi sa ratio, o ayuhon kini gamit ang duha ka anchor points. Mahimo usab niini hiusahon ang mga linya nga gibahin, ug bahinon kadtong sobra ka dugay.",
+  "feat": "Ang pagbalhin naglihok sa matag cue nga dili usbon kung unsa ka dugay ang matag usa sa screen. Ang pag-rescale nagpadaghan sa duha ka tumoy, busa ang gitas-on sa cue nagbag-o uban niini - mapuslanon tali sa 24 ug 25 fps. Ang two-point fix nagdumala sa mga file nga parehong naay offset ug nagdagan sa sayop nga katulin. Ang mga oras nga mogawas nga negatibo gi-clamp sa zero, ug ang himan nagsulti kanimo kung pila ang naapektuhan. Parehas nga format ang sulod, parehas ang gawas - walay conversion, ug ang ASS styles, per-line styling ug effect tags gitagoan gyud sama sa kaniadto. Ang mga bilingual cue nagpabilin sa duha ka linya kung gihiusa ug gipalta kung nagbahin.",
+  "who": "Bisan kinsa kansang mga subtitle nag-drift human sa pagbag-o sa gigikanan, nagdagan nga medyo paspas o hinay, o gikan sa usa ka tawo nga nagtrabaho sa lain nga frame rate.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Timeline Shift"
+ },
+ "repair": {
+  "title": "Ayuhon ang mga Gubot nga Subtitle - Pag-ayo sa Mojibake",
+  "desc": "Libreng online repair para sa mga gubot nga subtitle: makita kung ang file kay UTF-8, GBK, Big5, Shift_JIS o EUC-KR, iuli ang sayop nga basahon nga teksto, i-save pag-usab para sa imong player.",
+  "kw": "ayoha ang gidaot nga mga subtitle,mojibake sa subtitle,pag-ayo sa pag-encode sa srt,pag-ayo sa pag-encode sa subtitle,utf8 ngadto sa gbk sa subtitle,ang srt nagpakita og katingalahang mga karakter,sayop nga pag-encode sa subtitle,gidaot ang ass,gidaot ang vtt,ilha ang pag-encode sa subtitle",
+  "intro": "Ang mga subtitle nga moabli isip bungbong sa walay hinungdan nga mga pulong kasagarang nabasa sa sayop nga encoding. Ihulog ang file sa sulod, ug kini mahibal-an kung unsang encoding ang tinuod nga gigamit sa file ug ibalik ang mga sayop nga karakter.",
+  "feat": "Ang gi-upload nga mga file gi-re-decode gikan sa orihinal nga mga byte, busa walay nawala: kung ang file nahimo nga GBK, giingon kini, ug kung ang imong player ang nagbasa niini sa sayop, ang pag-save sa usa ka kopya isip \"UTF-8 with BOM\" kasagarang makapahusay niini. Ang gi-paste nga teksto dili na ang orihinal nga mga byte, busa gamay na kaayo ang maulian; kung kini adunay mga replacement characters, dili na kini mabalik ug ang himan moingon niana nga klaro imbes nga magpakaaron-ingnon. Ang mga numero sa linya ug timecodes wala gyud hikapa, ug ang ASS style tags gibilin nga eksakto kung unsa kini.",
+  "who": "Bisan kinsa nga nag-download sa mga subtitle nga moabli isip gibberish, nakakita og mga kahon imbes nga Chinese sa player, o gihatagan og file nga adunay wala mailhi nga encoding.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Mojibake Repair"
+ },
+ "extract": {
+  "title": "Kuhaa ang Teksto Gikan sa mga Subtitle - SRT/ASS/VTT ngadto sa Plain Text",
+  "desc": "Libreng online subtitle-to-text extractor: nagbasa sa SRT, VTT, ASS, SBV, LRC ug TXT, nagtangtang sa timecodes ug line numbers, ug nag-output sa limpyo nga dayalogo isip mga parapo o usa ka linya matag cue.",
+  "kw": "kuhaa ang teksto gikan sa mga subtitle,subtitle ngadto sa teksto,srt ngadto sa txt,srt ngadto sa ordinaryong teksto,ass ngadto sa txt,vtt ngadto sa txt,transcript sa subtitle,kuhaa ang dayalogo gikan sa srt,kuhaa ang mga timecode sa srt,tigkuha sa teksto sa subtitle",
+  "intro": "Kuhaa ang dayalogo gikan sa SRT / VTT / ASS / SBV / LRC / TXT nga mga subtitle isip limpyo nga plain text: ang timecodes, cue numbers ug style tags gitangtang sa awtomatiko.",
+  "feat": "Duha ka layout: nagpadayon nga mga parapo nga gibahin sa mga hunonganan ug katapusan sa sentensiya nga bantas, o usa ka linya matag cue para sa mga lista sa dayalogo. Ang mga sound cue sama sa \"(phone ringing)\", source watermarks ug gibalik-balik nga mga linya gikuha sa default; ang mga ngalan sa speaker sama sa \"TOM:\" ug mga linya sa lyrics mahimong tipigan o i-drop. Ang line-wrapping gihiusa pag-usab matag script — ang CJK nag-apil direkta, ang Korean ug Latin nagdugang og mga espasyo — busa walay bisan unsa nga natapot.",
+  "who": "Bisan kinsa nga gusto og subtitle text para sa mga nota, mga iskrip, praktis sa paghubad o pagpaka sa laing himan, nga dili kinahanglan tangtangon ang gatusan ka timecodes pinaagi sa kamot.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Text Extractor"
+ },
+ "videosub": {
+  "title": "Kuhaa ang Embedded Subtitles gikan sa MKV / MP4 ngadto sa SRT",
+  "desc": "Kuhaa ang embedded subtitles gikan sa MKV, WebM, MP4, MOV; i-export isip SRT / VTT / ASS / TXT. Walay pag-upload o re-encode — ang mga file gibasa sa imong browser; OK ang dagkong file.",
+  "kw": "kuhaa ang gi-embed nga mga subtitle,mkv ngadto sa srt,pagkuha sa subtitle sa mp4,kuhaa ang mga subtitle gikan sa video,tigkuha sa gi-embed nga subtitle,srt gikan sa mkv,pagkuha sa subtitle sa mov,pag-export sa track sa subtitle,vtt gikan sa mkv,kuhaa ang humok nga mga subtitle,pag-rip sa subtitle sa mkv",
+  "intro": "Kuhaa ang subtitle track nga naa sa sulod sa MKV o MP4 direkta ngadto sa SRT — walay pag-upload, mahitabo kini tanan sa imong browser.",
+  "feat": "Nagbasa sa plain-text, ASS, WebVTT ug mov_text / tx3g tracks, nagtipig sa orihinal nga ASS header ug resolusyon, ug nagbasa sa gagmay nga mga bahin pinaagi sa offset aron ang dako nga file dili mapuno ang memorya.",
+  "who": "Bisan kinsa nga adunay salida nga nagdala og soft subtitles nga gusto kuhaon ang teksto, mga grupo sa pag-encode, ug mga fansub team nga nagsugod gikan sa orihinal nga track.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Video Embedded Subtitle Extractor"
+ },
+ "hanconv": {
+  "title": "Chinese Subtitle Converter - Simplified ⇄ Traditional",
+  "desc": "Libreng Chinese subtitle converter: Simplified ⇄ Traditional (Taiwan / Hong Kong) ug vice versa. Dayalogo ra ang nausab — ang timecodes ug ASS tags nagpabilin. Gibase sa OpenCC.",
+  "kw": "tig-convert sa subtitle sa Intsik,gikapoy ngadto sa tradisyonal,tradisyonal ngadto sa gikapoy,tradisyonal nga Intsik sa srt,i-convert ang subtitle sa Intsik,tradisyonal nga Intsik sa Taiwan,tradisyonal nga Intsik sa Hong Kong,pag-convert sa han,i-convert ang srt ngadto sa tradisyonal nga Intsik,gikapoy nga Intsik srt,subtitle sa opencc",
+  "intro": "I-convert ang tibuok subtitle file tali sa Simplified ug Traditional, nga walay giusab gawas sa dayalogo.",
+  "feat": "Siyam ka direksyon: kinatibuk-ang Traditional, bokabularyo sa Taiwan, mga porma sa Taiwan, Hong Kong, balik sa Simplified, ug Traditional-to-Traditional nga rehiyonal nga mga porma. Gigamit ang OpenCC dictionary nga adunay longest-match-first phrase resolution.",
+  "who": "Bisan kinsa nga naghatod og mga subtitle sa mga tumatan-aw sa Taiwan o Hong Kong, mga distributor nga nag-andam og rehiyonal nga mga bersyon, ug mga editor nga nakadawat og Traditional file ug gusto og Simplified.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Chinese Simplified Traditional Converter"
+ },
+ "split": {
+  "title": "Tigbahin ug Tig-merge sa Subtitle - SRT / VTT | AI-SRTSub",
+  "desc": "Bahina ang mga subtitle pinaagi sa gidugayon o ihap, o hiusa ang daghang mga file sa han-ay o sa timestamp. Ang pag-renumber awtomatiko, ang dayalogo wala hikapa. SRT & VTT.",
+  "kw": "tigbahin sa subtitle,i-split ang mga subtitle,i-merge ang mga file sa srt,tig-merge sa srt,i-kombinar ang mga subtitle,i-split ang srt,i-apil ang mga file sa srt,i-cut ang mga subtitle,i-split ang vtt,tig-merge sa subtitle",
+  "intro": "Putla ang usa ka taas nga subtitle ngadto sa mga bahin, o hiusa ang daghang mga file ngadto sa usa. Nagdagan sa imong browser — walay gi-upload.",
+  "feat": "Bahina pinaagi sa gidugayon o ihap nga adunay renumbering sa matag bahin ug opsyonal nga zero-based timing; hiusa sa sunod-sunod nga adunay espasyo o interleave pinaagi sa orihinal nga timestamps. SRT ug VTT.",
+  "who": "Mga tigbuhat nga nagbahin sa mga episode para sa pag-upload, mga team nga nagrepaso sa mga bahin, ug mga editor nga naghiusa sa multi-part subtitles.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Splitter and Merger"
+ },
+ "table": {
+  "title": "Subtitles ngadto sa Excel/CSV ug Balik",
+  "desc": "Himua ang SRT o VTT nga Excel o CSV sheet para sa pagrepaso ug paghubad, dayon iuli kini. Ang mga timecodes nagpabilin nga eksakto, ang line breaks mabuhi. Walay gi-upload.",
+  "kw": "subtitle ngadto sa excel,srt ngadto sa csv,srt ngadto sa excel,excel ngadto sa srt,csv ngadto sa srt,spreadsheet sa subtitle,tig-convert sa subtitle sa tabla",
+  "intro": "I-export ang mga subtitle ngadto sa spreadsheet para sa pagrepaso ug paghubad, dayon i-import ang sheet balik. Nagdagan sa imong browser.",
+  "feat": "Usa ka click gikan sa SRT o VTT ngadto sa xlsx o CSV; usba ang mga oras, teksto ug mga nota sa imong spreadsheet, dayon i-export balik sa SRT o VTT. Ang mga kolum sa oras nagtipig sa tibuok millisecond precision; ang in-cell line breaks gipreserbar. Ang Chinese ug English headers parehong nagtrabaho.",
+  "who": "Mga translator, fansub teams ug editors nga nagrepaso, nag-annotate o nag-batch-fix sa mga subtitle sa spreadsheet.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Subtitle Excel CSV Converter"
+ },
+ "batch": {
+  "title": "Batch Convert Subtitles sa SRT/VTT",
+  "desc": "Ihulog ang napulo o gatosan ka SRT/VTT files, i-convert silang tanan sa usa ka format ug i-download ang usa ka ZIP. Ang pag-renumber ug timestamps gi-normalize; ang dili mabasa nga mga file gimarkahan.",
+  "kw": "batch nga i-convert ang mga subtitle,srt ngadto sa vtt,batch nga tig-convert sa subtitle,bulk srt,i-convert ang daghang mga subtitle,zip sa subtitle",
+  "intro": "I-drag ang gatosan ka subtitle files, i-convert silang tanan, kuhaa ang usa ka ZIP. Nagdagan sa imong browser — walay gi-upload.",
+  "feat": "SRT ngadto sa VTT ug balik sa bulk; ang sequence numbers gi-re-order ug timestamps gi-normalize kada target format. Ang mga file nga dili ma-parse gimarkahan ug giluwas gawas sa ZIP. Ang original filenames gitago sa bag-ong extension; ang collisions nakakuha og suffix.",
+  "who": "Mga editor ug subtitlers nga nag-convert sa tibuok serye folders, ug site owners nga nagpaka sa mga player og usa ka format.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Subtitle Converter"
+ },
+ "lrc": {
+  "title": "LRC Lyric Editor - Tap Timing Samtang Namati",
+  "desc": "Pag-load og kanta, i-paste ang mga lyrics, ug i-tap ang oras sa matag linya samtang namati; i-export ang LRC o SRT. I-import ang kasamtangang LRC aron ma-fine-tune. Keyboard-driven, sa sulod sa browser.",
+  "kw": "editor sa lrc sa online,paghimo og lrc,oras sa liriko,tigbuhat sa lrc,paghimo og lrc,tig-sync sa liriko,lrc ngadto sa srt",
+  "intro": "Pag-load og musika, i-paste ang mga lyrics, i-tap ang timing linya sa linya samtang namati, ug i-export ang LRC o SRT. Walay gi-upload.",
+  "feat": "Nagtrabaho sa MP3, M4A, FLAC, WAV ug OGG. Usa ka linya kada row; ang kasamtangang LRC files mahimong i-import ug i-adjust. Ang Space nag-play/pause, ang Enter nag-stamp sa kasamtangang linya, ang Z nag-undo — ang mga kamot nagpabilin sa keyboard.",
+  "who": "Mga musikero nga nag-sync sa mga cover, mga creator nga nagdugang og mga kanta sa mga video, ug bisan kinsa nga nagtukod og lyric subtitles para sa player.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "LRC Lyric Timing Editor"
+ },
+ "ytfix": {
+  "title": "YouTube Subtitle Realigner - Iuli ang mga Naputol nga Sentensya | AI-SRTSub",
+  "desc": "Ang auto-captions sa YouTube nagputol sa mga sentence matag 3-4 segundos. Ang himan nga kini walay gibag-o nga pulong, gibalhin lang ang hangganan. Libre, 100 ka pinulongan.",
+  "kw": "ayuhon ang youtube subtitle,awtomatikong caption sa youtube,i-realign ang subtitle,pag-align sa sentence sa subtitle,ayuhon ang guba nga subtitle,pag-align sa sentence sa srt,pag-resegment sa subtitle,pag-ayo sa caption sa youtube,subtitle nga nakasabot sa sentence",
+  "intro": "I-drop ang YouTube auto-generated nga subtitle file, pilia ang pinulongan, ug ang himan magtahi pag-usab sa mga sentensya tabok sa mga cue, dayon putlon pag-usab ang file matag sentensya. Walay bisan usa ka pulong nga giusab, ug ang mga oras sa cue magpabilin nga duol kutob sa mahimo sa orihinal nga mga timestamp.",
+  "feat": "Ang YouTube auto-captions giputol ngadto sa halos fixed nga 3-4 segundos nga cues bisan asa pa matapos ang mga sentensya, mao nga ang usa ka cue sagad magdala sa tumoy sa miaging sentensya ug sa sinugdanan sa sunod. Ang himan nagtratar sa orihinal nga mga timestamp isip mga angkla - kadtong mga orasa mao ang tinuod nga mga utlanan sa pulong nga gihimo sa speech recogniser - nagdesisyon kung asa matapos ang matag sentensya base sa punctuation, ug naggamit og dynamic programming aron pilion ang labing maayo nga break point tali sa katapusan sa sentensya, koma, conjunction, ug hard cut, dayon gipalugway ang oras sa screen aron mohaom sa gikusgon sa pagbasa. Ang matag usa sa 100 ka mga pinulongan adunay kaugalingong mga lagda sa sentensya: ang Chinese ug Japanese walay mga espasyo tali sa mga pulong, ang Thai panagsa ra magmarka sa mga utlanan sa pulong, ang Hindi motapos sa mga sentensya gamit ang ।, Arabic gamit ang ؟, Armenian gamit ang ։. Ang gilapdon sa linya ug gikusgon sa pagbasa nagsunod sa sistema sa pagsulat - 16 ka full-width nga mga karakter matag linya para sa Chinese, 42 ka karakter para sa Latin nga mga script. Sa dili pa i-export, ang teksto itandi matag karakter, ug bisan unsang nawala o nadugang nga pulong markahan dayon.",
+  "who": "Mga team sa subtitle nga naghimo sa YouTube, podcast, ug course auto-captions nga mahimong kompleto nga mga subtitle, ug mga creator nga nag-edit sa ilang kaugalingong mga video nga gikapoy na sa mga sentensya nga mohunong sa tunga-tunga.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "YouTube Subtitle Realigner"
+ },
+ "autosub": {
+  "title": "Audio ngadto sa Subtitles — himoong SRT sa browser | AI-SRTSub",
+  "desc": "I-convert ang audio o video ngadto sa subtitles gamit ang browser. Awtomatikong pag-ila sa sinultihan, pag-cut sa cues, ug pag-export sa SRT / VTT.",
+  "kw": "audio ngadto sa srt,speech ngadto sa subtitle,paghimo og subtitles gikan sa audio,awtomatikong subtitle generator,transcribe audio ngadto sa srt,whisper subtitles,browser speech recognition,offline nga paghimo og subtitle",
+  "intro": "I-drop ang audio o video file, pilia ang pinulongan ug modelo, ug ang pag-ila sa sinultihan modagan sulod sa imong browser. Makakuha ka og subtitle draft nga kompleto sa timing ug hustong pagkabahin sa mga sentence.",
+  "feat": "Kini nga himan awtomatikong nag-cut sa mga sentence base sa punctuation, nag-adjust sa line width, ug nag-set sa hustong oras sa pagpakita sa screen nga walay overlap.",
+  "who": "Para sa mga content creator, podcast team, ug bisan kinsa nga nagkinahanglan og subtitle draft alang sa ilang mga video."
+ },
+ "ocrsub": {
+  "title": "Hardcoded Subtitle OCR — basaha ang subtitles sa video | AI-SRTSub",
+  "desc": "Kuhaa ang mga subtitle nga permanenteng nakapilit sa video. Markahi ang area, basaha kini frame-by-frame, ug i-export isip SRT / VTT nga libre.",
+  "kw": "pagkuha og hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles gikan sa video,video ngadto sa srt,subtitle gikan sa video,hardcoded caption ocr",
+  "intro": "I-drop ang video, markahi ang bahin diin makita ang subtitles, ug ang himan mobasa niini frame-by-frame aron mahimong usa ka timed cue.",
+  "feat": "Ang himan nag-crop sa strip diin nahimutang ang subtitles, nag-binarize sa brightness aron makuha ang teksto, ug naghiusa sa managsama nga frames ngadto sa usa ka cue.",
+  "who": "Para sa mga subtitle team nga nag-localize og foreign videos, mga editor, ug kadtong nagkinahanglan og subtitle file gikan sa video nga walay orihinal nga source."
+ },
+ "multilang": {
+  "title": "Daghang pinulongan dungan — i-upload ang tibuok season | AI-SRTSub",
+  "desc": "I-drop ang tibuok season, pilia ang mga pinulongan, ug i-press ang start kausa ra. Ang mga episode ug pinulongan mahimong usa ka queue ug modagan sunod-sunod; ang resulta mabalik isip usa ka zip. Makapadayon kini kon maputol ug mohunong kon sirad-an ang tab.",
+  "kw": "batch subtitle translation, paghubad subtitulo daghang pinulongan, multi language subtitles, tibuok season subtitles, subtitle batch export, paghubad srt sa daghang pinulongan, usa ka season daghang pinulongan",
+  "intro": "I-drop ang tibuok season sa usa ka higayon, markahi ang gusto nimong mga pinulongan, ug i-press ang start. Ang mga episode ug pinulongan mahimong usa ka queue: ang matag pinulongan mahuman sa dili pa mosunod ang sunod, ug ang tanan nakaputos sa usa ka zip.",
+  "feat": "Ang kasagarang masaypan sa batch translation mao ang concurrency. Ang baynte ka episode ug lima ka pinulongan nga dunganon pagpasaka maghimo og gatosan ka request nga makapuno sa server queue — magsagol ang mga una ug ulahi ug walay kasiguruhan hain ang nahuman. Mao nga kining panid nagdagan isip usa ka queue: usa ka batch matag higayon, usa ka pinulongan hangtod mahuman. Ang progreso natago matag episode ug pinulongan sa imong computer, busa kon mapatay sa episode tres, ablihi pag-usab ang panid ug magpadayon kini nga dili na kinahanglan i-resend ang nahuman na. Ang kasagarang sayop sa usa ka season mao ang mga ngalan: kon hubaron ang baynte ka episode ngalahi-lahi, ang samang karakter mahimong tulo ka klase ang spelling. Mao nga ang glossary naa dinhi — i-upload kausa ra, gipaambit sa tibuok season — ug ipakita niini pila ka entry ang natakdo sa dili pa ka mag-sugod. Sirad-i ang tab ug ang trabaho mohunong dayon imbes ngausik sa quota sa background.",
+  "who": "Mga subtitle team nga naghimo og subtitulo sa tibuok season sa nagkalain-laing pinulongan, mga channel nga nag-apod-apod sa parehong batch ngadto sa lain-laing merkado, ug mga solo translator nga gusto mo-press sa start kausa ra ug mobalik na lang unya.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+ },
+ "ktv": {
+  "title": "KTV Karaoke Subtitle Maker - Oras sa Matag Karakter, Export ASS | AI-SRTSub",
+  "desc": "Libre nga online karaoke subtitle maker: karga ang kanta, i-paste ang lyrics, i-tap ang matag linya, unya bahina kini sa mga karakter o i-tap uban sa musika ug i-fine-tune pinaagi sa pag-drag. I-export ang ASS nga adunay \\\\kf tags para sa CapCut ug Premiere.",
+  "kw": "karaoke subtitle maker, ass karaoke, word level lyrics, kf tags, karaoke lrc, lyric sweep, ass karaoke maker, ai srtsub",
+  "intro": "Karga ang kanta, i-paste ang lyrics, i-tap ang matag linya, unya bahina ang matag linya ngadto sa mga karakter — awtomatiko pinaagi sa gilapdon, pag-tap subay sa musika, o pag-drag sa mga utlanan. Tan-awa ang mga pulo nga nag-ilaw samtang gikanta.",
+  "feat": "Ang Chinese gibahin matag karakter, ang English matag pulo, ug ang mga punctuation mosunod lang. Ang na-tune nga tail gap magpugong sa kataposang karakter nga molabaw sa boses. I-export ang ASS para sa CapCut / Premiere / Aegisub nga adunay \\\\kf tags, enhanced LRC para sa word-level players, o whole-line SRT isip kapilian. Ang tanan nagdagan sa imong browser - walay gi-upload.",
+  "who": "Mga creator nga nagbutang og lyrics sa cover videos ug concert footage, mga tibuhat sa music MV, ug bisan kinsa nga naghimo og karaoke subtitles.",
+  "siteName": "AI-SRTSub",
+  "jsonldName": "AI-SRTSub",
+  "jsonldAlt": "KTV Karaoke Subtitle Maker"
+ }
 }
