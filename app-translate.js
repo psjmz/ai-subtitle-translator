@@ -392,6 +392,10 @@ const S = {
   stop: false,
   snapOff: false,  // v0.9.77：localStorage 写满/被禁用时置 true，之后不再尝试存断点
   dropN: 0, mergeN: 0, wrapN: 0, dropLocal: 0, dropAiFiller: 0, dropAiDrop: 0,
+  /* v0.9.411：drop 救援账（与多语页 v0.9.406 同名同义）。dropTried 记本次任务已试过的句组，
+     整批重发后同一组不再被救第二次；dropRescueFail 是「连续零收获」计数，到阈值就关通道。 */
+  dropRescueTryN: 0, dropRescueFixN: 0, dropSkipN: 0, dropRescueFail: 0, dropRescueOff: 0,
+  dropSkipLogged: 0, dropTried: null, dropSdhN: 0,
 };
 
 /* ---------------- 工具函数 ---------------- */
@@ -2648,6 +2652,19 @@ function failWhyOf(msg){
    留足余量；15 次是让比值有统计意义的最小样本（低于它宁可不动手）。 */
 const GAP_TRY_MIN = 15;    /* 累计补译尝试达到这么多次才开始评估 */
 const GAP_EFF = 0.15;      /* 修复率低于此值 → 判定补译对本任务无效 */
+/* v0.9.411：SDH 画面/声音标注行（[speaking in French] / [door creaks open] / (laughs)）。
+   从多语页 v0.9.406 原样搬来 —— 那一版只改了多语页，主翻译页漏了（10-29 排查实证：
+   当天 68 次音乐/歌词重译 100% 出自主翻译页，多语页 0 次）。
+   它们不是对白，模型判「不用翻译」并删除属于正确判断 —— 不该进救援（白付一次请求），
+   也不该算进 subDrop 告警（那个数原意是「有实义的对白被删」，被这类标注撑大后就不准了）。
+   判据：剔掉 [..]、（..）片段与所有标点/符号后，不剩任何实义字符。
+   括号里带对白的仍算对白：\"(in French) Ferme la porte.\" 去掉前缀后正文还在 → 返回 false。 */
+function isScreenAnno(s){
+  const t=String(s||'').replace(/[\u2669\u266a\u266b\u266c]/g,' ');
+  const rest=t.replace(/\[[^\]]*\]/g,' ').replace(/\([^\)]*\)/g,' ').replace(/（[^）]*）/g,' ')
+              .replace(/[\s\p{P}\p{S}]/gu,'');
+  return rest.length===0;
+}
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
@@ -2987,8 +3004,14 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     if(m.type==='drop' && !String(m.text||'').trim()){
       const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
       const eff = C.effChars(dropSrc);
-      if(C.musicRe().test(String(g.text)) && eff > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
-      else if(eff >= 6 && !C.isPureHumming(g.text)) subDropGnos.push(g.gno);
+      if(C.musicRe().test(String(g.text)) && eff >= 6 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
+      else if(eff >= 6 && !C.isPureHumming(g.text)){
+        /* v0.9.411：SDH 标注（[speaking in French] 这类画面/声音提示）不算对白——模型删它是对的。
+           不进救援、单独计 dropSdhN；subDrop 那个「实义对白被删」的告警也就不再被它撑大。
+           与多语页 v0.9.406 同一份逻辑。 */
+        if(isScreenAnno(dropSrc)) S.dropSdhN=(S.dropSdhN||0)+1;
+        else subDropGnos.push(g.gno);
+      }
       /* v0.9.380：eff<6 但确有实词 → 保留原文，不再静默删帧。
          上面两档都不成立时，此前是 continue 掉什么都不做 → 回填层按 explicitDrop 整组删除，
          rows 里连 dropAiDrop 都不加（那行记的是 m.type==='drop' 才有），日志一片干净。
@@ -3543,7 +3566,7 @@ function reportEvent(ev, extra, fmt){
        短实义组保底、歌词缺号。与既有 drop* 和 cue* 同为纯统计，服务端白名单读取（见 server.js GAP_FIELDS）。
        gapTryN/gapFixN = 缺号补译的分子分母（值不值得再做第二轮，靠这个比）；gapGiveUpN = 最终判死的批数；
        shortDropKeepN = 差点被静默删掉、改为保留原文的组数；lyricShortN = 检出歌词缺号的次数。 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',pg:'translate',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',pg:'translate',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.381：分配失衡样本（某条只剩虚词/符号）——与 cueSample 一样只在 finish 带一次 */
       thinSample:(ev==='finish'&&S.thinSamples&&S.thinSamples.length)?S.thinSamples:undefined,
       /* v0.9.375：编号级样本只在 finish 带一次（download/copy 再带就是同一份数据重复传） */
@@ -3735,6 +3758,10 @@ async function runTranslate(){
      两半里只要有一半成功就先落库，失败的半边交下方逐组补救（≤3 组一请求）接手——
      补救粒度比半批更细，等于把第三次机会让给了修复率更高的通道。 */
   const maxTry  = 2;
+  /* v0.9.411：模型判「不用翻译」的救援，连续几次零收获就停手（与多语页 v0.9.406 同值）。
+     取 3 而不是 1：单次零收获可能只是那批内容恰好都该删（例如整批都是 [music] 标注）；
+     连续 3 次说明这次任务里模型就是铁了心判水词，再问也只是白付系统提示词的固定开销。 */
+  const DROP_RESCUE_FAIL_LIMIT = 3;
   let lastCall = 0;
   let deadStreak = 0;   // v0.9.56：连续整批零成功计数（熔断判定用）
   // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
@@ -3759,7 +3786,7 @@ async function runTranslate(){
      实际这些值一个都不会被使用（切模式不清空输入框，值一直留着）。此前零提示。
      ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
   if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
-  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
+  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0; S.locale=cfg.dst;   // v0.9.411：drop 救援账随任务重置
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   /* v0.9.375：编号级样本与重试修复率同口径随任务重置（跨任务不累加） */
@@ -4028,13 +4055,30 @@ async function runTranslate(){
           if(!dropFillers && out.musicDropGnos) rescueGnos.push(...out.musicDropGnos);
           if(out.subDropGnos) rescueGnos.push(...out.subDropGnos);
           if(rescueGnos.length){
-            const g1s=rescueGnos.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
-            const stillDrop=rescueGnos.slice();
+            /* v0.9.411：模型判「不用翻译」，只救一次（与多语页 v0.9.406 同一套）。
+               依据（多语页那版的线上数据）：一个 1780 条 / 44 批的任务有 39 个批次各触发一次救援，
+               救回的条数远不抵请求成本；用户决策——模型说不用翻，试一次不行就算了。
+               两条约束：
+               ① 本次任务内记下试过的句组（S.dropTried），批次重发后同一组不再被救第二次；
+               ② 连续 DROP_RESCUE_FAIL_LIMIT 次救援零收获 → 本次任务关闭救援通道，
+                  后面再有 drop 直接按模型判断处理（不再付钱去问）。
+               ⚠️ 主翻译页此前完全没有这两条：同一组在整批重发后会被反复救，
+                  10-29 实证当天 68 次音乐重译全部出自本页、多语页 0 次。 */
+            const tried=S.dropTried||(S.dropTried=new Set());
+            const skipped=rescueGnos.filter(g=>tried.has(g)).length;
+            if(skipped){
+              S.dropSkipN=(S.dropSkipN||0)+skipped;
+              if(!S.dropSkipLogged){ S.dropSkipLogged=1; log(t('dropSkipNote',skipped),'warn'); }
+            }
+            const todo=S.dropRescueOff?[]:rescueGnos.filter(g=>!tried.has(g));
+            const g1s=todo.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
+            const stillDrop=todo.slice();
             if(g1s.length && !S.stop){
+              S.dropRescueTryN=(S.dropRescueTryN||0)+todo.length;
               try{
                 const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sysB,null,ctx,1);
                 stillDrop.length=0;
-                for(const gno of rescueGnos){
+                for(const gno of todo){
                   const m2=o2.byGno&&o2.byGno[gno];
                   // 救回标准：非空组译文（音乐/旧格式）或 cue 对齐有文（cueTexts / cues），且该组未触发语言跑偏锚定
                   const cueAny = m2 && ((m2.cueTexts && m2.cueTexts.size) || (Array.isArray(m2.cues) && m2.cues.some(c=>String((c&&c.text)||'').trim())));
@@ -4043,11 +4087,24 @@ async function runTranslate(){
                     o2.fillers.forEach(no=>fillerSet.add(no));
                   } else stillDrop.push(gno);
                 }
+                todo.forEach(g=>tried.add(g));
               }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              const savedN=todo.length-stillDrop.length;
+              S.dropRescueFixN=(S.dropRescueFixN||0)+savedN;
+              /* 连败计数只算「真去救过」的批次；救回任意一条即清零 */
+              if(savedN>0) S.dropRescueFail=0;
+              else {
+                S.dropRescueFail=(S.dropRescueFail||0)+1;
+                if(S.dropRescueFail>=DROP_RESCUE_FAIL_LIMIT && !S.dropRescueOff){
+                  S.dropRescueOff=1;
+                  log(t('dropRescueOff',DROP_RESCUE_FAIL_LIMIT),'warn');
+                }
+              }
+              if(savedN>0) log(t('musicDropSaved',savedN),'okc');
+              if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
+            } else {
+              todo.forEach(g=>tried.add(g));
             }
-            const savedN=rescueGnos.length-stillDrop.length;
-            if(savedN>0) log(t('musicDropSaved',savedN),'okc');
-            if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
           }
           if(out.badAnchor && out.badAnchor.length){
             // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
@@ -4521,7 +4578,9 @@ async function runTranslate(){
     /* v0.9.86：静默清空遥测（纯统计，不改任何行为）——统计被删行里「源文仍有实义」的行数。
        判定：有效字符 ≥6（排除 Um./Yeah./Mm-hmm 这类真水词）且非纯哼唱（Oh-oh 之类）。
        用途：判断要不要把合并救援通道从「有 ♪ 标记」放宽到「源文有实义」，先攒数据再定。 */
-    S.subDrop = S.rows.filter(r=>r.flag==='drop' && C.effChars(String(r.en||''))>=6 && !C.isPureHumming(String(r.en||''))).length;
+    /* v0.9.411：加上「非画面/声音标注」——[speaking in French] / (laughs) 这类被删是对的，
+       算进 subDrop 会把「有实义的对白被删」这个告警数字撑大（与多语页 v0.9.406 同口径）。 */
+    S.subDrop = S.rows.filter(r=>r.flag==='drop' && C.effChars(String(r.en||''))>=6 && !C.isPureHumming(String(r.en||'')) && !isScreenAnno(String(r.en||''))).length;
     S.mergeN = gMulti;
     S.mergedN = mG;
     log(t('mergeInfo', gMulti, mG, gMulti-mG));
@@ -4859,6 +4918,7 @@ function setSrc(text, fileName){
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
+  S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0;   // v0.9.411：换片清掉落救援计数
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
   S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清，样本不跨文件混
   if(fileName){

@@ -38,7 +38,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.410';
+const ASSET_VER = '0.9.411';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -544,7 +544,12 @@ function markEvent(ip, meta, ev){
      （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
      下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
   if (f.task) lite.taskId = f.task;
-  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta), cueSampleField(meta), thinSampleField(meta)); if (meta.stopped) lite.stopped = 1; }
+  /* v0.9.411：补 gapFields —— 这条支路一直漏着它（v0.9.375 引入 gap* 时就少了）。
+     后果：自带 Key 用户（翻译不经过本站、没有 appendEvent 会话）的完成记录里，
+     gap* / shortDropKeep* / lyricShortN / thinN / dropRescue* / dropSdhN 全部写不进去，
+     后台看这批人永远是「零重试、零救援」——406 的救援账也就跟着一起瞎了。
+     上面 markEvent 的正规分支（第 501 行）是带的，两条必须同口径。 */
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta), gapFields(meta), cueSampleField(meta), thinSampleField(meta)); if (meta.stopped) lite.stopped = 1; }
   /* v0.9.244：自带 Key 用户同样记导出格式（这条记录是本次上报新建的，计数从 1 起） */
   else if (ev === 'download') {
     lite.downloads = 1; lite.downloadedAt = now;
