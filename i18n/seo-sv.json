@@ -24,6 +24,7 @@
   "who": "Undertextningsteam som textar en hel säsong till flera språk, kanaler som distribuerar samma sats av avsnitt till olika marknader, och enskilda översättare som hellre trycker på start en gång och kommer tillbaka senare.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+  "jsonldAlt": "Batch Multi-language Subtitle Translator",
+  "use": "Den här sidan är till största nytta för tre typer av program. Korta dramer: ett till tre minuter per avsnitt och ofta 80–120 avsnitt per säsong – filerna är många och var och en är kort, så det svåra är aldrig översättningen utan synkning och distribution. Släpp hela serien, kryssa för de språk du behöver, och en genomkörning av kön ger dig en komplett uppsättning på flera språk; hur huvudpersonen tilltalas, vad företaget heter, vilken replik som är ett slagord – allt fastställt av en säsongsövergripande ordlista, och en körning som avbryts vid avsnitt 40 återupptas från det avsnittet. Amerikanska och brittiska dramer och TV-serier: 40-minutersavsnitt, tio till drygt tjugo per säsong, tät dialog full av slang med [lyrics] och on-screen-text uppblandat – ladda upp säsongen en gång och alla språk kommer ut samtidigt; SDH-taggar ([door slams], [lyrics]) tas bort i stället för att översättas, så att ingenting förvandlas till berättarröst som ingen läser. Animation: attacknamn, fraktioner och påhittade termer dyker upp i dussintal, och ordlistan spikar var och en av dem så att en säsong aldrig slutar med olika översättningar per avsnitt."
  }
 }

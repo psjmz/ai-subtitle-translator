@@ -24,6 +24,7 @@
   "who": "Équipes de sous-titrage adaptant une saison entière en plusieurs langues, chaînes redistribuant les mêmes épisodes sur différents marchés, et traducteurs indépendants qui préfèrent lancer une fois et revenir plus tard.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Traducteur de sous-titres multilingue par lot"
+  "jsonldAlt": "Traducteur de sous-titres multilingue par lot",
+  "use": "Trois types de programmes tirent le meilleur parti de cette page. Les mini-dramas : un à trois minutes par épisode et souvent 80 à 120 épisodes par saison - les fichiers sont nombreux et courts, le plus dur n'est donc jamais la traduction mais l'appariement et la distribution. Déposez toute la série, cochez les langues souhaitées, et un seul passage dans la file d'attente vous donne un ensemble multilingue complet ; la façon de s'adresser au personnage principal, le nom de l'entreprise, le slogan - tout est fixé par un glossaire valable pour toute la saison, et un traitement qui s'interrompt à l'épisode 40 reprend à cet épisode. Les séries dramatiques et télévisées américaines et britanniques : des épisodes de 40 minutes, une dizaine à un peu plus de vingt par saison, des dialogues denses pleins d'argot avec des paroles de chansons [lyrics] et du texte à l'écran mélangés - téléchargez la saison une seule fois et toutes les langues sortent en même temps ; les balises SDH ([door slams], lyrics) sont supprimées plutôt que traduites, afin que rien ne se transforme en narration que personne ne lit. Les animations : les noms d'attaques, les factions et les termes inventés arrivent par dizaines, et le glossaire fixe chacun d'eux pour qu'une saison ne se retrouve jamais avec une traduction différente selon l'épisode."
  }
 }

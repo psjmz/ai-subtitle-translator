@@ -24,6 +24,7 @@
   "who": "Untertitel-Teams, die eine komplette Staffel in mehrere Sprachen übersetzen, Kanäle, die dieselben Episoden in verschiedene Märkte exportieren, und Solo-Übersetzer, die lieber einmal starten und später zurückkehren.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+  "jsonldAlt": "Batch Multi-language Subtitle Translator",
+  "use": "Drei Arten von Sendungen profitieren am meisten von dieser Seite. Kurze Dramen: ein bis drei Minuten pro Episode und oft 80 bis 120 Episoden pro Staffel – es gibt viele Dateien und jede ist kurz, sodass nicht die Übersetzung das Schwierige ist, sondern das Pairing und die Verteilung. Werfen Sie die gesamte Serie hinein, haken Sie die benötigten Sprachen an, und ein einzelner Durchlauf der Warteschlange liefert Ihnen ein vollständiges mehrsprachiges Set; wie die Hauptfigur angeredet wird, wie das Unternehmen heißt, welche Zeile ein Catchphrase ist – all das wird durch ein staffelweites Glossar festgelegt, und ein Durchlauf, der bei Episode 40 abbricht, setzt ab dieser Episode fort. US- und UK-Dramen und Serien: 40-minütige Episoden, zehn bis über zwanzig pro Staffel, dichter Dialog voller Slang, in den Lyrics und On-Screen-Text gemischt sind – laden Sie die Staffel einmal hoch und jede Sprache kommt gleichzeitig heraus; SDH-Tags ([door slams], lyrics) werden weggelassen statt übersetzt, sodass nichts zu einer Erzählung wird, die niemand liest. Animation: Attackennamen, Fraktionen und erfundene Begriffe kommen dutzendweise vor, und das Glossar legt jeden einzelnen davon fest, sodass eine Staffel am Ende nicht pro Episode eine andere Übersetzung aufweist."
  }
 }

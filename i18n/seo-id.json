@@ -24,6 +24,7 @@
   "who": "Tim pembuat subtitle yang menerjemahkan satu musim penuh ke dalam beberapa bahasa, kanal yang mendistribusikan batch episode yang sama ke berbagai pasar, dan penerjemah mandiri yang ingin menekan tombol mulai sekali lalu kembali nanti.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Penerjemah Subtitle Multibahasa Batch"
+  "jsonldAlt": "Penerjemah Subtitle Multibahasa Batch",
+  "use": "Tiga jenis tayangan mendapatkan manfaat paling maksimal dari halaman ini. Drama pendek: satu hingga tiga menit per episode dan sering kali 80-120 episode per penayangan—filenya banyak dan masing-masing berdurasi singkat, sehingga bagian tersulitnya bukanlah penerjemahan melainkan penyandingan dan distribusi. Masukkan seluruh serial, centang bahasa yang Anda butuhkan, dan satu kali proses dalam antrean akan menghasilkan set multibahasa yang lengkap; cara menyapa pemeran utama, nama perusahaan, kalimat mana yang menjadi slogan—semuanya dikunci oleh glosarium untuk satu musim penuh, dan proses yang terhenti di episode 40 akan dilanjutkan dari episode tersebut. Drama dan serial TV AS serta Inggris: episode berdurasi 40 menit, sepuluh hingga dua puluhan per musim, dialog padat yang penuh slang dengan lirik dan teks di layar yang tercampur—unggah musim tersebut sekali dan semua bahasa akan dihasilkan bersamaan; tag SDH ([door slams], lirik) diabaikan alih-alih diterjemahkan, sehingga tidak ada yang berubah menjadi narasi yang tidak dibaca orang. Animasi: nama serangan, faksi, dan istilah ciptaan hadir dalam jumlah banyak, dan glosarium mengunci setiap istilah tersebut sehingga satu musim tidak akan pernah berakhir dengan terjemahan yang berbeda di setiap episodenya."
  }
 }

@@ -24,6 +24,7 @@
   "who": "Ondertitelteams die een heel seizoen naar verschillende talen vertellen, kanalen die dezelfde batch afleveringen herverdelen naar verschillende markten, en solovertalers die liever één keer op start drukken en later terugkeren.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Meertalige Ondertitelvertaalt tool"
+  "jsonldAlt": "Batch Meertalige Ondertitelvertaalt tool",
+  "use": "Drie soorten programma's halen het meeste uit deze pagina. Korte drama's: één tot drie minuten per aflevering en vaak 80-120 afleveringen per reeks — de bestanden zijn talrijk en elk is kort, dus het lastige is nooit de vertaling maar het koppelen en distribueren. Sleep de hele serie erin, vink de gewenste talen aan en één doorgang van de wachtrij levert een complete meertalige set op; hoe het hoofdpersonage wordt aangesproken, hoe het bedrijf heet, welke regel een catchphrase is — alles wordt vastgelegd door een seizoensbrede woordenlijst, en een reeks die stopt bij aflevering 40 hervat vanaf die aflevering. Amerikaanse en Britse drama's en tv-series: afleveringen van 40 minuten, tien tot twintig stuks per seizoen, dichte dialoog vol slang met door elkaar lopende lyrics en on-screen tekst — upload het seizoen één keer en elke taal komt er tegelijk uit; SDH-tags ([door slams], lyrics) worden weggelaten in plaats van vertaald, zodat niets verandert in vertelling die niemand leest. Animatie: aanvalsnamen, fracties en bedachte termen komen met dozen tegelijk binnen, en de woordenlijst legt ze allemaal vast zodat een seizoen nooit eindigt met een andere vertaling per aflevering."
  }
 }

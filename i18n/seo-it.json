@@ -24,6 +24,7 @@
   "who": "Team di sottotitolaggio che traducono una stagione intera in diverse lingue, canali che distribuiscono lo stesso batch di episodi in mercati differenti e traduttori indipendenti che preferiscono avviare l'elaborazione una sola volta e tornare in seguito.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Traduttore di sottotitoli multilingua batch"
+  "jsonldAlt": "Traduttore di sottotitoli multilingua batch",
+  "use": "Tre tipi di programmi traggono il massimo vantaggio da questa pagina. I drammi brevi: da uno a tre minuti a episodio e spesso da 80 a 120 episodi a stagione; i file sono numerosi e ciascuno è breve, quindi la difficoltà non è mai la traduzione ma l'abbinamento e la distribuzione. Carica l'intera serie, spunta le lingue necessarie e un solo passaggio della coda ti offre un set multilingue completo: come ci si rivolge al protagonista, come si chiama l'azienda, quale battuta è uno slogan, tutto bloccato da un glossario valido per l'intera stagione, e un'elaborazione che si interrompe all'episodio 40 riprende da quell'episodio. I drammi e le serie TV statunitensi e britanniche: episodi di 40 minuti, da dieci a venti e passa a stagione, dialoghi densi pieni di slang con lyrics e testo su schermo mescolati; carica la stagione una volta sola e ogni lingua viene generata insieme; i tag SDH ([door slams], lyrics) vengono eliminati anziché tradotti, in modo che nulla si trasformi in una narrazione che nessuno legge. L'animazione: nomi di attacchi, fazioni e termini inventati arrivano a dozzine e il glossario ne fissa ciascuno in modo che una stagione non finisca mai con una resa diversa a ogni episodio."
  }
 }

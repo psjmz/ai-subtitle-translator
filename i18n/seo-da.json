@@ -24,6 +24,7 @@
   "who": "Undertekstteams, der laver undertekster til en hel sæson på flere sprog, kanaler der distribuerer samme hold af episoder til forskellige markeder, og solotranslatører der vil trykke start én gang og vende tilbage senere.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch flersproget undertekst-oversætter"
+  "jsonldAlt": "Batch flersproget undertekst-oversætter",
+  "use": "Tre typer programmer får mest ud af denne side. Korte dramaer: én til tre minutter pr. afsnit og ofte 80-120 afsnit pr. sæson – filer er der mange af, og hver enkelt er kort, så det svære er aldrig oversættelsen, men pardannelse og distribution. Smid hele serien ind, markér de sprog, du skal bruge, og én gennemgang af køen giver dig et komplet flersproget sæt; hvordan hovedpersonen tiltales, hvad virksomheden hedder, hvilken linje der er et catchphrase – alt sammen fastlåst af en sæsonomfattende ordliste, og en kørsel der stopper ved afsnit 40, genoptages fra det afsnit. Amerikanske og britiske dramaer og tv-serier: 40 minutters afsnit, ti til tyve stykker pr. sæson, tæt dialog fuld af slang med sangtekster [lyrics] og on-screen-tekst blandet sammen – upload sæsonen én gang, og alle sprog kommer ud på en gang; SDH-tags ([door slams], sangtekster [lyrics]) slettes i stedet for at blive oversat, så intet bliver til fortælling, som ingen læser. Animation: angrebsnavne, fraktioner og opfundne termer kommer i snesevis, og ordlisten fastlåser hver eneste af dem, så en sæson aldrig ender med en ny gengivelse for hvert afsnit."
  }
 }

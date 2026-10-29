@@ -38,7 +38,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.413';
+const ASSET_VER = '0.9.414';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -3118,6 +3118,7 @@ const SEO_MULTILANG = {
     intro: "整季字幕一次拖进来，勾选要出的语言，点一次开始。工具把「集 × 语言」排成一条队列，一种语言跑完再跑下一种，最后打成一个 zip。",
     feat: "多语批量最容易失控的地方是并发：20 集 × 5 语同时发出去，几百个请求一起挤进来，服务端的排队就被架空了，先发的和后发的混在一起，谁也说不清哪一格跑没跑完。所以这里刻意做成一条队列：同一时刻只有一个批次在跑，一种语言跑完才换下一种。进度按「集 + 语言」分开记在本机，跑到第 3 集断了，重新打开页面导入同一批文件，它会从断掉的那一批接着做，已经译完的不会重发一次。跨集最容易露馅的是人名地名：一套剧 20 集分开翻，同一个人会被译成三种写法，所以术语表在这一页是独立的一栏，上传一次、全季共用，开跑前还会告诉你这批字幕里命中了多少条。关掉页面任务会立刻停下，不会在后台继续烧额度。",
     who: "一次要给整季剧配多语字幕的字幕组、把同一批片子分发到多个语区的搬运 up 主，以及手上压着一堆剧集、只想点一次就等结果的独立译者。",
+    use: "按片子类型说三句。短剧：一集一两分钟、一部常常八十到一百二十集，文件多、每集短，麻烦不在翻译本身而在配对与分发——整部一次拖进来，勾好要出的几种语言，队列跑完一轮就是一套多语成品；主角怎么称呼、公司叫什么、哪句是口头禅，靠全季共用的术语表钉住，断在第 40 集也能从那集接着跑。美剧与电视剧：一集四十分钟、一季十几到二十几集，句子密、口语多，还夹着歌词和屏幕字——整季上传后一次出多语，SDH 标注（[门响]、♪ 歌词）只删不译，不会把「[door slams]」翻成一句没人看的旁白。动画：招式名、组织名、自造词一集能冒出一串，全部丢进术语表锁死，同一季里不会一集一个译法。",
     siteName: "随心字幕 AI", jsonldName: "随心字幕 AI", jsonldAlt: "Batch Multi-language Subtitle Translator"
   },
   'zh-TW': {
@@ -3127,6 +3128,7 @@ const SEO_MULTILANG = {
     intro: "整季字幕一次拖進來，勾選要出的語言，點一次開始。工具把「集 × 語言」排成一條佇列，一種語言跑完再跑下一種，最後打成一個 zip。",
     feat: "多語批次最容易失控的地方是並行：20 集 × 5 語同時送出去，幾百個請求一起擠進來，服務端的排隊就被架空了，先送的和後送的混在一起，誰也說不清哪一格跑沒跑完。所以這裡刻意做成一條佇列：同一時刻只有一個批次在跑，一種語言跑完才換下一種。進度依「集 + 語言」分開記在本機，跑到第 3 集斷了，重新打開頁面匯入同一批檔案，它會從斷掉的那一批接著做，已經譯完的不會重送一次。跨集最容易露餡的是人名地名：一套劇 20 集分開翻，同一個人會被譯成三種寫法，所以術語表在這一頁是獨立的一欄，上傳一次、全季共用，開跑前還會告訴你這批字幕裡命中了多少條。關掉頁面任務會立刻停下，不會在背景繼續燒額度。",
     who: "一次要給整季劇配多語字幕的字幕組、把同一批片子分發到多個語區的搬運 up 主，以及手上壓著一堆劇集、只想點一次就等結果的獨立譯者。",
+    use: "按片子類型說三句。短劇：一集一兩分鐘、一部常常八十到一百二十集，檔案多、每集短，麻煩不在翻譯本身而在配對與分發——整部一次拖進來，勾好要出的幾種語言，佇列跑完一輪就是一套多語成品；主角怎麼稱呼、公司叫什麼、哪句是口頭禪，靠全季共用的術語表釘住，斷在第 40 集也能從那集接著跑。美劇與電視劇：一集四十分鐘、一季十幾到二十幾集，句子密、口語多，還夾著歌詞和螢幕字——整季上傳後一次出多語，SDH 標註（[門響]、♪ 歌詞）只刪不譯，不會把「[door slams]」翻成一句沒人看的旁白。動畫：招式名、組織名、自造詞一集能冒出一串，全部丟進術語表鎖死，同一季裡不會一集一個譯法。",
     siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "Batch Multi-language Subtitle Translator"
   },
   'en': {
@@ -3136,6 +3138,7 @@ const SEO_MULTILANG = {
     intro: "Drop in a whole season at once, tick the target languages, press start. Episodes × languages become one queue: each language runs to the end before the next one begins, and everything is packed into a single zip.",
     feat: "The part that goes wrong in batch translation is concurrency. Twenty episodes times five languages fired at once is hundreds of requests landing together, which quietly defeats the server-side queue — early and late requests interleave and nobody can say which cell actually finished. So this page runs deliberately as one queue: a single batch at a time, one language to completion before the next. Progress is stored per episode and per language on your machine, so if it breaks at episode three you reopen the page, load the same files, and it picks up at that batch without re-sending what is already done. The thing that gives a season away is names: translate twenty episodes separately and the same character ends up spelled three ways. That is why the glossary is its own panel here — upload once, shared by the whole season — and it tells you how many entries actually matched before you start. Close the tab and the task stops immediately instead of burning quota in the background.",
     who: "Subtitle teams captioning a full season into several languages, channels redistributing the same batch of episodes to different markets, and solo translators who would rather press start once and come back later.",
+    use: "Three kinds of shows get the most out of this page. Short dramas: one to three minutes an episode and often 80-120 episodes a run - the files are many and each is short, so the hard part is never the translation but pairing and distribution. Drop the whole series in, tick the languages you need, and one pass of the queue gives you a complete multi-language set; how the lead is addressed, what the company is called, which line is a catchphrase - all pinned by a season-wide glossary, and a run that dies at episode 40 resumes from that episode. US and UK dramas and TV series: 40-minute episodes, ten to twenty-odd per season, dense dialogue full of slang with lyrics and on-screen text mixed in - upload the season once and every language comes out together; SDH tags ([door slams], lyrics) are dropped rather than translated, so nothing turns into narration nobody reads. Animation: attack names, factions and invented terms arrive by the dozen, and the glossary pins every one of them so a season never ends up with a different rendering per episode.",
     siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Batch Multi-language Subtitle Translator"
   }
 };
@@ -6256,6 +6259,8 @@ function seoCopy(page, lang){
     '    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">' + (s.h || s.title) + '</h2>\n' +
     '    <p><strong>' + s.intro + '</strong></p>\n' +
     '    <p style="margin-top:8px;">' + s.feat + '</p>\n' +
+    /* v0.9.414：适用片型（短剧 / 美剧 · 电视剧 / 动画）。没有该字段的语言跳过，不影响其他页。 */
+    (s.use ? '    <p style="margin-top:8px;">' + s.use + '</p>\n' : '') +
     '    <p style="margin-top:8px;">' + s.who + '</p>\n' +
     '  </section>';
 }

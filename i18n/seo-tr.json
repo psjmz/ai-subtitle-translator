@@ -24,6 +24,7 @@
   "who": "Tam bir sezonu birden fazla dile çeviren altyazı ekipleri, aynı bölüm grubunu farklı pazarlara dağıtan kanallar ve başlat tuşuna bir kez basıp sonrasında geri dönmek isteyen bağımsız çevirmenler.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Toplu Çok Dilli Altyazı Çevirmeni"
+  "jsonldAlt": "Toplu Çok Dilli Altyazı Çevirmeni",
+  "use": "Bu sayfadan en çok verim alan üç tür yapım vardır. Kısa diziler: bölüm başına bir ila üç dakika ve genellikle sezon başına 80-120 bölüm; dosya sayısı çok ve her biri kısa olduğundan zor kısım asla çeviri değil, eşleştirme ve dağıtımdır. Tüm seriyi bırakın, ihtiyacınız olan dilleri işaretleyin ve kuyruktaki tek bir işlemle eksiksiz bir çok dilli set elde edin; başrol oyuncusuna nasıl hitap edildiği, şirketin adı, hangi repliğin bir slogan olduğu - hepsi sezon geneli bir sözlükle sabitlenir ve 40. bölümde kesilen bir çalışma o bölümden devam eder. ABD ve İngiltere dizileri: 40 dakikalık bölümler, sezon başına yirmiye yakın bölüm, araya karışan şarkı sözleri (lyrics) ve ekran üzerindeki metinlerle dolu yoğun argolu diyaloglar - sezonu bir kez yükleyin ve her dil aynı anda çıksın; SDH etiketleri ([door slams], lyrics) çevrilmek yerine çıkarılır, böylece kimsenin okumadığı bir dış ses oluşmaz. Animasyonlar: saldırı adları, taraflar ve uydurma terimler ardı arkasına gelir ve sözlük bunların her birini sabitler, böylece bir sezonda asla her bölüm için farklı bir çeviri kullanılmaz."
  }
 }

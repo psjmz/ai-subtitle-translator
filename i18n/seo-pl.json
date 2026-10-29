@@ -24,6 +24,7 @@
   "who": "Zespoły tłumaczące cały sezon na kilka języków, kanały dystrybuujące ten sam pakiet odcinków na różne rynki oraz niezależni tłumacze, którzy wolą raz nacisnąć start i wrócić później.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+  "jsonldAlt": "Batch Multi-language Subtitle Translator",
+  "use": "Trzy rodzaje produkcji najwięcej korzystają z tej strony. Krótkie dramaty: od jednego do trzech minut na odcinek i często 80-120 odcinków na sezon – plików jest dużo, a każdy jest krótki, więc trudnością nie jest nigdy tłumaczenie, lecz parowanie i dystrybucja. Wrzuć cały serial, zaznacz potrzebne języki, a jedno przejście przez kolejkę daje Ci kompletny zestaw wielojęzyczny; jak zwraca się do głównego bohatera, jak nazywa się firma, która linijka to chwytliwy slogan – wszystko przypięte słownikiem dla całego sezonu, a przerwane na 40. odcinku zadanie wznawia się od tego odcinka. Dramaty i seriale z USA i Wielkiej Brytanii: 40-minutowe odcinki, od dziesięciu do ponad dwudziestu na sezon, gęste dialogi pełne slangu z domieszką [lyrics] i tekstów na ekranie – wgraj sezon raz, a każdy język wychodzi jednocześnie; znaczniki SDH ([door slams], [lyrics]) są pomijane zamiast tłumaczyć, więc nic nie zamienia się w narrację, której nikt nie czyta. Animacje: nazwy ataków, frakcje i zmyślone terminy pojawiają się dziesiątkami, a słownik przypina każdy z nich, dzięki czemu sezon nigdy nie kończy się innym tłumaczeniem w każdym odcinku."
  }
 }

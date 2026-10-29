@@ -24,6 +24,7 @@
   "who": "Týmy titulkovačů připravující celou sérii do několika jazyků, kanály distribuující stejné epizody na různé trhy a samostatní překladatelé, kteří chtějí spustit proces jedním kliknutím a vrátit se později.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Dávkový vícejazyčný překladač titulků"
+  "jsonldAlt": "Dávkový vícejazyčný překladač titulků",
+  "use": "Tři typy pořadů z této stránky vytěží nejvíce. Krátké drama: jedna až tři minuty na epizodu a často 80 až 120 epizod na řadu – souborů je mnoho a každý je krátký, takže nejtěžší na tom nikdy není překlad, ale párování a distribuce. Vložte celou sérii, zaškrtněte požadované jazyky a jedním průchodem frontou získáte kompletní vícejazyčnou sadu; jak se oslovuje hlavní hrdina, jak se jmenuje firma, který řádek je hláška – to vše je zafixováno celosezónním glosářem a běh, který selže u 40. epizody, se od této epizody obnoví. Americká a britská dramata a seriály: 40minutové epizody, deset až necelých dvacet na sezónu, hutné dialogy plné slangových výrazů s namíchaným textem písní a textem na obrazovce – nahrajte sérii jednou a každý jazyk vyjde najevo společně; značky SDH ([door slams], lyrics) se spíše vynechávají, než překládají, takže se nic nezmění v komentář, který nikdo nečte. Animace: názvy útoků, frakce a vymyšlené termíny přicházejí po tuctech a glosář každý jeden z nich upevní, takže sezóna nikdy neskončí s jiným zněním v každé epizodě."
  }
 }

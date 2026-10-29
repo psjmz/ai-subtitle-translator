@@ -24,6 +24,7 @@
   "who": "Các đội ngũ làm phụ đề cho cả một mùa phim sang nhiều ngôn ngữ, các kênh phân phối cùng một bộ tập phim tới các thị trường khác nhau, và những dịch giả độc lập thích bấm bắt đầu một lần rồi quay lại sau.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+  "jsonldAlt": "Batch Multi-language Subtitle Translator",
+  "use": "Ba loại chương trình tận dụng tối đa trang này. Phim ngắn: một đến ba phút một tập và thường có 80-120 tập mỗi đợt - các tệp rất nhiều và mỗi tệp đều ngắn, vì vậy phần khó không bao giờ là dịch thuật mà là ghép nối và phân phối. Tải toàn bộ series lên, chọn các ngôn ngữ bạn cần, và một lượt xử lý trong hàng đợi sẽ cho bạn một bộ đa ngôn ngữ hoàn chỉnh; cách gọi nhân vật chính, tên công ty, câu thoại nào là câu cửa miệng - tất cả đều được cố định bằng một bảng thuật ngữ cho cả mùa, và một tiến trình bị dừng ở tập 40 sẽ tiếp tục từ tập đó. Phim truyền hình và series TV của Mỹ và Anh: các tập dài 40 phút, mười đến hơn hai mươi tập mỗi mùa, hội thoại dày đặc đầy tiếng lóng kết hợp với lời bài hát [lyrics] và chữ trên màn hình - tải lên cả mùa một lần và mọi ngôn ngữ sẽ xuất hiện cùng nhau; các thẻ SDH ([door slams], lyrics) được giữ nguyên thay vì dịch, để không có gì biến thành lời dẫn chuyện mà không ai đọc. Hoạt ảnh: tên các đòn tấn công, phe phái và thuật ngữ hư cấu xuất hiện hàng tá, và bảng thuật ngữ ghim chặt từng thuật ngữ để một mùa phim không bao giờ kết thúc với các bản dịch khác nhau giữa các tập."
  }
 }

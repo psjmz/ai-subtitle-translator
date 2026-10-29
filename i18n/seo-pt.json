@@ -24,6 +24,7 @@
   "who": "Equipes de legendagem adaptando uma temporada inteira para vários idiomas, canais redistribuindo o mesmo lote de episódios para diferentes mercados, e tradutores independentes que preferem iniciar uma tarefa uma vez e voltar mais tarde.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Tradutor de Legendas Multilíngue em Lote"
+  "jsonldAlt": "Tradutor de Legendas Multilíngue em Lote",
+  "use": "Três tipos de produções aproveitam ao máximo esta página. Dramas curtos: de um a três minutos por episódio e geralmente de 80 a 120 episódios por temporada — os arquivos são muitos e cada um é curto, portanto a parte difícil nunca é a tradução, mas sim o pareamento e a distribuição. Insira a série inteira, marque os idiomas necessários e uma única passagem na fila gera um conjunto multilíngue completo; como o protagonista é tratado, o nome da empresa, qual fala é um bordão — tudo fixado por um glossário para toda a temporada, e uma execução que falha no episódio 40 é retomada a partir dele. Dramas e séries de TV dos EUA e do Reino Unido: episódios de 40 minutos, de dez a mais de vinte por temporada, diálogos densos cheios de gíria com letras de música e texto na tela misturados — carregue a temporada uma vez e todos os idiomas saem juntos; as legendas SDH ([door slams], lyrics) são omitidas em vez de traduzidas, para que nada vire uma narração que ninguém lê. Animações: nomes de ataques, facções e termos inventados chegam aos aos montes, e o glossário fixa cada um deles para que uma temporada nunca termine com uma tradução diferente por episódio."
  }
 }

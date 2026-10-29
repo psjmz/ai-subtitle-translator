@@ -24,6 +24,7 @@
   "who": "Equipos de subtitulación que adaptan una temporada completa a varios idiomas, canales que redistribuyen el mismo lote de episodios a diferentes mercados y traductores independientes que prefieren pulsar iniciar una vez y volver más tarde.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Traductor de subtítulos multilingüe por lotes"
+  "jsonldAlt": "Traductor de subtítulos multilingüe por lotes",
+  "use": "Tres tipos de programas sacan el máximo partido a esta página. Dramas cortos: de uno a tres minutos por episodio y a menudo de 80 a 120 episodios por temporada; los archivos son muchos y cada uno breve, por lo que lo difícil nunca es la traducción, sino la sincronización y la distribución. Sube toda la serie, marca los idiomas que necesites y una sola pasada por la cola te ofrece un conjunto completo multilingüe; cómo se dirige al protagonista, cómo se llama la empresa, qué línea es un eslogan: todo fijado por un glosario para toda la temporada, y una ejecución que se detiene en el episodio 40 se reanuda a partir de ese episodio. Dramas y series de televisión de EE. UU. y el Reino Unido: episodios de 40 minutos, de diez a más de veinte por temporada, diálogos densos llenos de jerga con [lyrics] y texto en pantalla mezclados; sube la temporada una vez y todos los idiomas salen juntos; las etiquetas SDH ([door slams], [lyrics]) se omiten en lugar de traducirse, para que nada se convierta en una narración que nadie lee. Animación: los nombres de ataques, facciones y términos inventados llegan a docenas, y el glosario fija cada uno de ellos para que una temporada nunca termine con una interpretación diferente por episodio."
  }
 }

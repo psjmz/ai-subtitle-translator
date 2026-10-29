@@ -24,6 +24,7 @@
   "who": "Tekstitystiimit, jotka kääntävät kokonaisia kausia useille kielille, kanavat, jotka jakelevat samoja jaksoja eri markkinoille, sekä yksittäiset kääntäjät, jotka haluavat käynnistää työn kerran ja palata myöhemmin.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Eräpohjainen monikielinen tekstityskääntäjä"
+  "jsonldAlt": "Eräpohjainen monikielinen tekstityskääntäjä",
+  "use": "Tältä sivulta saavat eniten irti kolme ohjelmatyyppiä. Lyhytdraamat: yksi tai kolme minuuttia per jakso ja usein 80–120 jaksoa per tuotantokausi – tiedostoja on paljon ja ne ovat lyhyitä, joten vaikeinta ei ole kääntäminen vaan yhdistäminen ja jakelu. Pudota koko sarja sisään, valitse tarvittavat kielet, ja jonon käsittely kerralla antaa täydellisen monikielisen paketin; miten päähenkilöä puhutellaan, mikä yrityksen nimi on, mikä repliikki on iskulause – kaikki lukitaan kausikohtaisella sanastolla, ja jaksolle 40 pysähtynyt ajo jatkuu siitä jaksosta. Yhdysvaltalaiset ja brittiläiset draamat ja televisiosarjat: 40 minuutin jaksot, kymmenestä kahteenkymmeneen per kausi, tiheää slangia täynnä olevaa dialogia, jossa on sekaisin [lyrics] ja ruututekstiä – lataa kausi kerran ja kaikki kielet valmistuvat yhdessä; SDH-tunnisteet ([door slams], [lyrics]) jätetään pois kääntämisen sijaan, jotta mikään ei muutu kerronnaksi, jota kukaan ei lue. Animaatiot: hyökkäysten nimet, ryhmittymät ja keksityt termit saapuvat tusinoittain, ja sanasto lukitsee ne kaikki, jotta kausi ei päädy tarjoamaan eri käännöstä eri jaksoissa."
  }
 }

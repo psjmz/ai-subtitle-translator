@@ -24,6 +24,7 @@
   "who": "Echipe de subtitrări care adaptează un sezon complet în mai multe limbi, canale care redistribuie același lot de episoade către diferite piețe și traducători independenți care preferă să apese start o singură dată și să revină mai târziu.",
   "siteName": "AI-SRTSub",
   "jsonldName": "AI-SRTSub",
-  "jsonldAlt": "Batch Multi-language Subtitle Translator"
+  "jsonldAlt": "Batch Multi-language Subtitle Translator",
+  "use": "Trei tipuri de producții beneficiază cel mai mult de pe urma acestei pagini. Drame scurte: de la unu la trei minute pe episod și adesea 80-120 de episoade per serie - fișierele sunt multe și fiecare este scurt, așa că partea dificilă nu este niciodată traducerea, ci împerecherea și distribuția. Încărcați întreaga serie, bifați limbile de care aveți nevoie, iar o singură trecere prin coadă vă oferă un set complet în mai multe limbi; cum este adresat personajul principal, cum se numește compania, care replică este un slogan - toate fixate printr-un glosar valabil pentru tot sezonul, iar o rulare oprită la episodul 40 se reia de la acel episod. Drame și seriale TV din SUA și Marea Britanie: episoade de 40 de minute, de la zece la peste douăzeci pe sezon, dialog dens plin de argou, cu versuri și text pe ecran amestecate - încărcați sezonul o singură dată și toate limbile ies împreună; etichetele SDH ([door slams], lyrics) sunt eliminate în loc să fie traduse, astfel încât nimic nu se transformă în narațiune pe care nimeni nu o citește. Animație: denumiri de atacuri, facțiuni și termeni inventați sosesc cu duzina, iar glosarul fixează fiecare dintre acestea, astfel încât un sezon să nu ajungă să aibă o traducere diferită de la un episod la altul."
  }
 }
