@@ -2145,6 +2145,10 @@ let _failWhy = null;
    10-25 实测主翻译页 367 次补救只记到 7 条原因。补救标记单独一份、只让 rt=4 的请求消费，
    条数才对得上「失败了几批」。 */
 let _failWhy4 = null;
+/* v0.9.415：整批重发通道（rt=6）专属的失败原因。与主翻译页同因同改
+   （10-30 排查 Chihuahua 时发现：原因只随补救通道上报，凡是重发后就救回的批次，
+   原因永久丢失 —— 全站 277 次重试只留下 11 条，且 11 个任务每个恰好 1 条）。 */
+let _failWhy6 = null;
 /* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
    → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
    埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
@@ -2231,9 +2235,10 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
       直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
       否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
-      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (rt===6&&_failWhy6)?{fwhy:_failWhy6}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
         if(rt===4) _failWhy4=null; /* v0.9.413：补救标记只让补救请求消费 */
+        if(rt===6) _failWhy6=null; /* v0.9.415：重发标记只让 rt=6 请求消费 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
@@ -3732,14 +3737,19 @@ async function runTranslate(){
       /* v0.9.134：提示词按批定制——只把本批原文里真出现的术语带进 4.5。
          无术语表时直接复用同一份 sys（与旧行为完全一致）。 */
       const sysB = glossSysFor(gBatch, cfg, sys);
-      let ok=false, lastWhy='';
+      let ok=false, lastWhy='', whySent=false;
       for(let attempt=0; attempt<maxTry && !ok; attempt++){
         if(S.stop) break;
         try{
           lastCall=Date.now();
           /* v0.9.400：重发带 rt=6。以前整批重发只落进 batches，后台根本看不出「重发了几次」；
              现在单独进 retryBatch 桶，batches 只统计首批与补译请求。 */
+          /* v0.9.415：重发前把整批失败的原因挂上，由这一发带走。 */
+          if(attempt) _failWhy6 = lastWhy || null;
           const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx, attempt?6:0);
+          /* 必须等请求「成功返回」才作数：网络失败的请求到不了服务端，却已在 mkBody 里
+             把标记吃掉了 —— 不作数才能交给下方补救通道补记。 */
+          if(attempt) whySent=true;
           /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
              理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
              模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +
@@ -3966,7 +3976,11 @@ async function runTranslate(){
         let consecFail=0, drifted=[];
         /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留）
            v0.9.380：改用补救专属标记 _failWhy4 —— 全局那个会被并发的 cue 重译请求先一步吃掉。 */
-        _failWhy4 = lastWhy || null;
+        /* v0.9.415：走过 rt=6 重发的批次，原因已经上报过了，这里必须收手 ——
+           否则同一个失败会被记两遍，把失败率凭空撑大一倍。
+           没走过重发的（例如整批直接 pace 超时）才由补救通道补记。 */
+        _failWhy4 = whySent ? null : (lastWhy || null);
+        _failWhy6 = null;   /* 本批没发出去的请求，标记不许残留到下一批 */
         /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
            此前会连同这些组一起补救，白白多烧请求（语义与上方 v0.9.77「整批已有结果则跳过」一致）。 */
         const pend = gBatch.filter(g=>!res.has(g.gno));

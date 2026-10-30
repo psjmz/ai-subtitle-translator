@@ -2343,6 +2343,13 @@ let _failWhy = null;
    先一步吃掉（mkBody 里谁先发谁消费），10-25 实测 367 次补救只记到 7 条原因。
    补救标记单独一份、只让 rt=4 的请求消费，条数才对得上「失败了几批」。 */
 let _failWhy4 = null;
+/* v0.9.415：拆半重发通道（rt=6）专属的失败原因。
+   此前原因只随补救通道（rt=4）上报 —— 10-30 排查 Chihuahua（1108 条 / 25 批 / 12 次重试）
+   时发现账本里只有 1 条 failNet：3 个批次整批失败，其中 2 个拆半后就救回了、根本没走到
+   补救通道，这两次的原因永久丢失。全站 277 次重试因此只留下 11 条原因（4%），
+   且 11 个任务每个恰好 1 条，无一例外 —— 正是「一次性标记」的指纹。
+   拆半标记单独一份，只让 rt=6 的请求消费。 */
+let _failWhy6 = null;
 /* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
    → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
    埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
@@ -2433,9 +2440,10 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
       直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
       否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
-      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (rt===6&&_failWhy6)?{fwhy:_failWhy6}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
         if(rt===4) _failWhy4=null; /* v0.9.380：补救标记只让补救请求消费 */
+        if(rt===6) _failWhy6=null; /* v0.9.415：拆半标记只让拆半请求消费 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
@@ -4016,7 +4024,7 @@ async function runTranslate(){
       /* v0.9.134：提示词按批定制——只把本批原文里真出现的术语带进 4.5。
          无术语表时直接复用同一份 sys（与旧行为完全一致）。 */
       const sysB = glossSysFor(gBatch, cfg, sys);
-      let ok=false, lastWhy='';
+      let ok=false, lastWhy='', whySent=false;
       for(let attempt=0; attempt<maxTry && !ok; attempt++){
         if(S.stop) break;
         try{
@@ -4036,10 +4044,17 @@ async function runTranslate(){
             const mid=Math.ceil(gBatch.length/2);
             const halves=[gBatch.slice(0,mid), gBatch.slice(mid)].filter(h=>h.length>0);
             let acc=null, halfErr=null;
+            /* v0.9.415：把整批失败的原因交给本轮第一个半批请求带走。
+               放在循环内、continue 之前 —— 两个半批串联，只有第一个能消费到它。 */
+            _failWhy6 = lastWhy || null;
             for(const h of halves){
               if(S.stop) break;
               try{
                 acc=mergeBatchOut(acc, await translateBatch(effBase,effKey,effModel,h,bi+1,totalB,sysB,null,ctx,6));
+                /* 位置必须在请求「成功返回」之后，不能放在发之前：mkBody 是在 fetch 之前
+                   构造 meta 并清标记的，网络失败的那个请求根本到不了服务端，标记却已被吃掉。
+                   放在这里，网络失败的半批就留不住原因，下方补救通道才会接手补记。 */
+                whySent=true;
               }catch(e2){
                 halfErr=e2;
                 /* 排队超时是真该停的信号：外层的 catch 会把它翻成 S.stop，但要等这轮拆半跑完。
@@ -4303,7 +4318,11 @@ async function runTranslate(){
         let consecFail=0, drifted=[];
         /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留）
            v0.9.380：改用补救专属标记 _failWhy4 —— 全局那个会被并发的 cue 重译请求先一步吃掉。 */
-        _failWhy4 = lastWhy || null;
+        /* v0.9.415：走过拆半的批次，原因已经由 rt=6 请求上报过了，这里必须收手 ——
+           否则同一个失败会在 fail* 里被记两遍，把失败率凭空撑大一倍。
+           没走过拆半的（例如整批直接 pace 超时）才由补救通道补记。 */
+        _failWhy4 = whySent ? null : (lastWhy || null);
+        _failWhy6 = null;   /* 本批没发出去的半批请求，标记不许残留到下一批 */
         /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
            此前会连同这些组一起补救，白白多烧请求（语义与上方 v0.9.77「整批已有结果则跳过」一致）。 */
         const pend = gBatch.filter(g=>!res.has(g.gno));
